@@ -1,0 +1,91 @@
+# read in manually filled in final data script and calculate any/all derived
+# columns from this
+
+# all species are aligned to the Australian Plant Census in "apc_nosubsp", 
+# names from tree manually matched to these in "tree_names", ditto names from
+# range data in "range_names"
+
+euc_traits_nosubsp <- cache_RDS("data_output/euc_traits_nosubsp.csv", 
+                                read_function = readr::read_csv,
+                                save_function = write_csv, function() {
+
+# eucalypt trait data ----
+
+# assembled by text mining using regular expressions to extract data from 
+# descriptions on EUCLID (https://apps.lucidcentral.org/euclid/text/intro/index.html, 
+# for bud and fruit dimensions, flower colour, number of buds and most max height) 
+# combined with AusTraits data (max height). 
+
+euc_traits_nosubsp <- readr::read_csv("data_input/euc_traits_nosubsp_filled.csv")
+
+# Data have been manually checked with missing values filled in and outlying 
+# values corrected. Species names have been matched to the Australian Plant
+# Census using APCalign and then by manually cross checking taxa with the APC 
+# to align taxonomy of EUCLID, plant occurrences and ranges, and the 
+# Thornhill et al. phylogeny.
+                                  
+# derived columns -----
+# calculate bud size and fruit size as mean(min, max)(length x width)
+euc_traits_nosubsp <- euc_traits_nosubsp %>%
+  dplyr::mutate(budsize_mm2 = 10*(rowMeans(dplyr::select(euc_traits_nosubsp, budlength_min, budlength_max), na.rm = TRUE))*10*(rowMeans(dplyr::select(euc_traits_nosubsp, budwidth_min, budwidth_max), na.rm = TRUE))) %>%
+  dplyr::mutate(frtsize_mm2 = 10*(rowMeans(dplyr::select(euc_traits_nosubsp, frtlength_min, frtlength_max), na.rm = TRUE))*10*(rowMeans(dplyr::select(euc_traits_nosubsp, frtwidth_min, frtwidth_max), na.rm = TRUE)))
+summary(euc_traits_nosubsp$budsize_mm2)
+summary(euc_traits_nosubsp$frtsize_mm2) # smallest fruit smaller than smallest bud? that's odd, maybe artefact of taking mean of min and max??
+                                  
+# replace NaNs (from missing data) with NA
+euc_traits_nosubsp$budsize_mm2[is.nan(euc_traits_nosubsp$budsize_mm2)] <- NA
+euc_traits_nosubsp$frtsize_mm2[is.nan(euc_traits_nosubsp$frtsize_mm2)] <- NA
+                                  
+# create binary colourful/not colourful variable from flower colour
+euc_traits_nosubsp$colour_binary <- euc_traits_nosubsp$colours_all
+euc_traits_nosubsp$colour_binary <- gsub("white_cream", "0", euc_traits_nosubsp$colour_binary)
+euc_traits_nosubsp$colour_binary <- gsub("yellow|green|pink|red|orange", "1", euc_traits_nosubsp$colour_binary)
+euc_traits_nosubsp$colour_binary <- gsub("1 1 1", "1", euc_traits_nosubsp$colour_binary)
+euc_traits_nosubsp$colour_binary <- gsub("1 1", "1", euc_traits_nosubsp$colour_binary)
+euc_traits_nosubsp$colour_binary <- gsub("1 0 1|1 0|0 1", "0.5", euc_traits_nosubsp$colour_binary)
+table(euc_traits_nosubsp$colour_binary)
+                                  
+# take mean of buds per umbel max and min
+euc_traits_nosubsp$bud_n_mean <- rowMeans(dplyr::select(euc_traits_nosubsp, 
+                                                        bud_n_max, bud_n_min), 
+                                          na.rm = TRUE)
+hist(euc_traits_nosubsp$bud_n_mean)
+                                  
+                                  # now tack on leaf area data also
+                                  leaf_dim <- readr::read_csv("data_output/leaf_dim_nosub.csv") %>%
+                                    dplyr::select(apc_nosubsp, leafarea_mm2)
+                                  
+                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
+                                    dplyr::left_join(leaf_dim, by = "apc_nosubsp")
+                                  rm(leaf_dim)
+                                  
+                                  # add in inflorescence type!
+                                  inflotype_nosub <- readr::read_csv("data_input/inflotype_nosub_matchedAPC_checked.csv")
+                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
+                                    dplyr::left_join(inflotype_nosub, by = "apc_nosubsp")
+                                  rm(inflotype_nosub)
+                                  
+                                  # AND tack on umbel size as bud size * mean buds per umbel
+                                  euc_traits_nosubsp$umbelsz_mm2 <- euc_traits_nosubsp$bud_n_mean*euc_traits_nosubsp$budsize_mm2
+                                  
+                                  # add in data on species' mean environment (phosphorus, temperature, precipitation
+                                  # flower-visiting bat species richness and flower-visiting bird species richness)
+                                  source("scripts/data_prep/prep_envdata.R")
+                                  # join onto final data
+                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
+                                    dplyr::left_join(spmean_env, by = "range_names")
+                                  rm(spmean_env)
+                                  
+                                  # add in data on species flowering time from EUCLID and AusTraits
+                                  species_flowering_time <- readr::read_csv("data_output/EUCLID_AusTraits_species_flowering_time.csv")
+                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
+                                    dplyr::left_join(species_flowering_time, by = "apc_nosubsp")
+                                  rm(species_flowering_time)
+                                  
+                                  # write data to folder so it can be cached
+                                  readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
+                                  
+                                  euc_traits_nosubsp
+                                })
+
+euc_traits_nosubsp$colour_binary <- factor(euc_traits_nosubsp$colour_binary)
