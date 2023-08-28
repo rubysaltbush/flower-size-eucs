@@ -16,12 +16,12 @@ spmean_env <- cache_RDS("data_output/euc_species_mean_env.csv",
                         save_function = write_csv, function() {
 
 #### 1 - PHOSPHORUS ####                        
-# read in 3 rasters of available phosphorus across Australia
+# read in 3 rasters of available phosphorus across Australia (90m resolution)
 # from the Soil and Landscape Grid of Australia (SLGA)
 # https://esoil.io/TERNLandscapes/Public/Pages/SLGA/index.html
 # and take 1 mean of top 30cm, where P most available to plants
 
-#### available soil phosphorus ####
+# available soil phosphorus #
 # read in 3 rasters downloaded from SLGA using terra stack function
 # FILES IN DATA CACHE AS TOO LARGE FOR GITHUB
 avp <- terra::rast(list.files("data_cache/AVP_EV_N_P_AU_TRN_N_20220826/", 
@@ -131,14 +131,17 @@ batranges <- batranges[!(names(batranges) %in% c("Dobsonia_magna_outlier",
                                                  "Pteropus_poliocephalus_outlier", 
                                                  "Pteropus_scapulatus_outlier"))]
 
-# generate blank raster at finer scale and broader extent than eucalypt ranges
-
-
-
+# generate blank raster at finer scale than eucalypt ranges raster
+# 20km*20km, each cell with unique integer value
+# to intersect with bat and bird ranges
+blankrast <- terra::rast(matrix(1:39975, 205),
+                         extent = terra::ext(rangerast$cell_id),
+                         crs = terra::crs(rangerast$cell_id))
+plot(blankrast)
 
 batrange_cells <- dplyr::tibble()
 for(name in names(batranges)) {
-  temp <- terra::extract(x = rangerast$cell_id, y = batranges[[name]])
+  temp <- terra::extract(x = blankrast, y = batranges[[name]])
   temp$species <- name
   batrange_cells <- rbind(batrange_cells, temp)
 }
@@ -146,17 +149,17 @@ rm(temp, name)
 # filter out NAs and remove unnecessary ID column
 batrange_cells <- batrange_cells %>%
   dplyr::select(-ID) %>%
-  dplyr::filter(!(is.na(cell_id)))
+  dplyr::filter(!(is.na(lyr.1)))
 
 # prepare map figure of flower-visiting bat species richness across Aus
 # calculate bat richness per grid cell 
 batrichness <- batrange_cells %>%
-  dplyr::group_by(cell_id) %>%
+  dplyr::group_by(lyr.1) %>%
   dplyr::summarise(richness = n())
 summary(batrichness)
 
 # turn into batrichness raster
-rbatrichness <- terra::subst(rangerast$cell_id, from = batrichness$cell_id, 
+rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1, 
                              to = batrichness$richness, others = 0)
 names(rbatrichness) <- "richness"
 plot(rbatrichness)
@@ -194,7 +197,7 @@ rm(batranges, batrange_cells)
 # now calculate mean richness of bats in landcsape per species
 # get raster back
 # turn into batrichness raster
-rbatrichness <- terra::subst(rangerast$cell_id, from = batrichness$cell_id, 
+rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1, 
                              to = batrichness$richness, others = 0)
 names(rbatrichness) <- "richness"
 rm(batrichness)
@@ -222,7 +225,7 @@ species_meanbatrich <- occurrences %>%
 
 # check it out
 summary(species_meanbatrich$meanbatrich)
-hist(species_meanbatrich$meanbatrich)
+hist(species_meanbatrich$meanbatrich) # more 0s with finer resolution
 rm(rbatrichness, euc_occurr_mean_batr)
 
 #### 5 - BIRD RICHNESS #### 
@@ -242,7 +245,7 @@ rm(rbatrichness, euc_occurr_mean_batr)
 # separate shapefile to be read in later to create a raster of diversity of
 # flower-visiting bird species across Australia
 
-# list of flower visiting Australian bird species ----
+#* list flower-visiting Australian bird species ----
 
 # Table 6 The main flower visiting families of birds (after Proctor & Yeo 1973). 
 # Bird family                               Distribution
@@ -423,9 +426,10 @@ ausflowervisitingbirds <- ausflowervisitingbirds %>%
 # export full list in case needed
 readr::write_csv(ausflowervisitingbirds, "data_output/aus_flower_visiting_birds.csv")
 
-# filter ranges shapefile ----
+#* filter ranges shapefile ----
 
 # read in massive shapefile for all bird species ranges across Australia
+# ONLY AVAILABLE FROM CACHED DATA
 # and filter down to only flower-visiting taxa
 
 ausbirdranges <- sf::st_read("data_cache/BOTW_ausonly.shp")
@@ -450,9 +454,6 @@ mismatches <- ausflowervisitingbirds[!(ausflowervisitingbirds$species %in% ausbi
 ausbirdranges <- ausbirdranges %>%
   dplyr::filter(sci_name %in% ausflowervisitingbirds$species)
 
-# write this to file to use for raster calculation later!
-sf::st_write(ausbirdranges, "data_cache/ausflowervisitingbirdranges.shp")
-
 # export one shapefile for each species' range to use next
 ausbirdranges %>%
   group_by(sci_name) %>%
@@ -467,7 +468,7 @@ ausbirdranges %>%
 
 rm(ausbirdrangestaxa, ausbirdranges, ausbirds, ausflowervisitingbirds, mismatches)
 
-# prep raster flower-visiting bird diversity ----
+#* prep raster flower-visiting bird diversity ----
 
 # first read in range maps for Australian flower visiting bird species
 # as per above assembled species list
@@ -486,15 +487,15 @@ for(name in names(birdranges)) {
 rm(name)
 
 # test plotting a few different bird ranges to check shapefiles
-plot(rangerast$cell_id)
+plot(blankrast)
 plot(birdranges$`Acanthagenys rufogularis`, add = TRUE) # central Aus
 plot(birdranges$`Xanthotis flaviventer`, add = TRUE) # tropical north Qld
 # looks good!
 
-# now, extract range rast cell_id for each bat range map
+# now, extract blank 20x20km raster cell ID for each bird range map
 birdrange_cells <- tibble::tibble()
 for(name in names(birdranges)) {
-  temp <- terra::extract(x = rangerast$cell_id, y = birdranges[[name]])
+  temp <- terra::extract(x = blankrast, y = birdranges[[name]])
   temp$species <- name
   birdrange_cells <- rbind(birdrange_cells, temp)
 }
@@ -502,17 +503,17 @@ rm(temp, name)
 # filter out NAs and remove unnecessary ID column
 birdrange_cells <- birdrange_cells %>%
   dplyr::select(-ID) %>%
-  dplyr::filter(!(is.na(cell_id)))
+  dplyr::filter(!(is.na(lyr.1)))
 
 # prepare map figure of flower-visiting bird species richness across Aus
 # calculate fl-vis bird richness per grid cell 
 birdrichness <- birdrange_cells %>%
-  dplyr::group_by(cell_id) %>%
+  dplyr::group_by(lyr.1) %>%
   dplyr::summarise(richness = n())
 summary(birdrichness)
 
 # turn into birdrichness raster
-rbirdrichness <- terra::subst(rangerast$cell_id, from = birdrichness$cell_id, 
+rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1, 
                               to = birdrichness$richness, others = 0)
 names(rbirdrichness) <- "richness"
 plot(rbirdrichness)
@@ -538,7 +539,7 @@ rm(birdranges, birdrange_cells)
 # now calculate mean richness of fl-vis birds in landcsape per species
 # get raster back
 # turn into batrichness raster
-rbirdrichness <- terra::subst(rangerast$cell_id, from = birdrichness$cell_id, 
+rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1, 
                               to = birdrichness$richness, others = 0)
 names(rbirdrichness) <- "richness"
 rm(birdrichness)
@@ -567,7 +568,7 @@ species_meanbirdrich <- occurrences %>%
 # check it out
 summary(species_meanbirdrich$meanbirdrich)
 hist(species_meanbirdrich$meanbirdrich)
-rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr, aus)
+rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr, aus, blankrast)
 
 #### FINAL SP MEAN ENV ####
 

@@ -69,16 +69,10 @@ euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::left_join(spmean_env, by = "range_names")
 rm(spmean_env)
                                   
-                                  # add in data on species flowering time from EUCLID and AusTraits
-                                  species_flowering_time <- readr::read_csv("data_output/EUCLID_AusTraits_species_flowering_time.csv")
-                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
-                                    dplyr::left_join(species_flowering_time, by = "apc_nosubsp")
-                                  rm(species_flowering_time)
-                                  
-                                  # write data to folder so it can be cached
-                                  readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
-                                  
-                                  euc_traits_nosubsp
-                                })
+# write data to folder so it can be cached
+readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
+
+euc_traits_nosubsp
+})
 
 euc_traits_nosubsp$colour_binary <- factor(euc_traits_nosubsp$colour_binary)
