@@ -1,8 +1,8 @@
 # uncomment below if you need to install packages
 #source("scripts/install_dependencies.R")
 library(tidyverse)
-library(austraits) # not sure if necessary? used for data but not using now
-library(APCalign) # not sure if necessary? used for data but not using now
+#library(austraits) # not sure if necessary? used for data but not using now
+#library(APCalign) # not sure if necessary? used for data but not using now
 library(ape)
 # insert packages for GLMM here
 library(sf)
@@ -24,7 +24,7 @@ rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells
 occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv")
 
 # Thornhill et al. (2019) phylogeny, dated and with tips cleaned
-treeML1 <- ape::read.tree("data_output/Eucalypts_ML1_dated_r8s.phy")
+treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
 # tidied, species level eucalypt trait and environment data with taxonomic name resolution
 source("scripts/final_data.R")

@@ -30,7 +30,9 @@ euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::mutate(budsize_mm2 = 10*(rowMeans(dplyr::select(euc_traits_nosubsp, budlength_min, budlength_max), na.rm = TRUE))*10*(rowMeans(dplyr::select(euc_traits_nosubsp, budwidth_min, budwidth_max), na.rm = TRUE))) %>%
   dplyr::mutate(frtsize_mm2 = 10*(rowMeans(dplyr::select(euc_traits_nosubsp, frtlength_min, frtlength_max), na.rm = TRUE))*10*(rowMeans(dplyr::select(euc_traits_nosubsp, frtwidth_min, frtwidth_max), na.rm = TRUE)))
 summary(euc_traits_nosubsp$budsize_mm2)
-summary(euc_traits_nosubsp$frtsize_mm2) # smallest fruit smaller than smallest bud? that's odd, maybe artefact of taking mean of min and max??
+summary(euc_traits_nosubsp$frtsize_mm2) 
+# smallest fruit (Euc. raveretiana) smaller than smallest bud (Euc. acroleuca)
+# have checked and this tracks with species descriptions
                                   
 # replace NaNs (from missing data) with NA
 euc_traits_nosubsp$budsize_mm2[is.nan(euc_traits_nosubsp$budsize_mm2)] <- NA
@@ -51,30 +53,21 @@ euc_traits_nosubsp$bud_n_mean <- rowMeans(dplyr::select(euc_traits_nosubsp,
                                           na.rm = TRUE)
 hist(euc_traits_nosubsp$bud_n_mean)
                                   
-                                  # now tack on leaf area data also
-                                  leaf_dim <- readr::read_csv("data_output/leaf_dim_nosub.csv") %>%
-                                    dplyr::select(apc_nosubsp, leafarea_mm2)
+# add in leaf area extracted from EUCLID leaf dimensions with 2/3 correction
+# leaf area will be supplementary to flower size analyses
+leaf_dim <- readr::read_csv("data_input/leaf_dim_nosub.csv") %>%
+  dplyr::select(apc_nosubsp, leafarea_mm2)
+euc_traits_nosubsp <- euc_traits_nosubsp %>%
+  dplyr::left_join(leaf_dim, by = "apc_nosubsp")
+rm(leaf_dim)
                                   
-                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
-                                    dplyr::left_join(leaf_dim, by = "apc_nosubsp")
-                                  rm(leaf_dim)
-                                  
-                                  # add in inflorescence type!
-                                  inflotype_nosub <- readr::read_csv("data_input/inflotype_nosub_matchedAPC_checked.csv")
-                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
-                                    dplyr::left_join(inflotype_nosub, by = "apc_nosubsp")
-                                  rm(inflotype_nosub)
-                                  
-                                  # AND tack on umbel size as bud size * mean buds per umbel
-                                  euc_traits_nosubsp$umbelsz_mm2 <- euc_traits_nosubsp$bud_n_mean*euc_traits_nosubsp$budsize_mm2
-                                  
-                                  # add in data on species' mean environment (phosphorus, temperature, precipitation
-                                  # flower-visiting bat species richness and flower-visiting bird species richness)
-                                  source("scripts/data_prep/prep_envdata.R")
-                                  # join onto final data
-                                  euc_traits_nosubsp <- euc_traits_nosubsp %>%
-                                    dplyr::left_join(spmean_env, by = "range_names")
-                                  rm(spmean_env)
+# add in data on species' mean environment (phosphorus, temperature, precipitation
+# flower-visiting bat species richness and flower-visiting bird species richness)
+source("scripts/data_prep/prep_envdata.R")
+# join onto final data
+euc_traits_nosubsp <- euc_traits_nosubsp %>%
+  dplyr::left_join(spmean_env, by = "range_names")
+rm(spmean_env)
                                   
                                   # add in data on species flowering time from EUCLID and AusTraits
                                   species_flowering_time <- readr::read_csv("data_output/EUCLID_AusTraits_species_flowering_time.csv")
