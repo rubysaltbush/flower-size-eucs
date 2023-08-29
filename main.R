@@ -27,4 +27,9 @@ occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv")
 treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
 # tidied, species level eucalypt trait and environment data with taxonomic name resolution
-source("scripts/final_data.R")
+source("scripts/data_prep/final_data.R")
+
+#### ANALYSES ####
+
+source("scripts/analysis/glmm.R")
+
