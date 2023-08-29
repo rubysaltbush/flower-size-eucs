@@ -31,17 +31,29 @@ hist(euc_traits_nosubsp$meanbatrich)
 hist(euc_traits_nosubsp$meanbirdrich)
 # normalish
 
-# need to check for correlation?
+#* check correlation ----
 correlation <- cor(euc_traits_nosubsp[,22:26],
                    use = "pairwise.complete.obs")
-correlation
 par(mfrow = c(1, 1))
 corrplot::corrplot(correlation, type = "upper", order = "hclust",  
                    col = RColorBrewer::brewer.pal(n = 10, name = "RdYlBu"),
                    tl.cex = 0.8, tl.col = "black")
-# hmm as suspected quite high correlation between bird richness and bat richness (0.68)
-# and both of these and mean soil available phosphorus (bird-0.62, bat-0.46)
+# as suspected correlation between bird richness and bat richness (0.68)
+# and both these and mean soil available phosphorus (~bird=0.62, ~bat=0.46)
+correlation
+# all correlations are below 0.7 and all are independently interesting so will
+# leave in for now but double check later if this is appropriate
+rm(correlation)
 
-# does this mean I should remove any of these? hope not, they're all part of 
-# the story
+# The full model formula will look like this:
+  
+  # Fixed effects for trend: 
+  #  budsize_mm2 ~ meanMAT + meanMAP + meanAVP + meanbirdrich + meanbatrich
+  
+  # Random effects for phylogenetic relatedness
+#              + ape::corBrownian(phy = tree_budsz, form = ~spp)
+
+#### identify distributions and link functions ####
+
+# how???
 
