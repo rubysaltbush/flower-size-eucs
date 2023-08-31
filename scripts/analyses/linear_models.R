@@ -1,7 +1,6 @@
-# run Generalised Linear Mixed-effects Model to assess whether the distributions 
-# of eucalypt flower (bud) size and eucalypt flower colourfulness are shaped
-# more by biotic or abiotic environmental variables (or a mixture??)
-# and whether this holds true for the evolution of these traits as well
+# run linear models (multiple regression and glm) to assess whether the  
+# distributions of eucalypt flower (bud) size and eucalypt flower colourfulness 
+# are shaped more by biotic or abiotic environmental variabless
 
 #### examine data ####
 

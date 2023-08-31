@@ -31,5 +31,5 @@ source("scripts/data_prep/final_data.R")
 
 #### ANALYSES ####
 
-source("scripts/analysis/glmm.R")
+source("scripts/analysis/linear_models.R")
 
