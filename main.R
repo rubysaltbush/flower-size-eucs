@@ -34,3 +34,6 @@ source("scripts/data_prep/final_data.R")
 
 source("scripts/analysis/linear_models.R")
 
+# NEXT - PGLS???
+#      - evolutionary correlation between colour and size? phylogenetic logistic regression?
+#      - produce final figures, maps etc
