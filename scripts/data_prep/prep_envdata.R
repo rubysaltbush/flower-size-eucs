@@ -194,15 +194,17 @@ ggsave("figures/maps/flvis bat species richness Aus.png", width = 11, height = 6
 # export as png for now
 rm(batranges, batrange_cells)
 
-# now calculate mean richness of bats in landcsape per species
+# as many zeroes, will just use bat richness as binary i.e. bats or no bats
 # get raster back
 # turn into batrichness raster
 rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1, 
                              to = batrichness$richness, others = 0)
 names(rbatrichness) <- "richness"
 rm(batrichness)
+# reduce raster to 1 (bats present) or 0 (no bats in area)
+rbatrichness <- terra::ifel(rbatrichness$richness >=1, 1, 0)
 
-# extract batrichness value for each cleaned eucalypt occurrence
+# extract bat presence value for each cleaned eucalypt occurrence
 # first make occurrences spatial
 euc_occurr <- terra::vect(occurrences, geom = c("longitude", "latitude"), 
                           crs = "epsg:4326")
@@ -213,20 +215,20 @@ plot(rbatrichness)
 plot(euc_occurr, add = TRUE)
 
 # now extract!
-euc_occurr_mean_batr <- terra::extract(rbatrichness, euc_occurr)
+euc_occurr_mean_batp <- terra::extract(rbatrichness, euc_occurr)
 
 # and join back to data frame
-occurrences$batrich <- euc_occurr_mean_batr[, -1]
+occurrences$batpresence <- euc_occurr_mean_batp[, -1]
 
 # now summarise by species!
-species_meanbatrich <- occurrences %>%
+species_meanbatpres <- occurrences %>%
   dplyr::group_by(speciesLevelUpdated) %>%
-  dplyr::summarise(meanbatrich = mean(batrich, na.rm = TRUE))
+  dplyr::summarise(meanbatpres = mean(batpresence, na.rm = TRUE))
 
 # check it out
-summary(species_meanbatrich$meanbatrich)
-hist(species_meanbatrich$meanbatrich) # more 0s with finer resolution
-rm(rbatrichness, euc_occurr_mean_batr)
+summary(species_meanbatpres$meanbatpres)
+hist(species_meanbatpres$meanbatpres) # more 0s with finer resolution
+rm(rbatrichness, euc_occurr_mean_batp)
 
 #### 5 - BIRD RICHNESS #### 
 
@@ -576,14 +578,14 @@ rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr, aus, blankrast)
 spmean_env <- species_meanAVP %>%
   dplyr::left_join(species_meanMAT, by = "speciesLevelUpdated") %>%
   dplyr::left_join(species_meanMAP, by = "speciesLevelUpdated") %>%
-  dplyr::left_join(species_meanbatrich, by = "speciesLevelUpdated") %>%
+  dplyr::left_join(species_meanbatpres, by = "speciesLevelUpdated") %>%
   dplyr::left_join(species_meanbirdrich, by = "speciesLevelUpdated") %>%
   dplyr::rename(range_names = speciesLevelUpdated)
 
 # export this to use in final data!!!
 readr::write_csv(spmean_env, "data_output/euc_species_mean_env.csv")
 
-rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatrich,
+rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatpres,
    species_meanbirdrich, euc_occurr, aus)
 
 })

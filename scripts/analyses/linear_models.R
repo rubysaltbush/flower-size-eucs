@@ -8,25 +8,29 @@
 
 # first, main response variable, bud size (mm2)
 hist(euc_traits_nosubsp$budsize_mm2)
-# extreme left-biased distribution, what about log transformation?
+# extreme right-skewed distribution, what about log transformation?
 hist(log(euc_traits_nosubsp$budsize_mm2))
-# still a bit left-biased but fairly normal
+# still a bit right-skewed but fairly normal
 
 # second response variable is flower colourfulness, binary
 plot(euc_traits_nosubsp$colour_binary)
 table(euc_traits_nosubsp$colour_binary)
-# way more 0s than 1s, and 28 0.5s (exclude? or treat as ordinal?)
+# way more 0s than 1s, and 28 0.5s
+# will try classifying 0.5 (mixed white_cream and colourful flowers) as 1s for now
+euc_traits_nosubsp$colour_fullbinary <- gsub("0.5", "1", euc_traits_nosubsp$colour_binary)
+table(euc_traits_nosubsp$colour_fullbinary)
 
 #* predictor variables ----
 
 hist(euc_traits_nosubsp$meanMAT)
 #roughly normal
 hist(euc_traits_nosubsp$meanMAP)
-# left-biased
+# right-skewed
 hist(euc_traits_nosubsp$meanAVP)
-# left-biased
+# right-skewed
 hist(euc_traits_nosubsp$meanbatrich)
-# many many 0s
+plot(log(euc_traits_nosubsp$budsize_mm2) ~ euc_traits_nosubsp$meanbatrich)
+# many many 0s - best to classify as binary (bats or no bats)
 hist(euc_traits_nosubsp$meanbirdrich)
 # normalish
 
