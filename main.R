@@ -4,11 +4,12 @@ library(tidyverse)
 #library(austraits) # not sure if necessary? used for data but not using now
 #library(APCalign) # not sure if necessary? used for data but not using now
 library(ape)
-# insert packages for GLMM here
 library(sf)
 library(terra)
 library(ggpubr)
 library(RColorBrewer)
+library(GGally)
+library(car)
 
 # function to cache pre-prepared R data. If RDS already in cache will read data
 source("scripts/functions/cache_RDS.R")

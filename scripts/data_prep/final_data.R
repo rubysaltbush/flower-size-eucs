@@ -46,6 +46,9 @@ euc_traits_nosubsp$colour_binary <- gsub("1 1 1", "1", euc_traits_nosubsp$colour
 euc_traits_nosubsp$colour_binary <- gsub("1 1", "1", euc_traits_nosubsp$colour_binary)
 euc_traits_nosubsp$colour_binary <- gsub("1 0 1|1 0|0 1", "0.5", euc_traits_nosubsp$colour_binary)
 table(euc_traits_nosubsp$colour_binary)
+# try classifying 0.5 (mixed white_cream and colourful flowers) as 1s for now
+euc_traits_nosubsp$colour_fullbinary <- gsub("0.5", "1", euc_traits_nosubsp$colour_binary)
+table(euc_traits_nosubsp$colour_fullbinary)
                                   
 # take mean of buds per umbel max and min
 euc_traits_nosubsp$bud_n_mean <- rowMeans(dplyr::select(euc_traits_nosubsp, 
@@ -68,6 +71,10 @@ source("scripts/data_prep/prep_envdata.R")
 euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::left_join(spmean_env, by = "range_names")
 rm(spmean_env)
+hist(euc_traits_nosubsp$meanbatpres)
+# bat presence best to classify as binary (bats or no bats)
+# will have 50% cutoff for now
+euc_traits_nosubsp$meanbatpres_bin <- ifelse(euc_traits_nosubsp$meanbatpres > 0.5, 1, 0)
                                   
 # write data to folder so it can be cached
 readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
