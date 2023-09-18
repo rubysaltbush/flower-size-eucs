@@ -36,6 +36,7 @@ mean_avp <- terra::app(avp, fun = mean)
 # how does this look?
 plot(mean_avp)
 # generally higher along east coast but a bit variable
+# CHANGE HERE TO EXPORT MAP IMAGE IN CASE NEEDED
 
 # export this raster to use in analysis!
 terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff")
@@ -74,6 +75,7 @@ rm(mean_avp, avp, euc_occurr_mean_avp, euc_occurr)
 # Precipitation calculate MAT and MAP per species as well
 
 # for now use Bree's provided MAT and MAP (from CHELSA, checking with Bree which version etc)
+# UPDATE THIS!! checking with Rach which source to use, maybe BIOCLIM?
 
 # summarise MAT by species!
 species_meanMAT <- occurrences %>%
