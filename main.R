@@ -1,7 +1,7 @@
 # uncomment below if you need to install packages
 #source("scripts/install_dependencies.R")
 library(tidyverse)
-#library(austraits) # not sure if necessary? used for data but not using now
+library(austraits) # not sure if necessary? used for data but not using now
 #library(APCalign) # not sure if necessary? used for data but not using now
 library(ape)
 library(sf)
