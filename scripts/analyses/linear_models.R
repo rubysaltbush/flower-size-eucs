@@ -34,7 +34,7 @@ hist(euc_traits_nosubsp$meanbirdrich)
 
 # visually check relationships between predictor and response variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(17, 20, 24, 25, 23, 26, 28), 
+                columns = c(17, 20, 24, 25, 23, 27, 28), 
                 columnLabels = c("Bud size",
                                  "Flower colour",
                                  "Temperature", 
@@ -42,20 +42,22 @@ GGally::ggpairs(data = euc_traits_nosubsp,
                                  "Phosphorus",
                                  "Bird richness",
                                  "Bat presence")) + theme_pubr()
+ggsave("figures/regressions/full pairwise correlation plot.pdf", 
+       width = 13, height = 10)
 # lots going on - looks like bud size best correlated with bat presence, then
-# soil phosphorus, then bird richness
-# and flower colour bats then birds then phosphorus
-# temperature and precipitation low correlation for both bud size and flower colour
+# soil phosphorus, then bird richness then precipitation
+# and flower colour bats then birds then phosphorus then precipitation
+# temperature no correlation for both bud size and flower colour
 
 # check for collinearity among predictor variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(24, 25, 23, 26, 28), 
+                columns = c(24, 25, 23, 27, 28), 
                 columnLabels = c("Temperature", 
                                  "Precipitation",
                                  "Phosphorus",
                                  "Bird richness",
                                  "Bat presence")) + theme_pubr()
-ggsave("figures/pairwise correlation plot.pdf", width = 9, height = 5.6)
+ggsave("figures/regressions/predictors pairwise correlation plot.pdf", width = 9, height = 5.6)
 # some correlation between mean bird richness and bat presence (0.69)
 # and birds/bats and mean soil available phosphorus (~bird = 0.62, ~bat = 0.54)
 # all correlations are below 0.7 and all are independently interesting so will
@@ -84,64 +86,67 @@ summary(multiple_regressions$budsize_full)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.1797 -0.5680 -0.0637  0.4630  3.5927 
+# -2.2424 -0.5540 -0.0629  0.4557  3.6427 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)   4.2683854  0.2131402  20.026  < 2e-16 ***
-#   meanMAT       0.0020393  0.0078031   0.261  0.79389    
-# meanMAP       0.0002000  0.0001036   1.930  0.05394 .  
-# meanAVP      -0.0150678  0.0051273  -2.939  0.00339 ** 
-#   meanbirdrich -0.0043171  0.0060995  -0.708  0.47929    
-# meanbatpres  -0.7034861  0.1042282  -6.749 2.91e-11 ***
+# (Intercept)   3.842e+00  2.880e-01  13.341  < 2e-16 ***
+#   meanMAT       2.357e-02  1.031e-02   2.286   0.0225 *  
+#   meanMAP       2.567e-05  1.212e-04   0.212   0.8323    
+# meanAVP      -7.612e-03  6.274e-03  -1.213   0.2254    
+# meanbirdrich  1.111e-03  6.611e-03   0.168   0.8666    
+# meanbatpres  -8.647e-01  1.437e-01  -6.017 2.73e-09 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.865 on 774 degrees of freedom
+# Residual standard error: 0.8642 on 774 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1947,	Adjusted R-squared:  0.1895 
-# F-statistic: 37.43 on 5 and 774 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1963,	Adjusted R-squared:  0.1911 
+# F-statistic:  37.8 on 5 and 774 DF,  p-value: < 2.2e-16
 
-# bat presence/absence and soil phosphorus explain most variation, precipitation
-# ~maybe some amount but p>0.05
+# bat presence/absence explains most variation, also ???temperature???
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multiple_regressions$budsize_full)
 # meanMAT      meanMAP      meanAVP meanbirdrich  meanbatpres 
-# 1.112974     1.057996     1.777219     2.473326     2.402253 
-# VIF below 2.5 for all variables, no serious multicollinearity 
+# 2.171117     1.869797     2.666469     2.911299     4.574500 
+# VIF now above 4.5 for bat presence, generally recommended threshold is 5-10
+# but possible some effect of multicollinearity??
 
 #** final model ----
 
 # run again, removing non-significant factors from regression
-multiple_regressions$budsize_final <- lm(log(budsize_mm2) ~ meanAVP + meanbatpres,
+multiple_regressions$budsize_final <- lm(log(budsize_mm2) ~ meanMAT + meanbatpres,
                                          data = euc_traits_nosubsp)
 summary(multiple_regressions$budsize_final)
 
 # Call:
-#   lm(formula = log(budsize_mm2) ~ meanAVP + meanbatpres, data = euc_traits_nosubsp)
+#   lm(formula = log(budsize_mm2) ~ meanMAT + meanbatpres, data = euc_traits_nosubsp)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.1240 -0.5667 -0.0722  0.4583  3.6055 
+# -2.2430 -0.5436 -0.0735  0.4449  3.6697 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  4.367849   0.063897  68.358  < 2e-16 ***
-#   meanAVP     -0.017231   0.004671  -3.689 0.000241 ***
-#   meanbatpres -0.703526   0.081678  -8.613  < 2e-16 ***
+# (Intercept)  3.687986   0.130821  28.191  < 2e-16 ***
+#   meanMAT      0.030331   0.007098   4.273 2.16e-05 ***
+#   meanbatpres -0.924739   0.068153 -13.569  < 2e-16 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8659 on 777 degrees of freedom
+# Residual standard error: 0.8633 on 777 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:   0.19,	Adjusted R-squared:  0.1879 
-# F-statistic: 91.12 on 2 and 777 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1947,	Adjusted R-squared:  0.1927 
+# F-statistic: 93.95 on 2 and 777 DF,  p-value: < 2.2e-16
+
+# well this is frankly confusing, going to have to double check all my 
+# environmental predictors
 
 # triple check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multiple_regressions$budsize_final)
-# meanAVP meanbatpres 
-# 1.472267    1.472267 
+# meanMAT meanbatpres 
+# 1.031094    1.031094 
 
 #* flower colourfulness ----
 
@@ -165,29 +170,29 @@ summary(multiple_regressions$flcolour_full)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)  -1.1082355  0.9251137  -1.198   0.2309    
-# meanMAT       0.0325679  0.0306552   1.062   0.2881    
-# meanMAP       0.0004911  0.0004031   1.218   0.2230    
-# meanAVP      -0.0422988  0.0226345  -1.869   0.0617 .  
-# meanbirdrich -0.0316837  0.0267977  -1.182   0.2371    
-# meanbatpres  -1.9521996  0.4724624  -4.132  3.6e-05 ***
+# (Intercept)  -2.674e+00  1.492e+00  -1.792 0.073141 .  
+# meanMAT       1.070e-01  5.181e-02   2.065 0.038945 *  
+#   meanMAP       2.999e-05  5.446e-04   0.055 0.956088    
+# meanAVP      -1.218e-02  2.706e-02  -0.450 0.652469    
+# meanbirdrich -1.416e-02  3.105e-02  -0.456 0.648406    
+# meanbatpres  -2.643e+00  7.644e-01  -3.458 0.000544 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 561.46  on 777  degrees of freedom
-# Residual deviance: 477.74  on 772  degrees of freedom
+# Residual deviance: 475.65  on 772  degrees of freedom
 # (20 observations deleted due to missingness)
-# AIC: 489.74
+# AIC: 487.65
 # 
 # Number of Fisher Scoring iterations: 6
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multiple_regressions$flcolour_full)
 # meanMAT      meanMAP      meanAVP meanbirdrich  meanbatpres 
-# 1.128953     1.079208     1.201261     1.423437     1.854147 
-# VIF below 1.9 for all variables, no serious multicollinearity 
+# 2.386535     1.949238     1.618947     1.774548     4.758462 
+# VIF now above 4.7 for bat presence, possible slight multicollinearity ?
 
 #** final model ----
 
@@ -195,28 +200,29 @@ car::vif(multiple_regressions$flcolour_full)
 
 # using glm with binomial distribution for logistic regression
 multiple_regressions$flcolour_final <- glm(colour_fullbinary ~ 
-                                          meanbatpres,
+                                          meanMAT + meanbatpres,
                                           data = euc_traits_nosubsp,
                                           family = binomial())
 summary(multiple_regressions$flcolour_final)
 
 # Call:
-#   glm(formula = colour_fullbinary ~ meanbatpres, family = binomial(), 
+#   glm(formula = colour_fullbinary ~ meanMAT + meanbatpres, family = binomial(), 
 #       data = euc_traits_nosubsp)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)  -1.1802     0.1309  -9.014  < 2e-16 ***
-#   meanbatpres  -2.4600     0.3411  -7.212 5.52e-13 ***
+# (Intercept) -3.30373    0.70082  -4.714 2.43e-06 ***
+#   meanMAT      0.12332    0.03958   3.115  0.00184 ** 
+#   meanbatpres -2.91522    0.40666  -7.169 7.57e-13 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 565.74  on 778  degrees of freedom
-# Residual deviance: 489.59  on 777  degrees of freedom
+# Residual deviance: 479.06  on 776  degrees of freedom
 # (19 observations deleted due to missingness)
-# AIC: 493.59
+# AIC: 485.06
 # 
 # Number of Fisher Scoring iterations: 6
 
