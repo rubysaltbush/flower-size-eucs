@@ -111,42 +111,45 @@ car::vif(multiple_regressions$budsize_full)
 # meanMAT      meanMAP      meanAVP meanbirdrich  meanbatpres 
 # 2.171117     1.869797     2.666469     2.911299     4.574500 
 # VIF now above 4.5 for bat presence, generally recommended threshold is 5-10
-# but possible some effect of multicollinearity??
 
 #** final model ----
 
-# run again, removing non-significant factors from regression
-multiple_regressions$budsize_final <- lm(log(budsize_mm2) ~ meanMAT + meanbatpres,
+# run again, removing non-significant factors from regression and 
+# including interaction (as can't think why else temperature would 
+# be significant predictor?)
+multiple_regressions$budsize_final <- lm(log(budsize_mm2) ~ meanbatpres*meanMAT,
                                          data = euc_traits_nosubsp)
 summary(multiple_regressions$budsize_final)
 
 # Call:
-#   lm(formula = log(budsize_mm2) ~ meanMAT + meanbatpres, data = euc_traits_nosubsp)
+#   lm(formula = log(budsize_mm2) ~ meanbatpres * meanMAT, data = euc_traits_nosubsp)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.2430 -0.5436 -0.0735  0.4449  3.6697 
+# -2.2836 -0.5439 -0.0720  0.4474  3.6585 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  3.687986   0.130821  28.191  < 2e-16 ***
-#   meanMAT      0.030331   0.007098   4.273 2.16e-05 ***
-#   meanbatpres -0.924739   0.068153 -13.569  < 2e-16 ***
-#   ---
+# (Intercept)          3.99896    0.30929  12.929  < 2e-16 ***
+#   meanbatpres         -1.32383    0.36609  -3.616 0.000318 ***
+#   meanMAT              0.01217    0.01784   0.682 0.495302    
+# meanbatpres:meanMAT  0.02303    0.02076   1.110 0.267547    
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8633 on 777 degrees of freedom
+# Residual standard error: 0.8632 on 776 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1947,	Adjusted R-squared:  0.1927 
-# F-statistic: 93.95 on 2 and 777 DF,  p-value: < 2.2e-16
-
-# well this is frankly confusing, going to have to double check all my 
-# environmental predictors
+# Multiple R-squared:  0.196,	Adjusted R-squared:  0.1929 
+# F-statistic: 63.06 on 3 and 776 DF,  p-value: < 2.2e-16
 
 # triple check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multiple_regressions$budsize_final)
-# meanMAT meanbatpres 
-# 1.031094    1.031094 
+# there are higher-order terms (interactions) in this model
+# consider setting type = 'predictor'; see ?vif
+# meanbatpres             meanMAT meanbatpres:meanMAT 
+# 29.760168            6.515787           39.573433 
+
+# probs have to figure out better way to double check above
 
 #* flower colourfulness ----
 
@@ -192,39 +195,39 @@ summary(multiple_regressions$flcolour_full)
 car::vif(multiple_regressions$flcolour_full)
 # meanMAT      meanMAP      meanAVP meanbirdrich  meanbatpres 
 # 2.386535     1.949238     1.618947     1.774548     4.758462 
-# VIF now above 4.7 for bat presence, possible slight multicollinearity ?
+# VIF still under 5 for all, multicollinearity unlikely
 
 #** final model ----
 
 # run again, removing non-significant factors from regression
 
 # using glm with binomial distribution for logistic regression
-multiple_regressions$flcolour_final <- glm(colour_fullbinary ~ 
-                                          meanMAT + meanbatpres,
+multiple_regressions$flcolour_final <- glm(colour_fullbinary ~ meanbatpres*meanMAT,
                                           data = euc_traits_nosubsp,
                                           family = binomial())
 summary(multiple_regressions$flcolour_final)
 
 # Call:
-#   glm(formula = colour_fullbinary ~ meanMAT + meanbatpres, family = binomial(), 
+#   glm(formula = colour_fullbinary ~ meanbatpres * meanMAT, family = binomial(), 
 #       data = euc_traits_nosubsp)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept) -3.30373    0.70082  -4.714 2.43e-06 ***
-#   meanMAT      0.12332    0.03958   3.115  0.00184 ** 
-#   meanbatpres -2.91522    0.40666  -7.169 7.57e-13 ***
+# (Intercept)         -1.61462    0.92214  -1.751 0.079953 .  
+# meanbatpres         -8.13605    2.28186  -3.566 0.000363 ***
+#   meanMAT              0.02634    0.05318   0.495 0.620433    
+# meanbatpres:meanMAT  0.25233    0.10141   2.488 0.012836 *  
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 565.74  on 778  degrees of freedom
-# Residual deviance: 479.06  on 776  degrees of freedom
+# Residual deviance: 472.11  on 775  degrees of freedom
 # (19 observations deleted due to missingness)
-# AIC: 485.06
+# AIC: 480.11
 # 
-# Number of Fisher Scoring iterations: 6
+# Number of Fisher Scoring iterations: 7
 
 #### graph results ####
 
