@@ -110,7 +110,7 @@ summary(multiple_regressions$budsize_full)
 car::vif(multiple_regressions$budsize_full)
 # meanMAT      meanMAP      meanAVP meanbirdrich  meanbatpres 
 # 2.171117     1.869797     2.666469     2.911299     4.574500 
-# VIF now above 4.5 for bat presence, generally recommended threshold is 5-10
+# VIF below 4.6 for all, generally recommended threshold is 5-10
 
 #** final model ----
 
@@ -149,7 +149,7 @@ car::vif(multiple_regressions$budsize_final)
 # meanbatpres             meanMAT meanbatpres:meanMAT 
 # 29.760168            6.515787           39.573433 
 
-# probs have to figure out better way to double check above
+# can safely ignore high VIF as this is just due to interaction term in model
 
 #* flower colourfulness ----
 
@@ -158,6 +158,9 @@ car::vif(multiple_regressions$budsize_final)
 # The full model formula will look like this:
 
 #  colour_fullbinary ~ meanMAT + meanMAP + meanAVP + meanbirdrich + meanbatpres
+
+# make colour binary numeric
+euc_traits_nosubsp$colour_fullbinary <- as.numeric(euc_traits_nosubsp$colour_fullbinary)
 
 # using glm with binomial distribution for logistic regression
 multiple_regressions$flcolour_full <- glm(colour_fullbinary ~ 
@@ -228,6 +231,14 @@ summary(multiple_regressions$flcolour_final)
 # AIC: 480.11
 # 
 # Number of Fisher Scoring iterations: 7
+
+# double check for multicollinearity using Variance Inflation Factor (VIF)
+car::vif(multiple_regressions$flcolour_final)
+# there are higher-order terms (interactions) in this model
+# consider setting type = 'predictor'; see ?vif
+# meanbatpres             meanMAT meanbatpres:meanMAT 
+# 43.207886            3.032475           52.402661 
+# can safely ignore high VIF as this is just due to interaction term in model
 
 #### graph results ####
 
