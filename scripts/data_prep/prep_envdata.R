@@ -7,14 +7,18 @@
 #                     5) flower-visiting bird species richness
 
 # resulting species mean file has been cached because original data too large to
-# share over GitHub etc, but below script shows steps used to extract data
-
-# MULTIPLE FILES MISSING FROM CURRENT DATA CACHE, COPY ACROSS WEDNESDAY
+# share over GitHub, but below script shows steps used to extract data
 
 spmean_env <- cache_RDS("data_output/euc_species_mean_env.csv", 
                         read_function = readr::read_csv,
                         save_function = write_csv, function() {
 
+# read in cleaned euc herbarium occurrences from Bree-Anne Laugier Kitchener
+occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv") 
+occurrences <- occurrences %>%
+  dplyr::select(range_names = speciesLevelUpdated, latitude, longitude, year,
+                locality)
+                          
 #### 1 - PHOSPHORUS ####                        
 # read in 3 rasters of available phosphorus across Australia (90m resolution)
 # from the Soil and Landscape Grid of Australia (SLGA)
@@ -55,7 +59,8 @@ plot(aus, add = TRUE)
 dev.off()
 
 # export this raster to use in analysis!
-terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff")
+terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff",
+                   overwrite = TRUE)
 # because it's huge have to write to cache, can't sync via GitHub
 
 # now calculate mean AVP for each species by intersecting occurrences
@@ -76,14 +81,14 @@ occurrences$mean_AVP <- euc_occurr_mean_avp[, -1]
 
 # now summarise by species!
 species_meanAVP <- occurrences %>%
-  dplyr::group_by(speciesLevelUpdated) %>%
+  dplyr::group_by(range_names) %>%
   dplyr::summarise(meanAVP = mean(mean_AVP, na.rm = TRUE))
 
 # check it out
 summary(species_meanAVP$meanAVP)
 hist(species_meanAVP$meanAVP)
 
-rm(mean_avp, euc_occurr_mean_avp, euc_occurr)
+rm(mean_avp, euc_occurr_mean_avp)
 
 #### 2,3 - TEMPERATURE AND PRECIPITATION ####  
 
@@ -110,9 +115,6 @@ plot(aus, add = TRUE)
 dev.off()
 
 # extract MAT value for each cleaned eucalypt occurrence
-# first make occurrences spatial
-euc_occurr <- terra::vect(occurrences, geom = c("longitude", "latitude"), 
-                          crs = crs(mat))
 # check it out
 plot(euc_occurr, add = TRUE)
 
@@ -123,8 +125,9 @@ occurrences$mat_chelsav2 <- euc_occurr_mean_MAT[, -1]
 
 # summarise MAT by species!
 species_meanMAT <- occurrences %>%
-  dplyr::group_by(speciesLevelUpdated) %>%
+  dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAT = mean(mat_chelsav2, na.rm = TRUE))
+summary(species_meanMAT$meanMAT)
 hist(species_meanMAT$meanMAT)
 
 rm(mat, euc_occurr_mean_MAT)
@@ -155,8 +158,9 @@ occurrences$map_chelsav2 <- euc_occurr_mean_MAP[, -1]
 
 # summarise MAP by species!
 species_meanMAP <- occurrences %>%
-  dplyr::group_by(speciesLevelUpdated) %>%
+  dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAP = mean(map_chelsav2, na.rm = TRUE))
+summary(species_meanMAP$meanMAP)
 hist(species_meanMAP$meanMAP)
 
 rm(euc_occurr_mean_MAP, map)
@@ -237,28 +241,28 @@ rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1,
                              to = batrichness$richness, others = 0)
 names(rbatrichness) <- "richness"
 plot(rbatrichness, main = "Flower-visiting bat species richness", box = FALSE)
+# change aus outline projection to match raster
+aus <- terra::project(aus, crs(rangerast$cell_id))
+plot(aus, add = TRUE)
 # save raster as output
 terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.tif",
                    overwrite = TRUE)
+
 # then have to convert this back to df to plot with ggplot
 # tried plotting in base R, resolution very bad for some reason
 rbatrichness <- as.data.frame(rbatrichness, xy = TRUE) %>%
   na.omit()
 head(rbatrichness)
-
-# outline of Aus for plotting
-# change aus outline projection to match raster
-aus <- terra::project(aus, crs(rangerast$cell_id))
-# convert aus to sf for easy plotting
+# convert aus to sf for ggplot plotting
 aus <- sf::st_as_sf(aus)
 
 # plot using ggplot and viridis colour scale with Aus coastline
 pdf("figures/maps/aus_mean_flower-visiting_bat_richness.pdf", width = 10, height = 10)
 ggplot() +
   geom_tile(data = rbatrichness, aes(x = x, y = y, fill = richness, colour = richness)) +
-  scale_fill_viridis_c() +
-  scale_colour_viridis_c() +
-  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "grey") +
+  scale_fill_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
+  scale_colour_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
+  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
   theme_void() +
   labs(fill = "Flower-visiting bat\nspecies richness", colour = "Flower-visiting bat\nspecies richness")
 dev.off()
@@ -289,7 +293,7 @@ occurrences$batpresence <- euc_occurr_mean_batp[, -1]
 
 # now summarise by species!
 species_meanbatpres <- occurrences %>%
-  dplyr::group_by(speciesLevelUpdated) %>%
+  dplyr::group_by(range_names) %>%
   dplyr::summarise(meanbatpres = mean(batpresence, na.rm = TRUE))
 
 # check it out
@@ -411,10 +415,10 @@ flowervisitingbirds <- tibble(species = c("Acanthagenys rufogularis",
 flowervisitingbirds$family <- "Meliphagidae"
 
 flowervisitingbirds <- dplyr::bind_rows(flowervisitingbirds, 
-                                        data_frame(species = "Nectarinia jugularis",
+                                        tibble(species = "Nectarinia jugularis",
                                                    family = "Nectariniidae"))
 flowervisitingbirds <- dplyr::bind_rows(flowervisitingbirds, 
-                                        data_frame(species = c("Cyclopsitta diophthalma", 
+                                        tibble(species = c("Cyclopsitta diophthalma", 
                                                                "Glossopsitta concinna",
                                                                "Parvipsitta porphyrocephala",
                                                                "Parvipsitta pusilla", 
@@ -424,7 +428,7 @@ flowervisitingbirds <- dplyr::bind_rows(flowervisitingbirds,
                                                    family = "Psittacidae"))
 
 flowervisitingbirds <- dplyr::bind_rows(flowervisitingbirds, 
-                                        data_frame(species = c("Zosterops tenuirostris", # Norfolk Island
+                                        tibble(species = c("Zosterops tenuirostris", # Norfolk Island
                                                                "Zosterops natalis", # Christmas Island
                                                                "Zosterops luteus",
                                                                "Zosterops lateralis"),
@@ -498,7 +502,7 @@ readr::write_csv(ausflowervisitingbirds, "data_output/aus_flower_visiting_birds.
 #* filter ranges shapefile ----
 
 # read in massive shapefile for all bird species ranges across Australia
-# ONLY AVAILABLE FROM CACHED DATA
+# Birds of the World by Birdlife International
 # and filter down to only flower-visiting taxa
 
 ausbirdranges <- sf::st_read("data_cache/BOTW_ausonly.shp")
@@ -533,9 +537,8 @@ ausbirdranges %>%
                 ~st_write(obj = .x, 
                           dsn = paste0("data_cache/ausflvisbirdliferanges/", 
                                        .y, 
-                                       ".shp"))))
-
-# NOT SURE WHY BUT ABOVE THROWS ERROR!
+                                       ".shp"),
+                          append = FALSE)))
 
 rm(ausbirdrangestaxa, ausbirdranges, ausflowervisitingbirds, mismatches)
 
@@ -600,9 +603,9 @@ head(rbirdrichness)
 pdf("figures/maps/aus_mean_flower-visiting_bird_richness.pdf", width = 10, height = 10)
 ggplot() +
   geom_tile(data = rbirdrichness, aes(x = x, y = y, fill = richness, colour = richness)) +
-  scale_fill_viridis_c() +
-  scale_colour_viridis_c() +
-  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "grey") +
+  scale_fill_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
+  scale_colour_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
+  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
   theme_void() +
   labs(fill = "Flower-visiting bird\nspecies richness", colour = "Flower-visiting bird\nspecies richness")
 dev.off()
@@ -629,7 +632,7 @@ occurrences$birdrich <- euc_occurr_mean_fvbirdr[, -1]
 
 # now summarise by species!
 species_meanbirdrich <- occurrences %>%
-  dplyr::group_by(speciesLevelUpdated) %>%
+  dplyr::group_by(range_names) %>%
   dplyr::summarise(meanbirdrich = mean(birdrich, na.rm = TRUE))
 
 # check it out
@@ -641,16 +644,18 @@ rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr, aus, blankrast)
 
 # join all together and rename column
 spmean_env <- species_meanAVP %>%
-  dplyr::left_join(species_meanMAT, by = "speciesLevelUpdated") %>%
-  dplyr::left_join(species_meanMAP, by = "speciesLevelUpdated") %>%
-  dplyr::left_join(species_meanbatpres, by = "speciesLevelUpdated") %>%
-  dplyr::left_join(species_meanbirdrich, by = "speciesLevelUpdated") %>%
-  dplyr::rename(range_names = speciesLevelUpdated)
+  dplyr::left_join(species_meanMAT, by = "range_names") %>%
+  dplyr::left_join(species_meanMAP, by = "range_names") %>%
+  dplyr::left_join(species_meanbatpres, by = "range_names") %>%
+  dplyr::left_join(species_meanbirdrich, by = "range_names")
 
 # export this to use in final data!!!
 readr::write_csv(spmean_env, "data_output/euc_species_mean_env.csv")
 
+# export eucalypt herbarium records with associated climate and pollinator data
+readr::write_csv(occurrences, "data_output/occurrence_data_with_environment.csv")
+
 rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatpres,
-   species_meanbirdrich)
+   species_meanbirdrich, occurrences)
 
 })

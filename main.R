@@ -21,9 +21,6 @@ rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells
                   taxa = readr::read_csv("data_input/euc_raster/aus_100x100_taxa.csv"),
                   cell_taxa = readr::read_csv("data_input/euc_raster/aus_100x100_cell_taxa.csv"))
 
-# cleaned euc herbarium occurrences from Bree-Anne Laugier Kitchener
-occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv")
-
 # Thornhill et al. (2019) phylogeny, dated and with tips cleaned
 treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
