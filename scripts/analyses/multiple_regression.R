@@ -1,4 +1,4 @@
-# run linear models (multiple regression and glm) to assess whether the  
+# run multiple regression models (least squares and glm) to assess whether the  
 # distributions of eucalypt flower (bud) size and eucalypt flower colourfulness 
 # are shaped more by biotic or abiotic environmental variabless
 

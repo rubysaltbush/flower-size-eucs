@@ -649,6 +649,13 @@ spmean_env <- species_meanAVP %>%
   dplyr::left_join(species_meanbatpres, by = "range_names") %>%
   dplyr::left_join(species_meanbirdrich, by = "range_names")
 
+# add in median longitude of each eucalypt species
+medianlong <- occurrences %>%
+  dplyr::group_by(range_names) %>%
+  dplyr::summarise(medianlong = median(longitude, na.rm = TRUE))
+spmean_env <- spmean_env %>%
+  dplyr::left_join(medianlong, by = "range_names")
+
 # export this to use in final data!!!
 readr::write_csv(spmean_env, "data_output/euc_species_mean_env.csv")
 
@@ -656,6 +663,6 @@ readr::write_csv(spmean_env, "data_output/euc_species_mean_env.csv")
 readr::write_csv(occurrences, "data_output/occurrence_data_with_environment.csv")
 
 rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatpres,
-   species_meanbirdrich, occurrences)
+   species_meanbirdrich, medianlong, occurrences)
 
 })
