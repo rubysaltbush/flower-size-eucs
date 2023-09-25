@@ -37,6 +37,9 @@ summary(euc_traits_nosubsp$frtsize_mm2)
 # replace NaNs (from missing data) with NA
 euc_traits_nosubsp$budsize_mm2[is.nan(euc_traits_nosubsp$budsize_mm2)] <- NA
 euc_traits_nosubsp$frtsize_mm2[is.nan(euc_traits_nosubsp$frtsize_mm2)] <- NA
+
+# given right skew will log transform bud size for all analyses
+euc_traits_nosubsp$logbudsize_mm2 <- log(euc_traits_nosubsp$budsize_mm2)
                                   
 # create binary colourful/not colourful variable from flower colour
 euc_traits_nosubsp$colour_binary <- euc_traits_nosubsp$colours_all
@@ -115,7 +118,7 @@ summary(lflm)
 car::residualPlot(lflm)
 qqnorm(lflm$residuals)
 qqline(lflm$residuals)
-# look roughly okay?
+# look okay
 
 # export pretty plot to include in supp. mat.
 ggplot(leafarea, aes(x = log(meanleafarea_mm2), y = log(leafarea_mm2))) +

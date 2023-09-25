@@ -31,7 +31,7 @@ source("scripts/data_prep/final_data.R")
 
 source("scripts/analysis/multiple_regression.R")
 
-source("scripts/analysis/phylogenetic_least_squares_regression.R")
+source("scripts/analysis/phylogenetic_ls_regression.R")
 
 # NEXT - PGLS???
 #      - evolutionary correlation between colour and size? phylogenetic logistic regression?
