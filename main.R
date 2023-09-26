@@ -3,6 +3,7 @@
 library(tidyverse)
 library(austraits)
 library(ape)
+library(phytools)
 library(sf)
 library(terra)
 library(ggpubr)
@@ -28,6 +29,9 @@ treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 source("scripts/data_prep/final_data.R")
 
 #### ANALYSES AND FIGURES ####
+
+# standard colours for plots
+source("scripts/my_colours.R")
 
 # main analysis, multiple regressions
 source("scripts/analyses/multiple_regression.R")
