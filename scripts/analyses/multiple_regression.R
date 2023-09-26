@@ -78,7 +78,7 @@ ggsave("figures/regressions/predictors pairwise correlation plot.pdf", width = 9
 
 #### run models ####
 
-multiple_regressions <- list()
+multi_reg <- list()
 
 #* leaf area abiotic ----
 
@@ -90,10 +90,10 @@ multiple_regressions <- list()
 
 #  log(leaf_area) ~ meanMAT + meanMAP + meanAVP
 
-multiple_regressions$leafarea_abiotic <- lm(log(leafarea_mm2) ~ 
+multi_reg$leafarea_abiotic <- lm(log(leafarea_mm2) ~ 
                                               meanMAT + meanMAP + meanAVP, #abiotic
                                             data = euc_traits_nosubsp)
-summary(multiple_regressions$leafarea_abiotic)
+summary(multi_reg$leafarea_abiotic)
 
 # Call:
 #   lm(formula = log(leafarea_mm2) ~ meanMAT + meanMAP + meanAVP, 
@@ -118,7 +118,7 @@ summary(multiple_regressions$leafarea_abiotic)
 # F-statistic: 89.51 on 3 and 782 DF,  p-value: < 2.2e-16
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
-car::vif(multiple_regressions$leafarea_abiotic)
+car::vif(multi_reg$leafarea_abiotic)
 # meanMAT  meanMAP  meanAVP 
 # 1.408954 1.472960 1.796042 
 # VIF under 1.8 for all, multicollinearity unlikely
@@ -129,10 +129,10 @@ car::vif(multiple_regressions$leafarea_abiotic)
 # will increase positively with species mean temp, precip and phosphorus
 # not including birds or bats as no predicted relationships
 
-multiple_regressions$budsize_abiotic <- lm(logbudsize_mm2 ~ 
+multi_reg$budsize_abiotic <- lm(logbudsize_mm2 ~ 
                                              meanMAT + meanMAP + meanAVP, #abiotic
                                            data = euc_traits_nosubsp)
-summary(multiple_regressions$budsize_abiotic)
+summary(multi_reg$budsize_abiotic)
 
 # Call:
 #   lm(formula = logbudsize_mm2 ~ meanMAT + meanMAP + meanAVP, data = euc_traits_nosubsp)
@@ -156,18 +156,18 @@ summary(multiple_regressions$budsize_abiotic)
 # F-statistic: 40.25 on 3 and 776 DF,  p-value: < 2.2e-16
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
-car::vif(multiple_regressions$budsize_abiotic)
+car::vif(multi_reg$budsize_abiotic)
 # meanMAT  meanMAP  meanAVP 
 # 1.412562 1.469958 1.798264 
 # VIF under 1.8 for all, multicollinearity unlikely
 
 #* bud size full model ----
 
-multiple_regressions$budsize_full <- lm(logbudsize_mm2 ~ 
+multi_reg$budsize_full <- lm(logbudsize_mm2 ~ 
                                           meanMAT + meanMAP + meanAVP + #abiotic
                                           meanbirdrich + meanbatpres_bin, #biotic
                                         data = euc_traits_nosubsp)
-summary(multiple_regressions$budsize_full)
+summary(multi_reg$budsize_full)
 
 # Call:
 #   lm(formula = logbudsize_mm2 ~ meanMAT + meanMAP + meanAVP + meanbirdrich + 
@@ -196,7 +196,7 @@ summary(multiple_regressions$budsize_full)
 # bat presence/absence explains most variation, also phosphorus but small effect
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
-car::vif(multiple_regressions$budsize_full)
+car::vif(multi_reg$budsize_full)
 # meanMAT         meanMAP         meanAVP    meanbirdrich meanbatpres_bin 
 # 1.914214        1.913569        2.493547        2.647623        3.836827 
 # VIF below 3.85 for all, generally recommended threshold is 5-10
@@ -204,12 +204,12 @@ car::vif(multiple_regressions$budsize_full)
 #* flower colourfulness full model ----
 
 # using glm with binomial distribution for logistic regression
-multiple_regressions$flcolour_full <- glm(as.numeric(colour_fullbinary) ~ 
+multi_reg$flcolour_full <- glm(as.numeric(colour_fullbinary) ~ 
                                             meanMAT + meanMAP + meanAVP + 
                                             meanbirdrich + meanbatpres_bin,
                                           data = euc_traits_nosubsp,
                                           family = binomial())
-summary(multiple_regressions$flcolour_full)
+summary(multi_reg$flcolour_full)
 
 # Call:
 #   glm(formula = colour_fullbinary ~ meanMAT + meanMAP + meanAVP + 
@@ -236,9 +236,138 @@ summary(multiple_regressions$flcolour_full)
 # Number of Fisher Scoring iterations: 6
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
-car::vif(multiple_regressions$flcolour_full)
+car::vif(multi_reg$flcolour_full)
 # meanMAT         meanMAP         meanAVP    meanbirdrich meanbatpres_bin 
 # 1.766085        1.871925        1.472729        1.631975        3.502379 
 # VIF still under 4 for all, multicollinearity unlikely
 
+#### with phylogeny ####
 
+# subset data to phylogenetic least squares regression variables
+# removing data with no match in tree
+pgls_data <- euc_traits_nosubsp %>%
+  dplyr::select(tree_names, logbudsize_mm2, colour_fullbinary, meanAVP, meanMAT, 
+                meanMAP,meanbirdrich, meanbatpres_bin) %>%
+  dplyr::filter(complete.cases(.)) %>%
+  as.data.frame()
+
+# drop outgroups and missing data tips from tree
+# lose 62 tips
+to_drop <- as.data.frame(treeML1$tip.label) %>%
+  dplyr::rename(tree_names = `treeML1$tip.label`) %>%
+  dplyr::left_join(pgls_data, by = "tree_names") %>%
+  dplyr::filter(is.na(logbudsize_mm2))
+tree_pgls <- ape::drop.tip(treeML1, to_drop$tree_names)
+length(tree_pgls$tip.label) # 669 tips remain
+rm(to_drop)
+
+rownames(pgls_data) <- pgls_data[,1] # tree names to row names
+pgls_data[,1] <- NULL
+spp <- rownames(pgls_data) # set species names as reference point
+
+#* bud size full PGLS ----
+
+multi_reg$budsize_PGLS <- nlme::gls(logbudsize_mm2 ~ meanMAT + 
+                                         meanMAP + meanAVP + 
+                                         meanbirdrich + meanbatpres_bin, 
+                                       correlation = ape::corBrownian(phy = tree_pgls, 
+                                                                      form = ~spp),
+                                       data = pgls_data, method = "ML")
+summary(multi_reg$budsize_PGLS)
+
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ meanMAT + meanMAP + meanAVP + meanbirdrich +      meanbatpres_bin 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2151.951 2183.491 -1068.975
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error   t-value p-value
+# (Intercept)      4.337911 2.7026075  1.605084  0.1090
+# meanMAT         -0.013184 0.0125714 -1.048730  0.2947
+# meanMAP         -0.000440 0.0001243 -3.537104  0.0004
+# meanAVP          0.010079 0.0052163  1.932166  0.0538
+# meanbirdrich    -0.016222 0.0051560 -3.146294  0.0017
+# meanbatpres_bin  0.294969 0.0824193  3.578875  0.0004
+# 
+# Correlation: 
+#   (Intr) menMAT menMAP menAVP mnbrdr
+# meanMAT         -0.109                            
+# meanMAP         -0.045  0.080                     
+# meanAVP         -0.043  0.299 -0.174              
+# meanbirdrich    -0.061  0.253  0.057 -0.083       
+# meanbatpres_bin  0.047 -0.419 -0.011 -0.099 -0.506
+# 
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.303837451 -0.088099764 -0.001542781  0.083065783  0.532925665 
+# 
+# Residual standard error: 7.062507 
+# Degrees of freedom: 669 total; 663 residual
+
+#* flower colourfulness full model ----
+
+# using glm with binomial distribution for logistic regression
+multi_reg$flcolour_PGLS <- nlme::gls(as.numeric(colour_fullbinary) ~ meanMAT + 
+                                       meanMAP + meanAVP + 
+                                       meanbirdrich + meanbatpres_bin, 
+                                     correlation = ape::corBrownian(phy = tree_pgls, 
+                                                                    form = ~spp),
+                                     data = pgls_data, method = "ML")
+summary(multi_reg$flcolour_PGLS)
+
+# Generalized least squares fit by maximum likelihood
+# Model: as.numeric(colour_fullbinary) ~ meanMAT + meanMAP + meanAVP +      meanbirdrich + meanbatpres_bin 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 1041.021 1072.561 -513.5104
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error   t-value p-value
+# (Intercept)      0.3961881 1.1781268  0.336286  0.7368
+# meanMAT         -0.0022067 0.0054801 -0.402669  0.6873
+# meanMAP         -0.0002070 0.0000542 -3.820388  0.0001
+# meanAVP          0.0017863 0.0022739  0.785586  0.4324
+# meanbirdrich    -0.0023820 0.0022476 -1.059790  0.2896
+# meanbatpres_bin -0.0745808 0.0359284 -2.075817  0.0383
+# 
+# Correlation: 
+#   (Intr) menMAT menMAP menAVP mnbrdr
+# meanMAT         -0.109                            
+# meanMAP         -0.045  0.080                     
+# meanAVP         -0.043  0.299 -0.174              
+# meanbirdrich    -0.061  0.253  0.057 -0.083       
+# meanbatpres_bin  0.047 -0.419 -0.011 -0.099 -0.506
+# 
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.096964960 -0.077419834 -0.029194632 -0.005510027  0.350241160 
+# 
+# Residual standard error: 3.078704 
+# Degrees of freedom: 669 total; 663 residual
+
+#### conclusions ####
+
+# comparing all these models, my interpretations are that: 
+# 1) including biotic variables includes model R2 for bud size (.135 with 
+# abiotic only to 0.18)
+# 2) with full model precipitation becomes a less significant predictor, with
+# bud size mostly explained by presence/absence of bats in a eucalypt's 
+# environment improves 
+# 3) this matches result of full model for flower colourfulness, bat presence
+# best predictor
+# 4) with phylogenetic relatedness included via PGLS, bat presence still a 
+# significant predictor of bud size and flower colourfulness but mean annual
+# precipitation also considered a significant predictor of both, plus bird
+# richness for bud size - model doesn't seem to be accounting for significant
+# covariance in these predictors? will need to ask someone more expert in PGLS
