@@ -27,12 +27,17 @@ treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 # resolution between phylogeny, ranges, EUCLID and Australian Plant Census
 source("scripts/data_prep/final_data.R")
 
-#### ANALYSES ####
+#### ANALYSES AND FIGURES ####
 
-source("scripts/analysis/multiple_regression.R")
+# main analysis, multiple regressions
+source("scripts/analyses/multiple_regression.R")
 
-source("scripts/analysis/phylogenetic_ls_regression.R")
+# supporting regression analyses and figures
+source("scripts/analyses/single_regressions.R")
 
-# NEXT - PGLS???
-#      - evolutionary correlation between colour and size? phylogenetic logistic regression?
-#      - produce final figures, maps etc
+# supporting evolutionary modelling and phylogenetic figure
+source("scripts/analyses/phylogeny.R")
+
+# trait maps for figures
+source("scripts/analyses/maps.R")
+

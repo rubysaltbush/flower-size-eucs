@@ -1,9 +1,6 @@
-# predictions:  - larger flowers *evolved* more in western than eastern Aus eucs
-#               - larger, colourful flowers evolved in correlation
-#               - 
+# phylogenetic and least squares regressions to support multiple regressions
+# and produce scatter plots for panelling in figures
 
-# for final analysis can I write function to run and check assumptions for all 
-# these PGLS regressions?
 
 # bud size and median longitude ----
 
@@ -18,13 +15,8 @@ pgls_data <- euc_traits_nosubsp %>%
 
 # drop outgroups and missing data tips from tree
 # lose 56 tips
-to_drop <- as.data.frame(treeML1$tip.label) %>%
-  dplyr::rename(tree_names = `treeML1$tip.label`) %>%
-  dplyr::left_join(pgls_data, by = "tree_names") %>%
-  dplyr::filter(is.na(logbudsize_mm2)|is.na(medianlong))
-tree_budsz <- ape::drop.tip(treeML1, to_drop$tree_names)
+tree_budsz <- ape::drop.tip(treeML1, treeML1$tip.label[-match(pgls_data$tree_names, treeML1$tip.label)])
 length(tree_budsz$tip.label) # 675 tips remain
-rm(to_drop)
 
 rownames(pgls_data) <- pgls_data[,1]
 pgls_data[,1] <- NULL

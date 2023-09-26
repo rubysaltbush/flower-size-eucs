@@ -371,3 +371,5 @@ summary(multi_reg$flcolour_PGLS)
 # precipitation also considered a significant predictor of both, plus bird
 # richness for bud size - model doesn't seem to be accounting for significant
 # covariance in these predictors? will need to ask someone more expert in PGLS
+
+rm(spp, tree_pgls, multi_reg, pgls_data)
