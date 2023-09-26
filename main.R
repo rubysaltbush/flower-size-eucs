@@ -20,7 +20,7 @@ rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells
                   taxa = readr::read_csv("data_input/euc_raster/aus_100x100_taxa.csv"),
                   cell_taxa = readr::read_csv("data_input/euc_raster/aus_100x100_cell_taxa.csv"))
 
-# Thornhill et al. (2019) phylogeny, dated and with tips cleaned
+# Thornhill et al. (2019) phylogeny, dated ML1 version with tips cleaned
 treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
 # tidied, species level eucalypt trait and environment data with taxonomic name 
