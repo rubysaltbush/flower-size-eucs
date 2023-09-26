@@ -54,18 +54,13 @@ ggsave("figures/regressions/bud size by median longitude PGLS.pdf", width = 10, 
 # remove data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
   dplyr::select(tree_names, logbudsize_mm2, colour_binary) %>%
-  dplyr::filter(!is.na(tree_names) & !is.na(logbudsize_mm2) & !is.na(colour_binary)) %>%
+  dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
 
 # drop outgroups and missing data tips from tree
 # lose 58 tips
-to_drop <- as.data.frame(treeML1$tip.label) %>%
-  dplyr::rename(tree_names = `treeML1$tip.label`) %>%
-  dplyr::left_join(pgls_data, by = "tree_names") %>%
-  dplyr::filter(is.na(logbudsize_mm2)|is.na(colour_binary))
-tree_budsz <- ape::drop.tip(treeML1, to_drop$tree_names)
+tree_budsz <- ape::drop.tip(treeML1, treeML1$tip.label[-match(pgls_data$tree_names, treeML1$tip.label)])
 length(tree_budsz$tip.label) # 673 tips remain
-rm(to_drop)
 
 rownames(pgls_data) <- pgls_data[,1]
 pgls_data[,1] <- NULL
@@ -77,8 +72,35 @@ pglsModel <- nlme::gls(logbudsize_mm2 ~ colour_binary,
                                                       form = ~spp),
                        data = pgls_data, method = "ML") # why ML method? not REML (default)?
 summary(pglsModel)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ colour_binary 
+# Data: pgls_data 
+# AIC      BIC   logLik
+# 2108.96 2127.007 -1050.48
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error  t-value p-value
+# (Intercept)      3.552087 2.5854335 1.373885  0.1699
+# colour_binary0.5 0.669066 0.1310472 5.105531  0.0000
+# colour_binary1   0.764355 0.0967291 7.902017  0.0000
+# 
+# Correlation: 
+#   (Intr) cl_0.5
+# colour_binary0.5 -0.001       
+# colour_binary1   -0.003  0.183
+# 
+# Standardized residuals:
+#   Min          Q1         Med          Q3         Max 
+# -0.32686568 -0.06756832  0.01349127  0.08720121  0.47904527 
+# 
+# Residual standard error: 6.823389 
+# Degrees of freedom: 673 total; 670 residual
 plot(logbudsize_mm2 ~ colour_binary, data = pgls_data)
-abline(a = coef(pglsModel)[1], b = coef(pglsModel)[2])
 # significant differences between 3 groups, p < 0.001
 
 # bud size and species mean available P ----
