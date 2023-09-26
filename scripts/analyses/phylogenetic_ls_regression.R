@@ -1,7 +1,5 @@
 # predictions:  - larger flowers *evolved* more in western than eastern Aus eucs
 #               - larger, colourful flowers evolved in correlation
-#               - larger, few per umbel flowers evolved in correlation
-#               - larger flowers evolved in eucalypts with bats in environment
 #               - 
 
 # for final analysis can I write function to run and check assumptions for all 
@@ -90,42 +88,6 @@ summary(pglsModel)
 plot(logbudsize_mm2 ~ colour_binary, data = pgls_data)
 abline(a = coef(pglsModel)[1], b = coef(pglsModel)[2])
 # significant differences between 3 groups, p < 0.001
-
-# bud size and buds per umbel ----
-
-## prepare data and tree ##
-
-# subset data to variables of interest for phylogenetic least squares regression
-# remove data with no match in tree
-pgls_data <- euc_traits_nosubsp %>%
-  dplyr::select(tree_names, logbudsize_mm2, bud_n_mean) %>%
-  dplyr::filter(!is.na(tree_names) & !is.na(logbudsize_mm2) & !is.na(bud_n_mean)) %>%
-  as.data.frame()
-
-# drop outgroups and missing data tips from tree
-# lose 51 tips
-to_drop <- as.data.frame(treeML1$tip.label) %>%
-  dplyr::rename(tree_names = `treeML1$tip.label`) %>%
-  dplyr::left_join(pgls_data, by = "tree_names") %>%
-  dplyr::filter(is.na(logbudsize_mm2)|is.na(bud_n_mean))
-tree_budsz <- ape::drop.tip(treeML1, to_drop$tree_names)
-length(tree_budsz$tip.label) # 680 tips remain
-rm(to_drop)
-
-rownames(pgls_data) <- pgls_data[,1]
-pgls_data[,1] <- NULL
-
-## run PGLS ##
-spp <- rownames(pgls_data) # set species names as reference point
-pglsModel <- nlme::gls(logbudsize_mm2 ~ bud_n_mean, 
-                       correlation = ape::corBrownian(phy = tree_budsz, 
-                                                      form = ~spp),
-                       data = pgls_data, method = "ML")
-summary(pglsModel)
-plot(logbudsize_mm2 ~ bud_n_mean, data = pgls_data)
-abline(a = coef(pglsModel)[1], b = coef(pglsModel)[2])
-# significant, p < 0.001
-# though might want to remove outliers
 
 # bud size and species mean available P ----
 

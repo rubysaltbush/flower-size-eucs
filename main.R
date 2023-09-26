@@ -2,7 +2,6 @@
 #source("scripts/install_dependencies.R")
 library(tidyverse)
 library(austraits)
-#library(APCalign) # not sure if necessary? used for data but not using now
 library(ape)
 library(sf)
 library(terra)
@@ -24,7 +23,8 @@ rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells
 # Thornhill et al. (2019) phylogeny, dated and with tips cleaned
 treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
-# tidied, species level eucalypt trait and environment data with taxonomic name resolution
+# tidied, species level eucalypt trait and environment data with taxonomic name 
+# resolution between phylogeny, ranges, EUCLID and Australian Plant Census
 source("scripts/data_prep/final_data.R")
 
 #### ANALYSES ####
