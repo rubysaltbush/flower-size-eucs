@@ -145,3 +145,4 @@ dev.off()
 
 rm(rmeanleafarea, meanleafarea, leafarea_mm2)
 
+rm(aus)

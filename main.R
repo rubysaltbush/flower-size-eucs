@@ -29,10 +29,10 @@ treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 # resolution between phylogeny, ranges, EUCLID and Australian Plant Census
 source("scripts/data_prep/final_data.R")
 
-#### ANALYSES AND FIGURES ####
-
 # standard colours for plots
 source("scripts/my_colours.R")
+
+#### ANALYSES ####
 
 # main analysis, multiple regressions
 source("scripts/analyses/multiple_regression.R")
@@ -40,9 +40,11 @@ source("scripts/analyses/multiple_regression.R")
 # supporting regression analyses and figures
 source("scripts/analyses/single_regressions.R")
 
-# supporting evolutionary modelling and phylogenetic figure
-source("scripts/analyses/phylogeny.R")
+#### FIGURES ####
+
+# supporting phylogenetic figure with evolutionary modelling
+source("scripts/figures/phylogeny.R")
 
 # trait maps for figures
-source("scripts/analyses/maps.R")
+source("scripts/figures/maps.R")
 
