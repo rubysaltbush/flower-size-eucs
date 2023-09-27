@@ -10,6 +10,7 @@ library(ggpubr)
 library(RColorBrewer)
 library(GGally)
 library(car)
+library(plotrix)
 
 # function to cache pre-prepared R data. If RDS already in cache will read data
 source("scripts/functions/cache_RDS.R")
