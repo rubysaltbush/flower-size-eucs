@@ -11,6 +11,7 @@ library(RColorBrewer)
 library(GGally)
 library(car)
 library(plotrix)
+# library(APCalign) was used for aligning taxonomy but not needed in current workflow
 
 # function to cache pre-prepared R data. If RDS already in cache will read data
 source("scripts/functions/cache_RDS.R")
@@ -26,7 +27,7 @@ rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells
 treeML1 <- ape::read.tree("data_input/Eucalypts_ML1_dated_r8s.phy")
 
 # tidied, species level eucalypt trait and environment data with taxonomic name 
-# resolution between phylogeny, ranges, EUCLID and Australian Plant Census
+# resolution between phylogeny, ranges, EUCLID and Australian Plant Census (via APCalign)
 source("scripts/data_prep/final_data.R")
 
 # standard colours for plots

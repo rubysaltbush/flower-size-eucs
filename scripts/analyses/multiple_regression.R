@@ -359,11 +359,11 @@ summary(multi_reg$flcolour_PGLS)
 #### conclusions ####
 
 # comparing all these models, my interpretations are that: 
-# 1) including biotic variables includes model R2 for bud size (.135 with 
-# abiotic only to 0.18)
-# 2) with full model precipitation becomes a less significant predictor, with
+# 1) including biotic variables improves model R2 for bud size (.135 with 
+# abiotic only to 0.18 with biotic included)
+# 2) with full model precipitation becomes a less significant predictor, as
 # bud size mostly explained by presence/absence of bats in a eucalypt's 
-# environment improves 
+# environment  
 # 3) this matches result of full model for flower colourfulness, bat presence
 # best predictor
 # 4) with phylogenetic relatedness included via PGLS, bat presence still a 

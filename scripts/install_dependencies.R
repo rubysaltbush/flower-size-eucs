@@ -11,3 +11,4 @@ install.packages("phytools") # package for phylogenetic visualisations, v1.9-16
 install.packages("ggpubr") # for publication ready ggplots v0.6.0
 install.packages("RColorBrewer") # for plot colours, v1.1-3
 install.packages("GGally") # for correlation plots, v2.1.2
+install.packages("plotrix") # for drawing circles on phylogenies, v3.8-2

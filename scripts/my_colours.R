@@ -7,7 +7,7 @@ my_colours <- list()
 my_colours$flcol_fill <- c("#faebcd", "light pink", "red", "grey")
 names(my_colours$flcol_fill) <- c("white-cream", "mixed", "colourful", "NA")
 
-my_colours$flcol_col <- c("#F0E4BE", "light pink", "red", "grey")
+my_colours$flcol_col <- c("#DFBF5B", "light pink", "red", "grey")
 names(my_colours$flcol_col) <- c("white-cream", "mixed", "colourful", "NA")
 
 # log bud size (continuous)
