@@ -178,13 +178,13 @@ summary(multi_reg$budsize_full)
 # -2.2199 -0.5542 -0.0717  0.4887  3.6779 
 # 
 # Coefficients:
-#   Estimate Std. Error t value Pr(>|t|)    
+#                   Estimate  Std. Error   t value   Pr(>|t|)    
 # (Intercept)      4.281e+00  2.702e-01  15.841  < 2e-16 ***
 #   meanMAT          9.525e-03  9.776e-03   0.974   0.3302    
-# meanMAP         -3.509e-05  1.238e-04  -0.283   0.7769    
-# meanAVP         -1.388e-02  6.128e-03  -2.265   0.0238 *  
+#   meanMAP         -3.509e-05  1.238e-04  -0.283   0.7769    
+#   meanAVP         -1.388e-02  6.128e-03  -2.265   0.0238 *  
 #   meanbirdrich    -7.312e-03  6.367e-03  -1.148   0.2512    
-# meanbatpres_bin -5.552e-01  1.228e-01  -4.520 7.16e-06 ***
+#   meanbatpres_bin -5.552e-01  1.228e-01  -4.520 7.16e-06 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
@@ -247,7 +247,7 @@ car::vif(multi_reg$flcolour_full)
 # removing data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
   dplyr::select(tree_names, logbudsize_mm2, colour_fullbinary, meanAVP, meanMAT, 
-                meanMAP,meanbirdrich, meanbatpres_bin) %>%
+                meanMAP, meanbirdrich, meanbatpres_bin) %>%
   dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
 
@@ -312,7 +312,8 @@ summary(multi_reg$budsize_PGLS)
 
 #* flower colourfulness full model ----
 
-# using glm with binomial distribution for logistic regression
+# using PGLS with binomial distribution for logistic regression
+# WAIT no I'm not? should below be Ives & Garland method of phylogenetic logistic regression??
 multi_reg$flcolour_PGLS <- nlme::gls(as.numeric(colour_fullbinary) ~ meanMAT + 
                                        meanMAP + meanAVP + 
                                        meanbirdrich + meanbatpres_bin, 
