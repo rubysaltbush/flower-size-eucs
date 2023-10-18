@@ -1,7 +1,6 @@
 # phylogenetic and least squares regressions to support multiple regressions
 # and produce scatter plots for panelling in figures
 
-
 # bud size and median longitude ----
 
 #* prepare data and tree ----
@@ -161,7 +160,7 @@ regressions_todo <- list(
     ydata = euc_traits_nosubsp$logbudsize_mm2,
     xlabel = "Species mean available phosphorus (mg/kg 0-30cm depth)",
     ylabel = "Eucalypt bud size (log mm²)",
-    output_path = "figures/regressions/budsize vs AVP"
+    output_path = "figures/regressions/residuals/budsize vs AVP"
   ),
   # leaf v available phosphorus
   lmlfszavp = list(
@@ -169,7 +168,7 @@ regressions_todo <- list(
     ydata = log(euc_traits_nosubsp$leafarea_mm2),
     xlabel = "Species mean available phosphorus (mg/kg 0-30cm depth)",
     ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/leafsize vs AVP"
+    output_path = "figures/regressions/residuals/leafsize vs AVP"
   ),
   # bud v temperature
   lmbudszmat = list(
@@ -177,7 +176,7 @@ regressions_todo <- list(
     ydata = euc_traits_nosubsp$logbudsize_mm2,
     xlabel = "Species mean annual temperature (ºC)",
     ylabel = "Eucalypt bud size (log mm²)",
-    output_path = "figures/regressions/budsize vs MAT"
+    output_path = "figures/regressions/residuals/budsize vs MAT"
   ),
   # leaf v temperature
   lmlfszmat = list(
@@ -185,7 +184,7 @@ regressions_todo <- list(
     ydata = log(euc_traits_nosubsp$leafarea_mm2),
     xlabel = "Species mean annual temperature (ºC)",
     ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/leafsize vs MAT"
+    output_path = "figures/regressions/residuals/leafsize vs MAT"
   ),
   # bud v precipitation
   lmbudszmap = list(
@@ -193,7 +192,7 @@ regressions_todo <- list(
     ydata = euc_traits_nosubsp$logbudsize_mm2,
     xlabel = "Species mean annual precipitation (log mm)",
     ylabel = "Eucalypt bud size (log mm²)",
-    output_path = "figures/regressions/budsize vs MAP"
+    output_path = "figures/regressions/residuals/budsize vs MAP"
   ),
   # leaf v precipitation
   lmlfszmap = list(
@@ -201,7 +200,7 @@ regressions_todo <- list(
     ydata = log(euc_traits_nosubsp$leafarea_mm2),
     xlabel = "Species mean annual precipitation (log mm)",
     ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/leafsize vs MAP"
+    output_path = "figures/regressions/residuals/leafsize vs MAP"
   ),
   # bud v flower-visiting bat species richness
   lmbudszbat = list(
@@ -209,7 +208,7 @@ regressions_todo <- list(
     ydata = euc_traits_nosubsp$logbudsize_mm2,
     xlabel = "Species flower-visiting bat presence",
     ylabel = "Eucalypt bud size (log mm²)",
-    output_path = "figures/regressions/budsize vs bats"
+    output_path = "figures/regressions/residuals/budsize vs bats"
   )
 )
 
