@@ -35,11 +35,13 @@ source("scripts/my_colours.R")
 
 #### ANALYSES ####
 
+# supporting regression analyses and figures
+source("scripts/analyses/single_regressions.R")
+
 # main analysis, multiple regressions
 source("scripts/analyses/multiple_regression.R")
 
-# supporting regression analyses and figures
-source("scripts/analyses/single_regressions.R")
+
 
 #### FIGURES ####
 

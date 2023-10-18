@@ -69,7 +69,7 @@ ggplot(euc_traits_nosubsp, aes(x = medianlong, y = logbudsize_mm2)) +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = "PGLS p = 0.008")
-ggsave("figures/regressions/bud size by median longitude PGLS.pdf", width = 10, height = 5)
+ggsave("figures/regressions/bud size by median longitude PGLS.pdf", width = 8, height = 5)
 
 # bud size and flower colour ----
 
@@ -141,7 +141,7 @@ euc_traits_nosubsp %>%
     xlab("Flower colourfulness") +
     ylab("Eucalypt bud size (log mm²)") +
     theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14))
-ggsave("figures/regressions/bud size by flower colourfulness.pdf", width = 10, height = 5)
+ggsave("figures/regressions/bud size by flower colourfulness.pdf", width = 8, height = 5)
 
 rm(pglsModel, pgls_data, tree_budsz, spp)
 
@@ -247,7 +247,7 @@ ggplot(euc_traits_nosubsp, aes(x = meanMAT, y = logbudsize_mm2)) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszmat)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszmat)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/budsize vs MAT.pdf", width = 10, height = 5)
+ggsave("figures/regressions/budsize vs MAT.pdf", width = 8, height = 5)
 
 # leaf size and MAT
 ggplot(euc_traits_nosubsp, aes(x = meanMAT, y = log(leafarea_mm2))) +
@@ -261,7 +261,7 @@ ggplot(euc_traits_nosubsp, aes(x = meanMAT, y = log(leafarea_mm2))) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmlfszmat)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmlfszmat)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs MAT.pdf", width = 10, height = 5)
+ggsave("figures/regressions/leafsize vs MAT.pdf", width = 8, height = 5)
 
 # bud size and MAP
 ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = logbudsize_mm2)) +
@@ -275,7 +275,7 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = logbudsize_mm2)) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszmap)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszmap)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/budsize vs MAP.pdf", width = 10, height = 5)
+ggsave("figures/regressions/budsize vs MAP.pdf", width = 8, height = 5)
 
 # leaf size and MAP
 ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = log(leafarea_mm2))) +
@@ -289,7 +289,7 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = log(leafarea_mm2))) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmlfszmap)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmlfszmap)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs MAP.pdf", width = 10, height = 5)
+ggsave("figures/regressions/leafsize vs MAP.pdf", width = 8, height = 5)
 
 # bud size and AVP
 ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = logbudsize_mm2)) +
@@ -303,7 +303,7 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = logbudsize_mm2)) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszavp)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszavp)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/budsize vs AVP.pdf", width = 10, height = 5)
+ggsave("figures/regressions/budsize vs AVP.pdf", width = 8, height = 5)
 
 # leaf size and AVP
 ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = log(leafarea_mm2))) +
@@ -317,23 +317,28 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = log(leafarea_mm2))) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmlfszavp)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmlfszavp)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs AVP.pdf", width = 10, height = 5)
+ggsave("figures/regressions/leafsize vs AVP.pdf", width = 8, height = 5)
 
 # bud size and bat richness
-# FIX BELOW
+# not sure if this better as boxplot or scatter plot with logistic regression line?
+# boxplot for now
 euc_traits_nosubsp %>%
-  ggplot(aes(x = meanbatpres_bin, y = logbudsize_mm2)) +
-  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
-  geom_smooth(method = "lm", colour = "black") + # fix to logistic regression method???
-  theme_pubr(legend = "right") + # or display as boxplot???
-  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  dplyr::filter(!is.na(meanbatpres_bin)) %>%
+  dplyr::mutate(meanbatpres_bin = factor(meanbatpres_bin)) %>%
+ggplot(aes(x = meanbatpres_bin, y = logbudsize_mm2)) +
+  geom_boxplot(aes(fill = meanbatpres_bin)) +
+  #geom_smooth(method = "lm", colour = "black") + # fix to logistic regression method???
+  theme_pubr(legend = "none") + # or display as boxplot???
+  geom_jitter(color = "black", size = 0.4, alpha = 0.3) +
+  scale_fill_viridis_d(direction = -1, alpha = 0.9) +
+  #scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_x_discrete(labels = c("bats absent", "bats present")) +
   xlab("Species mean flower-visiting bat presence") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszbat)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszbat)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/budsize vs batrich pretty.pdf", width = 10, height = 5)
+ggsave("figures/regressions/budsize vs bat presence.pdf", width = 8, height = 5)
 
 
 
