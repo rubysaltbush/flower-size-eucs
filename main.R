@@ -35,13 +35,14 @@ source("scripts/my_colours.R")
 
 #### ANALYSES ####
 
-# supporting regression analyses and figures
+# initial regression analyses and figures
 source("scripts/analyses/single_regressions.R")
 
 # main analysis, multiple regressions
 source("scripts/analyses/multiple_regression.R")
 
-
+# supporting phylogenetic regressions for evolutionary relationships
+source("scripts/analyses/PGLS.R")
 
 #### FIGURES ####
 
