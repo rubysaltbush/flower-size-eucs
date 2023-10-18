@@ -19,17 +19,13 @@ length(tree_budsz$tip.label) # 680 tips remain
 # change data into a named vector that matches tree
 budsz_contdata <- contMap_data$logbudsize_mm2
 names(budsz_contdata) <- contMap_data$tree_names
-
-# #### model evolution of bud size??? ####
-# 
-# # estimate ancestral states w. variances & 95% confidence intervals for each node
-# fit <- phytools::fastAnc(tree_budsz, budsz_contdata, vars = TRUE, CI = TRUE)
-# # results show estimated ancestral log_budsize_mm2 for each node in tree, plus var and CI
-# # build results into data.frame and export
-# logbudsize_fastAnc <- data.frame(names(fit$ace), fit$ace, fit$var, fit$CI95[,1], fit$CI95[,2])
-# names(logbudsize_fastAnc) <- c("tip_n", "anc_logbudszmm2", "var", "CI95_lower", "CI95_upper")
-# #readr::write_csv(logbudsize_fastAnc, "results/fastAnc_tree_logbudsize_mm2.csv")
-# rm(logbudsize_fastAnc, fit)
+# and prep flower colour data also
+flcol <- as.factor(contMap_data$colour_binary)
+names(flcol) <- contMap_data$tree_names
+# make sure discrete character is in the order of tree
+flcol <- flcol[tree_budsz$tip.label]
+# set factor colours
+cols <- setNames(c(my_colours$flcol_fill[1], my_colours$flcol_fill[2], my_colours$flcol_fill[3]), c("0", "0.5", "1"))
 
 #### visualise phylogeny ####
 
@@ -52,11 +48,12 @@ dev.off()
 # plot contmap with data on flower colour displayed at tips with phytools
 # workaround from http://blog.phytools.org/2022/06/how-to-plot-tip-node-labels-without.html
 
-pdf(file = "figures/phylogeny_logbudsize.pdf", width = 10, height = 10)
+#* circular plot ----
+pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 12)
 # plot contMap
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
                        ftype = "off", lwd = 3, outline = FALSE,
-                       xlim = c(-100, 70))
+                       xlim = c(-100, 100))
 
 # first label beginning of Neogene boundary at 23 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23, 
@@ -66,19 +63,19 @@ plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23,
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52, 
                      col = "#dadada", lty = 0)
 
-# then add text to boundary points
-text(x = max(nodeHeights(tree_budsz)) - 23, y = -6, "23 Ma", cex = 1, col = "#636363")
-text(x = max(nodeHeights(tree_budsz)) - 52, y = -6, "52 Ma", cex = 1, col = "#636363")
+# # then add text to boundary points
+# text(x = max(nodeHeights(tree_budsz)) - 23, y = -6, "23 Ma", cex = 1, col = "#636363")
+# text(x = max(nodeHeights(tree_budsz)) - 52, y = -6, "52 Ma", cex = 1, col = "#636363")
 
 # plot contMap again
 par(new = TRUE) # hack to force below to plot on top of above 
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
                        ftype = "off", lwd = 2, outline = FALSE,
-                       xlim = c(-100, 70))
+                       xlim = c(-100, 100))
 
 # below adapted from http://blog.phytools.org/2016/08/vertical-legend-in-contmap-style-plots.html
 # add bud size legend using phytools function
-phytools::add.color.bar(leg = 100,
+phytools::add.color.bar(leg = 70,
                         cols = treecont$cols,
                         title = "Eucalypt bud size (log mm²)",
                         lims = NULL,
@@ -88,12 +85,12 @@ phytools::add.color.bar(leg = 100,
                         direction = "upwards",
                         subtitle = "",
                         x = -90,
-                        y = -50)
+                        y = -10)
 
 # then add custom tick marks
-lines(x = rep(-87.525, 2), y = c(-50, 52)) # draw vertical line
-Y <- cbind(seq(-50, 52, length.out = 5), # define x pos for ticks
-         seq(-50, 52, length.out = 5))
+lines(x = rep(-87.525, 2), y = c(-10, 60)) # draw vertical line
+Y <- cbind(seq(-10, 60, length.out = 5), # define x pos for ticks
+         seq(-10, 60, length.out = 5))
 X <- cbind(rep(-87.525, 5), # define y pos for ticks
          rep(-85.925, 5))
 for(i in 1:nrow(Y)) lines(X[i,], Y[i,]) # draw ticks
@@ -101,52 +98,39 @@ ticks <- seq(treecont$lims[1], treecont$lims[2], length.out = 5) # get tick valu
 text(x = X[,2], y = Y[,2], round(ticks, 1), pos = 4, cex = 0.8) # draw tick values
 rm(X, Y, i, ticks)
 
-# points coloured by flower colour
-# try using tip.labels rather than below
-# get tree tip numbers and match data to these for tip plotting
-tipn_treebudsz <- as.data.frame(treecont$tree$tip.label)
-names(tipn_treebudsz) <- "tree_names"
-tipn_treebudsz$tipn <- rownames(tipn_treebudsz)
-contMap_data <- tipn_treebudsz %>%
-  dplyr::left_join(contMap_data, by = "tree_names")
-rm(tipn_treebudsz)
-# first prep tip labels for polymorphic tips
-coltips <- contMap_data %>%
-  dplyr::select(colour_binary, tipn) %>%
-  tibble::remove_rownames() %>%
-  tibble::column_to_rownames(var = "tipn") %>% # rename rows with tip numbers
-  dplyr::select(colour_binary) %>%
-  dplyr::filter(!is.na(colour_binary)) %>% # filter out taxa with missing tip data
-  as.matrix()
-cols <- my_colours$flcol_fill[1:3]
-names(cols) <- c(0, 0.5, 1)
-ape::tiplabels(tip = as.numeric(rownames(coltips)), 
-               pie = as.numeric(coltips),
-               piecol = my_colours$flcol_fill, 
-               cex = 0.15)
+# tip points coloured by flower colour
 
-# # assign plot to object
-# pp <- get("last_plot.phylo", envir = .PlotPhyloEnv)
-# # from pp object will pull out x and y coordinates to plot points
-# # set colours and names for flower colour
-# fcols <- my_colours$flcol_fill
-# names(fcols) <- c("0", "0.5", "1")
-# # change flower colour data into a named vector that matches tree and colour names
-# fcol_data <- contMap_data$colour_binary
-# names(fcol_data) <- contMap_data$tree_names
-# # add flower colour points
-# points(pp$xx[1:ape::Ntip(tree_budsz)],
-#        pp$yy[1:ape::Ntip(tree_budsz)],
-#        pch = 15, cex = 0.5,
-#        col = fcols[fcol_data[tree_budsz$tip.label]])
+# assign plot to object
+pp <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+# from pp object will pull out x and y coordinates to plot points
+
+#function below by GM to offset x and y points, huzzah
+offset_xx_yy <- function(xx, yy, offset) {
+  angle <- atan2(yy, xx)
+  data.frame(
+    xx = xx + offset * cos(angle),
+    yy = yy + offset * sin(angle)
+  )
+}
+
+xx_yy <- offset_xx_yy(
+  xx = pp$xx[1:ape::Ntip(tree_budsz)],
+  yy = pp$yy[1:ape::Ntip(tree_budsz)],
+  offset = 4
+)
+
+# add flower symmetry points
+points(xx_yy$xx,
+       xx_yy$yy,
+       pch = 15, cex = 1.5,
+       col = cols[flcol[tree_budsz$tip.label]])
 
 # legends
 legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = cols, 
-       bty = "n", cex = 0.8, title = "Flower colour", pch = 15)
+       bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
 
 dev.off()
-rm(pp, budsz_contdata, fcol_data, fcols, tree_budsz, treecont, contMap_data, cols, coltips)
-# to do - offset tip labels from circle - will need to rehash Greg's calculations and make a function
-#       - clade labels?
-#       - label western/eastern Australia clades?
+rm(pp, budsz_contdata, fcol_data, fcols, tree_budsz, treecont, contMap_data, cols)
+# to do - clade labels? categorise species, read in table, use arclabel
+#       - label western/eastern Australia clades? or rely on subclades?
 
