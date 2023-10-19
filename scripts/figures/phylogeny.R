@@ -130,7 +130,7 @@ points(xx_yy$xx,
        pch = 15, cex = 1,
        col = cols[flcol[tree_budsz$tip.label]])
 
-rm(xx_yy, offset_xx_yy, pp)
+rm(xx_yy, offset_xx_yy)
 
 # legend
 legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = cols, 
@@ -138,46 +138,60 @@ legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = co
 
 #** clade labelling ----
 
-## FIX BELOW ##
-# label larger orders
-# first calculate order tip positions
-to_label <- contMap_data %>%
-  dplyr::select(position, subgenus) %>%
-  dplyr::group_by(subgenus) %>%
+# label larger subgenera
+# first calculate tip positions
+subg_label <- contMap_data %>%
+  dplyr::select(position, subgen_label) %>%
+  dplyr::group_by(subgen_label) %>%
   tidyr::nest() %>%
   dplyr::ungroup() %>%
   dplyr::mutate(mintip = purrr::map(data, ~{min(.x$position)})) %>%
   dplyr::mutate(maxtip = purrr::map(data, ~{max(.x$position)})) %>%
   tidyr::unnest(cols = c(data, mintip, maxtip)) %>%
-  dplyr::select(subgenus, mintip, maxtip) %>%
+  dplyr::select(subgen_label, mintip, maxtip) %>%
   dplyr::distinct() %>%
-  dplyr::mutate(tiprange = maxtip - mintip)
-# GAH totally non-monophyletic, will need to customise labels
-
-# then filter out smaller orders AND a few that overlap for labelling, 
-# leaves 21 of 43 orders 
-orders_to_label <- orders_to_label %>%
-  dplyr::filter(tiprange > 10 & !(order %in% c("Dipsacales", "Saxifragales", "Sapindales")))
-# and replace overlapping orders with abbreviations
-orders_to_label$order <- gsub("Santalales", "Santal.", orders_to_label$order)
-orders_to_label$order <- gsub("Apiales", "Api.", orders_to_label$order)
-orders_to_label$order <- gsub("Rosales", "Ros.", orders_to_label$order)
-orders_to_label$order <- gsub("Magnoliales", "Magnoli.", orders_to_label$order)
-orders_to_label$order <- gsub("Brassicales", "Brassic.", orders_to_label$order)
-orders_to_label$order <- gsub("Boraginales", "Boragin.", orders_to_label$order)
+  dplyr::filter(!(is.na(subgen_label)))
 
 # source custom arc labelling function
 source("scripts/functions/arclabel.R")
 
+arclabel(text = "Blakella + two Corymbia",
+         orientation = "perpendicular",
+         tips = c(1, 34),
+         ln.offset = 1.05,
+         lab.offset = 1.1)
+arclabel(text = "Angophora",
+         orientation = "perpendicular",
+         tips = c(35, 43),
+         ln.offset = 1.05,
+         lab.offset = 1.1)
+arclabel(text = "Corymbia",
+         tips = c(44, 87),
+         ln.offset = 1.05,
+         lab.offset = 1.1)
+arclabel(text = "Eudesmia",
+         orientation = "perpendicular",
+         tips = c(89, 109),
+         ln.offset = 1.05,
+         lab.offset = 1.09)
+arclabel(text = "Eucalyptus",
+         tips = c(112, 216),
+         ln.offset = 1.05,
+         lab.offset = 1.1)
+arclabel(text = "Symphyomyrtus",
+         tips = c(219, 680),
+         ln.offset = 1.05,
+         lab.offset = 1.1)
+
 # loop through and draw labels on phylogeny for larger orders
-for(i in 1:length(orders_to_label$order)) {
-  arclabel(text = orders_to_label$order[i],
-           tips = c(orders_to_label$mintip[i], orders_to_label$maxtip[i]),
+for(i in 1:length(subg_label$subgen_label)) {
+  arclabel(text = subg_label$subgen_label[i],
+           tips = c(subg_label$mintip[i], subg_label$maxtip[i]),
            cex = 1,
            ln.offset = 1.05,
            lab.offset = 1.069)
 }
-rm(i, orders_to_label)
+rm(i, subg_label)
 
 dev.off()
 
