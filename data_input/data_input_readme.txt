@@ -25,3 +25,5 @@ MPDM = mean precipitation warmest month (from CHELSA https://chelsa-climate.org/
 speciesLevel = amalgamated at species level (e.g. Angophora bakeri subsp. crassifolia = Angophora bakeri)
 speciesLevelUpdated = some species I further amalgamated because they were considered another species by D. Nicolles classification of eucalypts (e.g. Eucalyptus sp. Flinders Ranges (D.Nicolle 562) = Eucalyptus cajuputea)
 
+clades_forlabelling.csv - Ruby Stephens and David Coleman - added 2023-10-19 - Thornhill et al (2019) tree names, subgenus and position in tree matched to eucalypt section and selected subgenus and section labels excluding smaller clades and paraphyletic taxa
+

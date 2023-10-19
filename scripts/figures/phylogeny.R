@@ -6,7 +6,7 @@
 #### prep tree and data ####
 # remove taxa with no match in tree or bud size data
 contMap_data <- euc_traits_nosubsp %>%
-  dplyr::select(tree_names, budsize_mm2, logbudsize_mm2, medianlong, colour_binary) %>%
+  dplyr::select(tree_names, subgenus, budsize_mm2, logbudsize_mm2, medianlong, colour_binary) %>%
   dplyr::filter(!is.na(tree_names) & !is.na(logbudsize_mm2)) %>%
   as.data.frame()
 
@@ -25,6 +25,20 @@ names(flcol) <- contMap_data$tree_names
 flcol <- flcol[tree_budsz$tip.label]
 # set factor colours
 cols <- setNames(c(my_colours$flcol_fill[1], my_colours$flcol_fill[2], my_colours$flcol_fill[3]), c("0", "0.5", "1"))
+
+# add column with species' tip position in tree for plotting
+treetips <- data.frame(tree_names = tree_budsz$tip.label, position = c(1:680))
+contMap_data <- contMap_data %>%
+  dplyr::left_join(treetips, by = "tree_names")
+rm(treetips)
+
+# read in selected section and subgenus clade labelling
+cladelabs <- readr::read_csv("data_input/clades_forlabelling.csv")
+
+# match to data with tip position
+contMap_data <- contMap_data %>%
+  dplyr::left_join(cladelabs, by = c("tree_names", "subgenus", "position"))
+rm(cladelabs)
 
 #### visualise phylogeny ####
 
@@ -58,10 +72,6 @@ plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23,
 # then label eucalyptae crown age at 52 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52, 
                      border = "grey", lty = 2)
-
-# # then add text to boundary points
-# text(x = max(nodeHeights(tree_budsz)) - 23, y = -6, "23 Ma", cex = 1, col = "#636363")
-# text(x = max(nodeHeights(tree_budsz)) - 52, y = -6, "52 Ma", cex = 1, col = "#636363")
 
 # plot contMap again
 par(new = TRUE) # hack to force below to plot on top of above 
@@ -120,12 +130,54 @@ points(xx_yy$xx,
        pch = 15, cex = 1,
        col = cols[flcol[tree_budsz$tip.label]])
 
-# legends
+rm(xx_yy, offset_xx_yy, pp)
+
+# legend
 legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = cols, 
        bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
 
-# label subgenera, have now updated, shall see if match tree...
+#** clade labelling ----
 
+## FIX BELOW ##
+# label larger orders
+# first calculate order tip positions
+to_label <- contMap_data %>%
+  dplyr::select(position, subgenus) %>%
+  dplyr::group_by(subgenus) %>%
+  tidyr::nest() %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(mintip = purrr::map(data, ~{min(.x$position)})) %>%
+  dplyr::mutate(maxtip = purrr::map(data, ~{max(.x$position)})) %>%
+  tidyr::unnest(cols = c(data, mintip, maxtip)) %>%
+  dplyr::select(subgenus, mintip, maxtip) %>%
+  dplyr::distinct() %>%
+  dplyr::mutate(tiprange = maxtip - mintip)
+# GAH totally non-monophyletic, will need to customise labels
+
+# then filter out smaller orders AND a few that overlap for labelling, 
+# leaves 21 of 43 orders 
+orders_to_label <- orders_to_label %>%
+  dplyr::filter(tiprange > 10 & !(order %in% c("Dipsacales", "Saxifragales", "Sapindales")))
+# and replace overlapping orders with abbreviations
+orders_to_label$order <- gsub("Santalales", "Santal.", orders_to_label$order)
+orders_to_label$order <- gsub("Apiales", "Api.", orders_to_label$order)
+orders_to_label$order <- gsub("Rosales", "Ros.", orders_to_label$order)
+orders_to_label$order <- gsub("Magnoliales", "Magnoli.", orders_to_label$order)
+orders_to_label$order <- gsub("Brassicales", "Brassic.", orders_to_label$order)
+orders_to_label$order <- gsub("Boraginales", "Boragin.", orders_to_label$order)
+
+# source custom arc labelling function
+source("scripts/functions/arclabel.R")
+
+# loop through and draw labels on phylogeny for larger orders
+for(i in 1:length(orders_to_label$order)) {
+  arclabel(text = orders_to_label$order[i],
+           tips = c(orders_to_label$mintip[i], orders_to_label$maxtip[i]),
+           cex = 1,
+           ln.offset = 1.05,
+           lab.offset = 1.069)
+}
+rm(i, orders_to_label)
 
 dev.off()
 
