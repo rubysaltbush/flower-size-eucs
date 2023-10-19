@@ -192,4 +192,4 @@ ggplot(aes(x = meanbatpres_bin, y = logbudsize_mm2)) +
                      "    P = ", format.pval(summary(regressions$lmbudszbat)$coef[2,4], eps = .001, digits = 2)))
 ggsave("figures/regressions/budsize vs bat presence boxplot.pdf", width = 7, height = 6)
 
-
+rm(regressions)

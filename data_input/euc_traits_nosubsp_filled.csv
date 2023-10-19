@@ -1,14 +1,14 @@
 apc_nosubsp,budlength_min,budlength_max,budwidth_min,budwidth_max,frtlength_min,frtlength_max,frtwidth_min,frtwidth_max,bud_n_min,bud_n_max,max_height_m,colours_all,tree_names,range_names,subgenus
-Angophora bakeri,0.4,0.7,0.4,0.7,0.7,1,0.7,1.2,3,7,15,white_cream,Angophora_bakeri,Angophora bakeri,NA
-Angophora costata,0.4,1,0.5,1.1,1,2,0.9,2,3,3,30,white_cream,Angophora_costata,Angophora costata,NA
-Angophora floribunda,0.3,0.5,0.3,0.5,0.7,1.2,0.7,1.1,3,7,30,white_cream,Angophora_floribunda,Angophora floribunda,NA
-Angophora hispida,0.9,1.3,0.7,1.3,1.5,2.6,1.3,2,3,7,8,white_cream,Angophora_hispida,Angophora hispida,NA
-Angophora inopina,0.5,0.8,0.5,0.8,0.6,1.3,0.9,1.5,3,7,8,white_cream,Angophora_inopina,Angophora inopina,NA
-Angophora leiocarpa,0.4,0.6,0.4,0.5,1,1.5,0.7,1.2,3,3,25,white_cream,NA,Angophora leiocarpa,NA
-Angophora melanoxylon,0.4,0.6,0.4,0.7,0.8,1.3,0.7,1.1,3,7,15,white_cream,Angophora_melanoxylon,Angophora melanoxylon,NA
-Angophora robur,0.7,1,0.7,1.2,1.2,1.7,1.2,1.6,3,7,10,white_cream,Angophora_robur,Angophora robur,NA
-Angophora subvelutina,0.4,0.6,0.4,0.6,0.8,1.1,0.6,1.1,3,7,20,white_cream,Angophora_subvelutina,Angophora subvelutina,NA
-Angophora woodsiana,0.6,0.7,0.6,0.7,1.2,1.5,0.9,1.6,3,7,20,white_cream,Angophora_woodsiana,Angophora woodsiana,NA
+Angophora bakeri,0.4,0.7,0.4,0.7,0.7,1,0.7,1.2,3,7,15,white_cream,Angophora_bakeri,Angophora bakeri,Angophora
+Angophora costata,0.4,1,0.5,1.1,1,2,0.9,2,3,3,30,white_cream,Angophora_costata,Angophora costata,Angophora
+Angophora floribunda,0.3,0.5,0.3,0.5,0.7,1.2,0.7,1.1,3,7,30,white_cream,Angophora_floribunda,Angophora floribunda,Angophora
+Angophora hispida,0.9,1.3,0.7,1.3,1.5,2.6,1.3,2,3,7,8,white_cream,Angophora_hispida,Angophora hispida,Angophora
+Angophora inopina,0.5,0.8,0.5,0.8,0.6,1.3,0.9,1.5,3,7,8,white_cream,Angophora_inopina,Angophora inopina,Angophora
+Angophora leiocarpa,0.4,0.6,0.4,0.5,1,1.5,0.7,1.2,3,3,25,white_cream,NA,Angophora leiocarpa,Angophora
+Angophora melanoxylon,0.4,0.6,0.4,0.7,0.8,1.3,0.7,1.1,3,7,15,white_cream,Angophora_melanoxylon,Angophora melanoxylon,Angophora
+Angophora robur,0.7,1,0.7,1.2,1.2,1.7,1.2,1.6,3,7,10,white_cream,Angophora_robur,Angophora robur,Angophora
+Angophora subvelutina,0.4,0.6,0.4,0.6,0.8,1.1,0.6,1.1,3,7,20,white_cream,Angophora_subvelutina,Angophora subvelutina,Angophora
+Angophora woodsiana,0.6,0.7,0.6,0.7,1.2,1.5,0.9,1.6,3,7,20,white_cream,Angophora_woodsiana,Angophora woodsiana,Angophora
 Corymbia abbreviata,1.1,1.6,0.9,1.2,2,3.5,1.7,3,7,11,7,white_cream,Corymbia_abbreviata,Corymbia abbreviata,Corymbia
 Corymbia abergiana,1.2,1.8,0.8,1.1,2.1,3.4,1.8,2.6,7,7,12,white_cream,Corymbia_abergiana,Corymbia abergiana,Corymbia
 Corymbia aparrerinja,0.6,0.7,0.5,0.6,0.9,1.3,0.7,0.9,3,7,20,white_cream,Corymbia_aparrerinja,Corymbia aparrerinja,Blakella
@@ -112,7 +112,7 @@ Eucalyptus adesmophloia,0.7,1.2,0.35,0.5,0.4,0.6,0.5,0.9,11,21,5,white_cream,NA,
 Eucalyptus aequioperta,0.5,0.7,0.25,0.35,0.4,0.5,0.4,0.6,9,15,10,white_cream,Eucalyptus_aequioperta,Eucalyptus aequioperta,Symphyomyrtus
 Eucalyptus agglomerata,0.6,0.8,0.3,0.4,0.3,0.5,0.5,1,11,15,8,white_cream,Eucalyptus_agglomerata,Eucalyptus agglomerata,Eucalyptus
 Eucalyptus aggregata,0.3,0.5,0.2,0.3,0.2,0.5,0.3,0.5,7,7,20,white_cream,Eucalyptus_aggregata,Eucalyptus aggregata,Symphyomyrtus
-Eucalyptus alaticaulis,0.45,0.9,0.25,0.5,0.5,1.1,0.5,1,7,7,30,white_cream,Eucalyptus_alaticaulis,NA,NA
+Eucalyptus alaticaulis,0.45,0.9,0.25,0.5,0.5,1.1,0.5,1,7,7,30,white_cream,Eucalyptus_alaticaulis,NA,Symphyomyrtus
 Eucalyptus alatissima,3.2,4.5,1.5,3,1.4,2,2.5,4.5,3,3,7,red,NA,Eucalyptus alatissima,Symphyomyrtus
 Eucalyptus alba,0.4,0.8,0.4,0.6,0.3,0.6,0.5,0.8,7,7,20,white_cream,Eucalyptus_alba,Eucalyptus alba,Symphyomyrtus
 Eucalyptus albens,0.8,1.8,0.3,0.6,0.6,1.4,0.5,1,7,7,25,white_cream,Eucalyptus_albens,Eucalyptus albens,Symphyomyrtus
@@ -417,7 +417,7 @@ Eucalyptus jucunda,1.1,1.3,0.5,0.6,0.8,1.7,0.8,1.5,7,9,7,white_cream,Eucalyptus_
 Eucalyptus jutsonii,0.6,1,0.3,0.4,0.3,0.5,0.5,0.7,7,7,6,white_cream,Eucalyptus_jutsonii,Eucalyptus jutsonii,Symphyomyrtus
 Eucalyptus kabiana,0.9,1.2,0.3,0.5,0.3,NA,0.5,0.7,7,11,10,white_cream,NA,Eucalyptus kabiana,Symphyomyrtus
 Eucalyptus kartzoffiana,0.5,0.6,0.4,0.5,0.4,0.6,0.4,0.9,3,3,30,white_cream,Eucalyptus_kartzoffiana,Eucalyptus kartzoffiana,Symphyomyrtus
-Eucalyptus kenneallyi,0.6,0.7,0.25,0.3,0.4,0.5,0.3,0.35,7,7,8,white_cream,NA,NA,NA
+Eucalyptus kenneallyi,0.6,0.7,0.25,0.3,0.4,0.5,0.3,0.35,7,7,8,white_cream,NA,NA,Symphyomyrtus
 Eucalyptus kessellii,1.1,2.2,0.8,1.3,0.7,1.7,0.9,2.1,3,7,10,white_cream,Eucalyptus_kessellii,Eucalyptus kessellii,Symphyomyrtus
 Eucalyptus kingsmillii,2.2,4,1.5,2.5,0.8,2,1.5,4,3,3,7,pink white_cream,Eucalyptus_kingsmillii,Eucalyptus kingsmillii,Symphyomyrtus
 Eucalyptus kitsoniana,0.6,0.9,0.5,0.6,0.4,0.9,0.7,1.1,7,7,8,white_cream,Eucalyptus_kitsoniana,Eucalyptus kitsoniana,Symphyomyrtus
@@ -465,7 +465,7 @@ Eucalyptus lucasii,0.3,0.6,0.2,0.4,0.5,0.8,0.4,0.6,7,11,10,white_cream,Eucalyptu
 Eucalyptus lucens,0.4,0.5,0.3,0.4,0.4,0.7,0.4,0.6,7,7,5,white_cream,Eucalyptus_lucens,Eucalyptus lucens,Symphyomyrtus
 Eucalyptus luculenta,1.4,1.9,0.6,0.9,0.7,1,0.7,0.8,7,7,5,white_cream,Eucalyptus_luculenta,Eucalyptus luculenta,Symphyomyrtus
 Eucalyptus luehmanniana,0.6,1,0.4,0.7,0.8,1.3,0.9,1.2,11,15,7,white_cream,Eucalyptus_luehmanniana,Eucalyptus luehmanniana,Eucalyptus
-Eucalyptus luteola,1.8,1.9,0.3,0.4,0.6,0.8,0.5,0.7,9,13,3,white_cream,NA,NA,NA
+Eucalyptus luteola,1.8,1.9,0.3,0.4,0.6,0.8,0.5,0.7,9,13,3,white_cream,NA,NA,Symphyomyrtus
 Eucalyptus macarthurii,0.25,0.5,0.2,0.35,0.2,0.5,0.4,0.6,7,7,40,white_cream,Eucalyptus_macarthurii,Eucalyptus macarthurii,Symphyomyrtus
 Eucalyptus mackintii,0.7,0.8,0.3,0.5,0.5,0.7,0.9,1.3,7,11,30,white_cream,Eucalyptus_mackintii,Eucalyptus mackintii,Eucalyptus
 Eucalyptus macrandra,1.5,3.6,0.2,0.7,0.6,1,0.7,1,13,31,4,yellow,Eucalyptus_macrandra,Eucalyptus macrandra,Symphyomyrtus
@@ -516,7 +516,7 @@ Eucalyptus neglecta,0.3,0.6,0.3,0.5,0.3,0.4,0.4,0.7,7,15,7,white_cream,Eucalyptu
 Eucalyptus neutra,1.1,1.7,0.3,0.6,0.5,1,0.5,0.8,7,7,6,white_cream,Eucalyptus_neutra,Eucalyptus neutra,Symphyomyrtus
 Eucalyptus newbeyi,5.2,6,1.1,1.6,1,2.7,1.8,2.8,7,7,8,green,Eucalyptus_newbeyi,Eucalyptus newbeyi,Symphyomyrtus
 Eucalyptus nicholii,0.3,0.5,0.2,0.3,0.3,0.4,0.3,0.5,7,7,18,white_cream,Eucalyptus_nicholii,Eucalyptus nicholii,Symphyomyrtus
-Eucalyptus nigrifunda,0.9,1.2,0.2,0.3,0.4,0.9,0.3,0.5,9,9,10,white_cream,NA,NA,NA
+Eucalyptus nigrifunda,0.9,1.2,0.2,0.3,0.4,0.9,0.3,0.5,9,9,10,white_cream,NA,NA,Symphyomyrtus
 Eucalyptus nitens,0.6,0.7,0.3,0.4,0.4,0.7,0.4,0.7,7,7,70,white_cream,Eucalyptus_nitens,Eucalyptus nitens,Symphyomyrtus
 Eucalyptus nitida,0.3,0.5,0.3,0.4,0.4,0.8,0.5,0.9,9,15,40,white_cream,Eucalyptus_nitida,Eucalyptus nitida,Eucalyptus
 Eucalyptus nobilis,0.4,0.7,0.3,0.5,0.3,0.6,0.4,0.9,7,7,70,white_cream,Eucalyptus_nobilis,Eucalyptus nobilis,Symphyomyrtus
@@ -687,7 +687,7 @@ Eucalyptus sinuosa,NA,NA,NA,NA,NA,NA,NA,NA,11,25,4,green,NA,Eucalyptus sinuosa,S
 Eucalyptus smithii,0.4,0.6,0.3,0.4,0.3,0.6,0.4,0.8,7,7,45,white_cream,Eucalyptus_smithii,Eucalyptus smithii,Symphyomyrtus
 Eucalyptus socialis,0.8,2,0.3,0.8,0.4,1.2,0.4,1,9,13,10,white_cream,Eucalyptus_socialis,Eucalyptus socialis,Symphyomyrtus
 Eucalyptus sp. Kalbarri (M.I.H.Brooker 7937),0.7,1.4,0.3,0.5,0.5,0.8,0.5,0.8,9,11,4,white_cream,NA,NA,NA
-Eucalyptus sp. Mulga Rock (K.D.Hill & L.A.S.Johnson KH 2668),0.8,NA,0.3,NA,0.4,NA,0.4,0.5,7,9,4,NA,Eucalyptus_minigwalica,NA,NA
+Eucalyptus sp. Mulga Rock (K.D.Hill & L.A.S.Johnson KH 2668),0.8,NA,0.3,NA,0.4,NA,0.4,0.5,7,9,4,NA,Eucalyptus_minigwalica,NA,Symphyomyrtus
 Eucalyptus sp. Southern wheatbelt (D.Nicolle & M.French DN 5507),0.7,1.3,0.4,0.7,0.6,1.1,0.7,0.9,9,13,5,white_cream,NA,Eucalyptus sp. Southern wheatbelt (D.Nicolle & M.French DN 5507),Dumaria
 Eucalyptus sparsa,0.4,0.6,0.3,0.4,0.4,0.7,0.5,0.7,7,7,9,white_cream,Eucalyptus_sparsa,Eucalyptus sparsa,Symphyomyrtus
 Eucalyptus sparsifolia,0.4,0.6,0.2,NA,0.3,0.5,0.5,0.7,9,15,8,white_cream,Eucalyptus_sparsifolia,Eucalyptus sparsifolia,Eucalyptus
@@ -781,9 +781,9 @@ Eucalyptus woodwardii,1.5,1.9,0.8,1,1.2,1.4,1.1,1.5,7,9,10,yellow,Eucalyptus_woo
 Eucalyptus woollsiana,0.2,0.5,0.2,0.3,0.2,0.4,0.2,0.4,7,9,25,white_cream,Eucalyptus_pilligaensis,Eucalyptus woollsiana,Symphyomyrtus
 Eucalyptus wubinensis,0.7,0.9,0.4,0.5,0.5,0.8,0.5,0.7,7,7,8,white_cream,Eucalyptus_wubinensis,Eucalyptus wubinensis,Symphyomyrtus
 Eucalyptus wyolensis,1.2,1.7,0.6,0.8,0.8,1.1,0.8,1,7,11,7,yellow,Eucalyptus_wyolensis,Eucalyptus wyolensis,Symphyomyrtus
-Eucalyptus x balanites,0.8,1.1,0.6,0.7,0.8,0.9,0.8,1,11,11,5,white_cream,Eucalyptus_balanites,NA,NA
-Eucalyptus x balanopelex,1.2,1.9,0.5,0.9,0.8,1,0.9,1.2,7,9,4,white_cream,Eucalyptus_balanopelex,NA,NA
-Eucalyptus x brachyphylla,0.6,0.7,0.3,0.35,0.5,1,0.4,0.6,7,7,4,white_cream,Eucalyptus_brachyphylla,NA,NA
+Eucalyptus x balanites,0.8,1.1,0.6,0.7,0.8,0.9,0.8,1,11,11,5,white_cream,Eucalyptus_balanites,NA,Symphyomyrtus
+Eucalyptus x balanopelex,1.2,1.9,0.5,0.9,0.8,1,0.9,1.2,7,9,4,white_cream,Eucalyptus_balanopelex,NA,Symphyomyrtus
+Eucalyptus x brachyphylla,0.6,0.7,0.3,0.35,0.5,1,0.4,0.6,7,7,4,white_cream,Eucalyptus_brachyphylla,NA,Symphyomyrtus
 Eucalyptus x impensa,4,5,2.5,3.5,2,3,4.8,5.5,1,1,5,pink,Eucalyptus_impensa,Eucalyptus impensa,Symphyomyrtus
 Eucalyptus x lateritica,0.7,1,0.5,0.7,1,1.3,1.2,1.6,9,11,4,white_cream,Eucalyptus_lateritica,Eucalyptus lateritica,Eucalyptus
 Eucalyptus x missilis,1.7,2.3,0.7,0.8,1,1.5,0.8,1.5,15,15,3,yellow,NA,NA,NA

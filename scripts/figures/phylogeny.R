@@ -1,6 +1,5 @@
 # script to simulate evolution of eucalypt bud size on phylogeny and 
-# render this in figure with flower colour labelled at tips adn clades (and clade
-# distributions?) labelled
+# render this in figure with labels for tip flower colour and clades
 
 # produces circular phylogeny (Figure 1b)
 
@@ -31,10 +30,6 @@ cols <- setNames(c(my_colours$flcol_fill[1], my_colours$flcol_fill[2], my_colour
 
 # visualise evolution of euc bud size (log mm2) on phylogeny using contmap
 treecont <- phytools::contMap(tree_budsz, budsz_contdata, plot = FALSE)
-treecont
-# Object of class "contMap" containing:
-# (1) A phylogenetic tree with 680 tips and 518 internal nodes.
-# (2) A mapped continuous trait on the range (1.321756, 7.585154).
 
 # re-colour contmap with continous bud size colour scale
 treecont <- phytools::setMap(treecont, my_colours$budsz)
@@ -50,18 +45,19 @@ dev.off()
 
 #* circular plot ----
 pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 12)
+
 # plot contMap
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
                        ftype = "off", lwd = 3, outline = FALSE,
-                       xlim = c(-100, 100))
+                       xlim = c(-100, 80))
 
-# first label beginning of Neogene boundary at 23 mya
+# first label beginning of Neogene at 23 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23, 
-                     col = "#f8f6f7", lty = 0)
+                     border = "grey", lty = 3)
 
 # then label eucalyptae crown age at 52 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52, 
-                     col = "#dadada", lty = 0)
+                     border = "grey", lty = 2)
 
 # # then add text to boundary points
 # text(x = max(nodeHeights(tree_budsz)) - 23, y = -6, "23 Ma", cex = 1, col = "#636363")
@@ -71,7 +67,7 @@ plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52,
 par(new = TRUE) # hack to force below to plot on top of above 
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
                        ftype = "off", lwd = 2, outline = FALSE,
-                       xlim = c(-100, 100))
+                       xlim = c(-100, 80))
 
 # below adapted from http://blog.phytools.org/2016/08/vertical-legend-in-contmap-style-plots.html
 # add bud size legend using phytools function
@@ -99,7 +95,6 @@ text(x = X[,2], y = Y[,2], round(ticks, 1), pos = 4, cex = 0.8) # draw tick valu
 rm(X, Y, i, ticks)
 
 # tip points coloured by flower colour
-
 # assign plot to object
 pp <- get("last_plot.phylo", envir = .PlotPhyloEnv)
 # from pp object will pull out x and y coordinates to plot points
@@ -116,18 +111,21 @@ offset_xx_yy <- function(xx, yy, offset) {
 xx_yy <- offset_xx_yy(
   xx = pp$xx[1:ape::Ntip(tree_budsz)],
   yy = pp$yy[1:ape::Ntip(tree_budsz)],
-  offset = 4
+  offset = 2
 )
 
-# add flower symmetry points
+# add flower colour points
 points(xx_yy$xx,
        xx_yy$yy,
-       pch = 15, cex = 1.5,
+       pch = 15, cex = 1,
        col = cols[flcol[tree_budsz$tip.label]])
 
 # legends
 legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = cols, 
        bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
+
+# label subgenera, have now updated, shall see if match tree...
+
 
 dev.off()
 
