@@ -19,7 +19,8 @@ logbudsize_mm2 <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, logbudsize_mm2) %>%
   dplyr::filter(!is.na(logbudsize_mm2))
 
-logbudsize_mm2 <- merge(logbudsize_mm2, rangerast$taxa, by.x = "apc_nosubsp", by.y = "taxon_name", all.x = FALSE)
+logbudsize_mm2 <- merge(logbudsize_mm2, rangerast$taxa, by.x = "apc_nosubsp", 
+                        by.y = "taxon_name", all.x = FALSE)
 
 logbudsize_mm2 <- logbudsize_mm2 %>%
   merge(rangerast$cell_taxa, by = "taxon_id", all.x = FALSE)
@@ -57,7 +58,7 @@ dev.off()
 
 rm(rlogBudSize, logbudsize_mm2, meanlogBudSize)
 
-#* mean flower colourfulness ----
+#* flower colourfulness ----
 # prep flower colour data
 colour_bin <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, colour_binary) %>%
@@ -101,7 +102,7 @@ dev.off()
 
 rm(rColour, colour_bin, meanColour)
 
-#* mean leaf area ----
+#* leaf area ----
 # prepare leaf area data
 leafarea_mm2 <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, leafarea_mm2) %>%
@@ -144,5 +145,40 @@ ggplot() +
 dev.off()
 
 rm(rmeanleafarea, meanleafarea, leafarea_mm2)
+
+#* species richness ----
+# calculate richness of euc species across Australia
+richness <- rangerast$cell_taxa %>%
+  dplyr::group_by(cell_id) %>%
+  dplyr::summarise(richness = n())
+summary(richness)
+# this includes a few species not in our analysis as no bud size or flower
+# colour data available for them, but broad patterns very similar
+
+# turn into raster
+rRichness <- terra::subst(rangerast$cell_id, from = richness$cell_id, 
+                          to = richness$richness)
+names(rRichness) <- "richness"
+plot(rRichness)
+
+# save raster as output
+terra::writeRaster(rRichness, "data_output/rasters/euc_sp_richness_aus.tif",
+                   overwrite = TRUE)
+# then have to convert this back to df to plot with ggplot
+rRichness <- as.data.frame(rRichness, xy = TRUE) %>%
+  na.omit()
+head(rRichness)
+
+# plot using ggplot and viridis colour scale with Aus coastline
+pdf("figures/maps/euc_species_richness_map.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rRichness, aes(x = x, y = y, fill = richness)) +
+  scale_fill_viridis_c(breaks = c(10, 50, 100, 150)) +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Eucalypt species richness")
+dev.off()
+
+rm(rRichness, richness)
 
 rm(aus)

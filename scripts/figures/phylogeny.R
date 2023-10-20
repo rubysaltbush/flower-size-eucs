@@ -202,8 +202,5 @@ rm(i, sect_label)
 dev.off()
 
 
-rm(pp, budsz_contdata, tree_budsz, treecont, contMap_data, 
-   cols, flcol, xx_yy, offset_xx_yy)
-# to do - clade labels? categorise species, read in table, use arclabel
-#       - label western/eastern Australia clades? or rely on subclades?
-
+rm(arclabel, budsz_contdata, tree_budsz, treecont, contMap_data, 
+   cols, flcol)
