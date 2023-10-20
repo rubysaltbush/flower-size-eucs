@@ -58,7 +58,7 @@ dev.off()
 # workaround from http://blog.phytools.org/2022/06/how-to-plot-tip-node-labels-without.html
 
 #* circular plot ----
-pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 12)
+pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 9)
 
 # plot contMap
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
@@ -130,68 +130,74 @@ points(xx_yy$xx,
        pch = 15, cex = 1,
        col = cols[flcol[tree_budsz$tip.label]])
 
-rm(xx_yy, offset_xx_yy)
+rm(xx_yy, offset_xx_yy, pp)
 
 # legend
-legend(x = "topright", legend = c("white-cream", "mixed", "colourful"), col = cols, 
-       bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
+legend(x = "bottomleft", legend = c("white-cream", "mixed", "colourful"), 
+       col = cols, bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
 
 #** clade labelling ----
 
-# label larger subgenera
+# source custom arc labelling function
+source("scripts/functions/arclabel.R")
+
+# label broad subgenus clades (some exceptions within label areas)
+arclabel(text = "Blakella",
+         tips = c(1, 34),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.19)
+arclabel(text = "Angophora",
+         orientation = "perpendicular",
+         tips = c(35, 43),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.16)
+arclabel(text = "Corymbia",
+         tips = c(44, 87),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.19)
+arclabel(text = "Eudesmia",
+         tips = c(89, 109),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.19)
+arclabel(text = "Eucalyptus",
+         tips = c(112, 216),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.19)
+arclabel(text = "Symphyomyrtus",
+         tips = c(219, 680),
+         col = "grey",
+         ln.offset = 1.14,
+         lab.offset = 1.19)
+
+# label sections of Symphyomyrtus
 # first calculate tip positions
-subg_label <- contMap_data %>%
-  dplyr::select(position, subgen_label) %>%
-  dplyr::group_by(subgen_label) %>%
+sect_label <- contMap_data %>%
+  dplyr::select(position, sect_label) %>%
+  dplyr::group_by(sect_label) %>%
   tidyr::nest() %>%
   dplyr::ungroup() %>%
   dplyr::mutate(mintip = purrr::map(data, ~{min(.x$position)})) %>%
   dplyr::mutate(maxtip = purrr::map(data, ~{max(.x$position)})) %>%
   tidyr::unnest(cols = c(data, mintip, maxtip)) %>%
-  dplyr::select(subgen_label, mintip, maxtip) %>%
+  dplyr::select(sect_label, mintip, maxtip) %>%
   dplyr::distinct() %>%
-  dplyr::filter(!(is.na(subgen_label)))
-
-# source custom arc labelling function
-source("scripts/functions/arclabel.R")
-
-arclabel(text = "Blakella + two Corymbia",
-         orientation = "perpendicular",
-         tips = c(1, 34),
-         ln.offset = 1.05,
-         lab.offset = 1.1)
-arclabel(text = "Angophora",
-         orientation = "perpendicular",
-         tips = c(35, 43),
-         ln.offset = 1.05,
-         lab.offset = 1.1)
-arclabel(text = "Corymbia",
-         tips = c(44, 87),
-         ln.offset = 1.05,
-         lab.offset = 1.1)
-arclabel(text = "Eudesmia",
-         orientation = "perpendicular",
-         tips = c(89, 109),
-         ln.offset = 1.05,
-         lab.offset = 1.09)
-arclabel(text = "Eucalyptus",
-         tips = c(112, 216),
-         ln.offset = 1.05,
-         lab.offset = 1.1)
-arclabel(text = "Symphyomyrtus",
-         tips = c(219, 680),
-         ln.offset = 1.05,
-         lab.offset = 1.1)
+  dplyr::filter(!(is.na(sect_label)))
 
 # loop through and draw labels on phylogeny for larger orders
-for(i in 1:length(subg_label$subgen_label)) {
-  arclabel(text = subg_label$subgen_label[i],
-           tips = c(subg_label$mintip[i], subg_label$maxtip[i]),
-           cex = 1,
-           ln.offset = 1.05,
-           lab.offset = 1.069)
+for(i in 1:length(sect_label$sect_label)) {
+  arclabel(text = sect_label$sect_label[i],
+           tips = c(sect_label$mintip[i], sect_label$maxtip[i]),
+           cex = 0.75,
+           col = "grey",
+           ln.offset = 1.07,
+           lab.offset = 1.1)
 }
-rm(i, subg_label)
+rm(i, sect_label)
 
 dev.off()
 
