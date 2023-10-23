@@ -235,12 +235,14 @@ batrichness <- batrange_cells %>%
   dplyr::group_by(lyr.1) %>%
   dplyr::summarise(richness = n())
 summary(batrichness)
+rm(batranges, batrange_cells)
 
 # turn into batrichness raster
 rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1, 
                              to = batrichness$richness, others = 0)
 names(rbatrichness) <- "richness"
 plot(rbatrichness, main = "Flower-visiting bat species richness", box = FALSE)
+rm(batrichness)
 # change aus outline projection to match raster
 aus <- terra::project(aus, crs(rangerast$cell_id))
 plot(aus, add = TRUE)
@@ -250,34 +252,44 @@ terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.ti
 
 # then have to convert this back to df to plot with ggplot
 # tried plotting in base R, resolution very bad for some reason
-rbatrichness <- as.data.frame(rbatrichness, xy = TRUE) %>%
+rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
   na.omit()
-head(rbatrichness)
+head(rbatrichnessdf)
 # convert aus to sf for ggplot plotting
 aus <- sf::st_as_sf(aus)
 
-# plot using ggplot and viridis colour scale with Aus coastline
+# plot using ggplot and R colour scale with Aus coastline
 pdf("figures/maps/aus_mean_flower-visiting_bat_richness.pdf", width = 10, height = 10)
 ggplot() +
-  geom_tile(data = rbatrichness, aes(x = x, y = y, fill = richness, colour = richness)) +
+  geom_tile(data = rbatrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
   scale_fill_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
   scale_colour_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
   geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
   theme_void() +
   labs(fill = "Flower-visiting bat\nspecies richness", colour = "Flower-visiting bat\nspecies richness")
 dev.off()
-rm(batranges, batrange_cells)
 
 # as many zeroes, will just use bat richness as binary i.e. bats or no bats
-# get raster back
-# turn into batrichness raster
-rbatrichness <- terra::subst(blankrast, from = batrichness$lyr.1, 
-                             to = batrichness$richness, others = 0)
-names(rbatrichness) <- "richness"
-rm(batrichness)
 # reduce raster to 1 (bats present) or 0 (no bats in area)
 rbatrichness <- terra::ifel(rbatrichness$richness >=1, 1, 0)
 plot(rbatrichness)
+
+# convert back to df to ggplot
+rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
+  na.omit()
+head(rbatrichnessdf)
+
+# plot using ggplot and custom colour scale with Aus coastline
+pdf("figures/maps/aus_mean_flower-visiting_bat_presence.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rbatrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_gradientn(colours = c("white", "#9457eb")) +
+  scale_colour_gradientn(colours = c("white", "#9457eb")) +
+  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
+  theme_void() +
+  labs(fill = "Flower-visiting\nbat presence", colour = "Flower-visiting\nbat presence")
+dev.off()
+rm(rbatrichnessdf)
 
 # extract bat presence value for each cleaned eucalypt occurrence
 # change projection so raster and vector match
