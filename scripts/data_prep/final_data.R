@@ -67,6 +67,7 @@ leaf_dim <- readr::read_csv("data_input/leaf_dim_nosub.csv") %>%
 euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::left_join(leaf_dim, by = "apc_nosubsp")
 rm(leaf_dim)
+
 # confirm that species mean leaf area extracted from EUCLID dimensions
 # i.e. (2/3)*mean(length)*mean(width) correlates with field measurements
 # of actual scanned leaf area available in AusTraits database
@@ -79,13 +80,16 @@ leafarea$taxon_name <- gsub("\\s(?:subsp|var)\\.\\s.+$", "", leafarea$taxon_name
 paste("There are", length(unique(leafarea$taxon_name)), "eucalypt taxa with leaf area data in AusTraits")
 # 474 without subspecies/variants
 table(leafarea$unit) # all values in mm2
-table(leafarea$basis_of_record) # majority from field measurements, <50 from literature
+table(leafarea$basis_of_record) # majority from field measurements, <50 from literature (remove as may be duplicates)
+table(leafarea$life_stage) # mostly adults, will filter out other life stages
 # summarise by species
 leafarea <- leafarea %>%
+  dplyr::filter(basis_of_record != "literature") %>% # filter out literature records, keep only field/lab measurements of actual plants
+  dplyr::filter(life_stage == "adult") %>% # filter out literature records, keep only field/lab measurements of actual plants
   dplyr::group_by(taxon_name) %>%
   dplyr::summarise(meanleafarea_mm2 = mean(as.numeric(value)))
 sum(leafarea$taxon_name %in% euc_traits_nosubsp$apc_nosubsp)
-# 451 taxa match my eucalypt data taxa
+# 440 taxa match my eucalypt data taxa
 # join leaf area estimated from literature dimensions to austraits data
 leafarea <- leafarea %>%
   dplyr::left_join(euc_traits_nosubsp, by = c("taxon_name" = "apc_nosubsp")) %>%
@@ -100,25 +104,26 @@ summary(lflm)
 # 
 # Residuals:
 #   Min       1Q   Median       3Q      Max 
-# -1.79667 -0.24570 -0.00985  0.21936  1.40892 
+# -1.61377 -0.22976 -0.01235  0.21722  1.28348 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)        1.06144    0.21189   5.009 7.86e-07 ***
-#   log(leafarea_mm2)  0.86964    0.02907  29.919  < 2e-16 ***
+# (Intercept)        0.98500    0.19465   5.061 6.17e-07 ***
+#   log(leafarea_mm2)  0.87835    0.02667  32.929  < 2e-16 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.4068 on 449 degrees of freedom
-# (23 observations deleted due to missingness)
-# Multiple R-squared:  0.666,	Adjusted R-squared:  0.6652 
-# F-statistic: 895.1 on 1 and 449 DF,  p-value: < 2.2e-16
+# Residual standard error: 0.3665 on 438 degrees of freedom
+# (22 observations deleted due to missingness)
+# Multiple R-squared:  0.7123,	Adjusted R-squared:  0.7116 
+# F-statistic:  1084 on 1 and 438 DF,  p-value: < 2.2e-16
 
 # check residuals
 car::residualPlot(lflm)
 qqnorm(lflm$residuals)
 qqline(lflm$residuals)
-# look okay
+# have checked two outliers (one high and one low), both seem like legitimate
+# field measures so will leave in model
 
 # export pretty plot to include in supp. mat.
 ggplot(leafarea, aes(x = log(meanleafarea_mm2), y = log(leafarea_mm2))) +
@@ -130,7 +135,7 @@ ggplot(leafarea, aes(x = log(meanleafarea_mm2), y = log(leafarea_mm2))) +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(lflm)$r.squared, 2),
                      "    P = ", format.pval(summary(lflm)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/Fig Sx AusTraits vs EUCLID leaf area.pdf", width = 7, height = 6)
+ggsave("figures/regressions/Fig S2 AusTraits vs EUCLID leaf area.pdf", width = 7, height = 6)
 rm(lflm, leafarea)
 
 # add in data on species' mean environment (phosphorus, temperature, precipitation
