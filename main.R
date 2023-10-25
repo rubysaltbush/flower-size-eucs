@@ -53,3 +53,6 @@ source("scripts/figures/phylogeny.R")
 # trait maps for figures
 source("scripts/figures/maps.R")
 
+#### SUPPORTING ####
+
+source("scripts/analyses/field_data.R")
