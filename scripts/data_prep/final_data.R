@@ -129,7 +129,7 @@ qqline(lflm$residuals)
 ggplot(leafarea, aes(x = log(meanleafarea_mm2), y = log(leafarea_mm2))) +
   geom_point() +
   geom_smooth(method = "lm", colour = "red") +
-  theme_pubr() +
+  ggpubr::theme_pubr() +
   xlab("AusTraits mean eucalypt leaf area (log mm²)") +
   ylab("EUCLID mean eucalypt leaf area (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
@@ -146,9 +146,17 @@ euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::left_join(spmean_env, by = "range_names")
 rm(spmean_env)
 hist(euc_traits_nosubsp$meanbatpres)
+# export publishable histogram
+ggplot(euc_traits_nosubsp, aes(x = meanbatpres)) +
+  geom_histogram() +
+  ggpubr::theme_pubr() +
+  xlab("Mean flower-visiting bat presence") +
+  ylab("Number of eucalypt species")
+ggsave("figures/Fig S8 euc species mean bat presence histogram.pdf", width = 7, height = 4)
 # bat presence best to classify as binary (bats or no bats)
 # will have 50% cutoff for now
 euc_traits_nosubsp$meanbatpres_bin <- ifelse(euc_traits_nosubsp$meanbatpres > 0.5, 1, 0)
+table(euc_traits_nosubsp$meanbatpres_bin)
                                   
 # write data to folder so it can be cached
 readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
