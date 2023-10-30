@@ -62,7 +62,7 @@ pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 9)
 
 # plot contMap
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
-                       ftype = "off", lwd = 2.5, outline = FALSE,
+                       ftype = "off", lwd = 2.2, outline = FALSE,
                        xlim = c(-100, 80))
 
 # first label beginning of Neogene at 23 mya
@@ -76,7 +76,7 @@ plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52,
 # plot contMap again
 par(new = TRUE) # hack to force below to plot on top of above 
 phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
-                       ftype = "off", lwd = 2.5, outline = FALSE,
+                       ftype = "off", lwd = 2.2, outline = FALSE,
                        xlim = c(-100, 80))
 
 # below adapted from http://blog.phytools.org/2016/08/vertical-legend-in-contmap-style-plots.html

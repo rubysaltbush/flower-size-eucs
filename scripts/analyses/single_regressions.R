@@ -185,11 +185,11 @@ ggplot(aes(x = meanbatpres_bin, y = logbudsize_mm2)) +
   geom_jitter(aes(colour = colour_binary), size = 0.8, alpha = 0.9) +
   scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   scale_x_discrete(labels = c("bats absent", "bats present")) +
-  xlab("Species mean flower-visiting bat presence") +
+  xlab("") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszbat)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszbat)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/budsize vs bat presence boxplot.pdf", width = 7, height = 6)
+ggsave("figures/regressions/budsize vs bat presence boxplot.pdf", width = 8, height = 6)
 
 rm(regressions)
