@@ -78,6 +78,8 @@ ggsave("figures/regressions/predictors pairwise correlation plot.pdf", width = 9
 
 #### run models ####
 
+# with all predictors scaled so can compare effect sizes meaningfully
+
 multi_reg <- list()
 
 #* leaf area abiotic ----
@@ -89,8 +91,6 @@ multi_reg <- list()
 # The full model formula will look like this:
 
 #  log(leaf_area) ~ meanMAT + meanMAP + meanAVP
-
-# with all predictors scaled so can compare effect sizes meaningfully
 
 multi_reg$leafarea_abiotic <- lm(log(leafarea_mm2) ~ scale(meanMAT) + 
                                                      scale(meanMAP) + 
@@ -393,6 +393,18 @@ summary(multi_reg$flcolour_PGLS)
 #                                                   
 #  Note: Wald-type p-values for coefficients, conditional on alpha=0.9353154
 #  Parametric bootstrap results based on 100 fitted replicates
+
+#### dominance analysis ####
+
+dominanceanalysis <- domir::domin(logbudsize_mm2 ~ scale(meanMAT) + 
+                                    scale(meanMAP) + scale(meanAVP) + 
+                                    scale(meanbirdrich) + scale(meanbatpres_bin),
+                                  reg = lm,
+                                  fitstat = list(summary, "r.squared"),
+                                  data = euc_traits_nosubsp)
+dominanceanalysis
+# output suggests bats then birds then AVP then MAP then MAT best predictors
+# when all considered separately
 
 #### conclusions ####
 
