@@ -209,31 +209,6 @@ car::vif(multi_reg$budsize_full)
 # 1.914214        1.913569        2.493547        2.647623        3.836827 
 # VIF below 3.85 for all, generally recommended threshold is 5-10
 
-
-# TRY OUT MODEL SELECTION APPROACH OUT OF CURIOSITY
-# approach copied from https://uc-r.github.io/model_selection#best
-install.packages("leaps")
-library(leaps)
-best_subset <- leaps::regsubsets(logbudsize_mm2 ~ scale(meanMAT) + 
-                                 scale(meanMAP) + 
-                                   scale(meanAVP) + #abiotic
-                                   scale(meanbirdrich) + 
-                                   scale(meanbatpres_bin), #biotic
-                                 data = euc_traits_nosubsp)
-results <- summary(best_subset)
-
-tibble(predictors = 1:5,
-       adj_R2 = results$adjr2,
-       Cp = results$cp,
-       BIC = results$bic) %>%
-  gather(statistic, value, -predictors) %>%
-  ggplot(aes(predictors, value, color = statistic)) +
-  geom_line(show.legend = F) +
-  geom_point(show.legend = F) +
-  facet_wrap(~ statistic, scales = "free")
-# 2 variable model
-coef(best_subset, 2)
-
 #* flower colourfulness full model ----
 
 # using glm with binomial distribution for logistic regression
@@ -301,6 +276,98 @@ rm(to_drop)
 
 rownames(pgls_data) <- pgls_data[,1] # tree names to row names
 pgls_data[,1] <- NULL
+
+#* bud size abiotic PGLS ----
+
+multi_reg$budsize_abiotic_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanMAT) + 
+                                             scale(meanMAP) + 
+                                             scale(meanAVP),
+                                           data = pgls_data,
+                                           phy = tree_pgls,
+                                           model = "BM",
+                                           boot = 1000)
+summary(multi_reg$budsize_abiotic_PGLS)
+
+# Call:
+#   phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanMAT) + 
+#                      scale(meanMAP) + scale(meanAVP), data = pgls_data, phy = tree_pgls, 
+#                    model = "BM", boot = 1000)
+# 
+# AIC logLik 
+# 2163  -1077 
+# 
+# Raw residuals:
+#   Min      1Q  Median      3Q     Max 
+# -2.2581 -0.5904 -0.0114  0.5670  3.7340 
+# 
+# Mean tip height: 58.36226
+# Parameter estimate(s) using ML:
+#   sigma2: 0.8742472 
+# 
+# Coefficients:
+#   Estimate     StdErr    t.value lowerbootCI upperbootCI   p.value    
+# (Intercept)     3.6767647  2.7088214  1.3573301  -1.4844708      9.1511 0.1751368    
+# scale(meanMAT)  0.0281057  0.0490979  0.5724423  -0.0694359      0.1293 0.5672159    
+# scale(meanMAP) -0.1473231  0.0435913 -3.3796428  -0.2317710     -0.0647 0.0007682 ***
+#   scale(meanAVP)  0.0849894  0.0411703  2.0643359   0.0045727      0.1658 0.0393731 *  
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# R-squared: 0.02043	Adjusted R-squared: 0.01601 
+# 
+# sigma2: 0.8742472
+# bootstrap mean: 0.8701213 (on raw scale)
+# 0.8687721 (on log scale, then back transformed)
+# bootstrap 95% CI: (0.7797863,0.9666803)
+# 
+# Parametric bootstrap results based on 1000 fitted replicates
+
+#* bud size biotic PGLS ----
+
+multi_reg$budsize_biot_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanbirdrich) + 
+                                             scale(meanbatpres_bin),
+                                           data = pgls_data,
+                                           phy = tree_pgls,
+                                           model = "BM",
+                                           boot = 1000)
+summary(multi_reg$budsize_biot_PGLS)
+
+# Call:
+#   phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanbirdrich) + 
+#                      scale(meanbatpres_bin), data = pgls_data, phy = tree_pgls, 
+#                    model = "BM", boot = 1000)
+# 
+# AIC logLik 
+# 2162  -1077 
+# 
+# Raw residuals:
+#   Min      1Q  Median      3Q     Max 
+# -2.3220 -0.5330  0.0686  0.6806  4.0034 
+# 
+# Mean tip height: 58.36226
+# Parameter estimate(s) using ML:
+#   sigma2: 0.8751325 
+# 
+# Coefficients:
+#   Estimate    StdErr   t.value lowerbootCI upperbootCI  p.value
+# (Intercept)             3.593368  2.707957  1.326966   -1.902009      8.6953 0.184975
+# scale(meanbirdrich)    -0.101673  0.039403 -2.580333   -0.180173     -0.0283 0.010083
+# scale(meanbatpres_bin)  0.130369  0.037732  3.455094    0.057703      0.2005 0.000585
+# 
+# (Intercept)               
+# scale(meanbirdrich)    *  
+#   scale(meanbatpres_bin) ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# R-squared: 0.01944	Adjusted R-squared: 0.01649 
+# 
+# sigma2: 0.8751325
+# bootstrap mean: 0.8730049 (on raw scale)
+# 0.8715921 (on log scale, then back transformed)
+# bootstrap 95% CI: (0.7801833,0.9690999)
+# 
+# Parametric bootstrap results based on 1000 fitted replicates
 
 #* bud size full PGLS ----
 
@@ -430,6 +497,16 @@ dominanceanalysis <- domir::domin(logbudsize_mm2 ~ scale(meanMAT) +
 dominanceanalysis
 # output suggests bats then birds then AVP then MAP then MAT best predictors
 # when all considered separately
+
+# compare models with BIC
+BIC(multi_reg$budsize_abiotic, multi_reg$budsize_full)
+
+# no BIC for PGLS, AIC?
+c(multi_reg$budsize_abiotic_PGLS$aic, multi_reg$budsize_biot_PGLS$aic,
+  multi_reg$budsize_PGLS$aic)
+# log likelihood?
+c(multi_reg$budsize_abiotic_PGLS$logLik, multi_reg$budsize_biot_PGLS$logLik,
+  multi_reg$budsize_PGLS$logLik)
 
 #### conclusions ####
 
