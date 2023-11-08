@@ -209,6 +209,31 @@ car::vif(multi_reg$budsize_full)
 # 1.914214        1.913569        2.493547        2.647623        3.836827 
 # VIF below 3.85 for all, generally recommended threshold is 5-10
 
+
+# TRY OUT MODEL SELECTION APPROACH OUT OF CURIOSITY
+# approach copied from https://uc-r.github.io/model_selection#best
+install.packages("leaps")
+library(leaps)
+best_subset <- leaps::regsubsets(logbudsize_mm2 ~ scale(meanMAT) + 
+                                 scale(meanMAP) + 
+                                   scale(meanAVP) + #abiotic
+                                   scale(meanbirdrich) + 
+                                   scale(meanbatpres_bin), #biotic
+                                 data = euc_traits_nosubsp)
+results <- summary(best_subset)
+
+tibble(predictors = 1:5,
+       adj_R2 = results$adjr2,
+       Cp = results$cp,
+       BIC = results$bic) %>%
+  gather(statistic, value, -predictors) %>%
+  ggplot(aes(predictors, value, color = statistic)) +
+  geom_line(show.legend = F) +
+  geom_point(show.legend = F) +
+  facet_wrap(~ statistic, scales = "free")
+# 2 variable model
+coef(best_subset, 2)
+
 #* flower colourfulness full model ----
 
 # using glm with binomial distribution for logistic regression
