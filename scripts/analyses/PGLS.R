@@ -29,8 +29,8 @@ summary(pglsModel)
 # Generalized least squares fit by maximum likelihood
 # Model: logbudsize_mm2 ~ medianlong 
 # Data: pgls_data 
-# AIC      BIC    logLik
-# 2181.178 2194.722 -1087.589
+# AIC     BIC    logLik
+# 2180.466 2194.01 -1087.233
 # 
 # Correlation Structure: corBrownian
 # Formula: ~spp 
@@ -38,23 +38,24 @@ summary(pglsModel)
 #   numeric(0)
 # 
 # Coefficients:
-#              Value    Std.Error  t-value   p-value
-# (Intercept)  5.578457 2.8090386  1.985895  0.0475
-# medianlong  -0.014449 0.0053874 -2.682039  0.0075
+#   Value Std.Error   t-value p-value
+# (Intercept)  5.686459 2.8088307  2.024493  0.0433
+# medianlong  -0.015249 0.0054214 -2.812656  0.0051
 # 
 # Correlation: 
 #   (Intr)
-# medianlong -0.26 
+# medianlong -0.262
 # 
 # Standardized residuals:
 #   Min           Q1          Med           Q3          Max 
-# -0.303111378 -0.069072506  0.006017333  0.084652998  0.542929495 
+# -0.302449572 -0.069079320  0.006085422  0.083490638  0.541317026 
 # 
-# Residual standard error: 7.164214 
+# Residual standard error: 7.160438 
 # Degrees of freedom: 675 total; 673 residual
+
 plot(logbudsize_mm2 ~ medianlong, data = pgls_data)
 abline(a = coef(pglsModel)[1], b = coef(pglsModel)[2])
-# significant, P = 0.008
+# significant, P = 0.005
 
 #* figure ----
 # scatter plot with points coloured by flower colour
@@ -67,7 +68,7 @@ ggplot(euc_traits_nosubsp, aes(x = medianlong, y = logbudsize_mm2)) +
   xlab("Species median longitude") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = "PGLS p = 0.008")
+  labs(title = "PGLS p = 0.005")
 ggsave("figures/regressions/bud size by median longitude PGLS.pdf", width = 8, height = 5)
 
 # bud size and flower colour ----
