@@ -1,5 +1,5 @@
 # script to get environmental data rasters and calculate species means using
-# cleaned eucalypt occurrence data, for: 
+# cleaned eucalypt occurrence data (rasterised), for: 
 #                     1) soil available phosphorus
 #                     2) mean annual temperature
 #                     3) mean annual precipitation
@@ -11,14 +11,70 @@
 
 spmean_env <- cache_RDS("data_output/euc_species_mean_env.csv", 
                         read_function = readr::read_csv,
-                        save_function = write_csv, function() {
+                        save_function = readr::write_csv, 
+                        function() {
 
+#### thin occurrences ####
+
+# to avoid any sampling bias in herbarium occurrence data, thin
+# cleaned occurrences using spThin package to remove species observations
+# less than 5 km apart from obs. of same species
+# thinning takes a long time so cache output
+
+occurrences_thinned <- cache_RDS("data_output/occurrences_thinned.csv",
+                                 read_function = readr::read_csv,
+                                 save_function = readr::write_csv, 
+                                 function() {
+                          
 # read in cleaned euc herbarium occurrences from Bree-Anne Laugier Kitchener
 occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv") 
 occurrences <- occurrences %>%
   dplyr::select(range_names = speciesLevelUpdated, latitude, longitude, year,
                 locality)
-                          
+
+# make list of occurrences by species to iterate thinning for each species
+occurrences_list <- base::split(occurrences, f = occurrences$range_names)
+
+# how many occurrences per species?
+paste("there are", round(mean(sapply(occurrences_list, nrow)), 2), 
+            "occurrences on average per species with a max of",
+            max(sapply(occurrences_list, nrow)), "and a min of",
+            min(sapply(occurrences_list, nrow)))
+# how many species with occurrences >= 1000 ?
+sum(sapply(occurrences_list, nrow) >= 1000)
+# 18 species with >1000 occurrences, not too many
+
+# use spThin::thin function for each species in occurrence data
+# using lapply to iterate over each species and thin accordingly
+# will return, will do 1000 reps to be sure to choose best set for species
+# with large numbers of occurrences (may take a while, 823,000 instances total)
+starttime <- Sys.time()
+thinlist <- lapply(occurrences_list,
+                   FUN = spThin::thin,
+                   lat.col = "latitude",
+                   long.col = "longitude",
+                   spec.col = "range_names",
+                   thin.par = 5,
+                   reps = 1000, # number of times to iterate
+                   locs.thinned.list.return = TRUE,
+                   write.files = FALSE,
+                   write.log.file = FALSE)
+# returns a list with all 1000 possibilities, select longest from each
+thinlistmax <- list()
+for(name in names(thinlist)) {
+  thinlistmax[[name]] <- as.data.frame(thinlist[[name]][which.max(lengths(thinlist[[name]]))])
+}
+# then convert list back to long data frame of occurrences
+occurrences_thinned <- dplyr::bind_rows(thinlistmax, .id = "range_names")
+endtime <- Sys.time()
+totaltime <- endtime - starttime
+totaltime # Time difference of 1.326306 hours
+rm(occurrences, occurrences_list, thinlist, thinlistmax, 
+   endtime, starttime, totaltime, name)
+
+readr::write_csv(occurrences_thinned, "data_output/occurrences_thinned.csv")
+})
+
 #### 1 - PHOSPHORUS ####                        
 # read in 3 rasters of available phosphorus across Australia (90m resolution)
 # from the Soil and Landscape Grid of Australia (SLGA)
@@ -68,7 +124,8 @@ terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff",
 
 # extract available phosphorus value for each cleaned eucalypt occurrence
 # first make occurrences spatial
-euc_occurr <- terra::vect(occurrences, geom = c("longitude", "latitude"), 
+euc_occurr <- terra::vect(occurrences_thinned, 
+                          geom = c("Longitude", "Latitude"), 
                           crs = crs(mean_avp))
 # check it out
 plot(euc_occurr, add = TRUE)
@@ -76,11 +133,11 @@ plot(euc_occurr, add = TRUE)
 # now extract!
 euc_occurr_mean_avp <- terra::extract(mean_avp, euc_occurr)
 
-# and join back to data frame
-occurrences$mean_AVP <- euc_occurr_mean_avp[, -1]
+# and join back to data frame (relying on indexing to match)
+occurrences_thinned$mean_AVP <- euc_occurr_mean_avp[, -1]
 
 # now summarise by species!
-species_meanAVP <- occurrences %>%
+species_meanAVP <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanAVP = mean(mean_AVP, na.rm = TRUE))
 
@@ -96,7 +153,7 @@ rm(mean_avp, euc_occurr_mean_avp)
 # Precipitation calculate MAT and MAP per species as well
 
 # read in raster of global Mean Annual Air Temperature for 1981-2010
-# from CHELSA v2.1 
+# from CHELSA v2.1 (kilometre resolution)
 # Brun, P., Zimmermann, N.E., Hari, C., Pellissier, L., Karger, D. (2022): Data from: CHELSA-BIOCLIM+ A novel set of global climate-related predictors at kilometre-resolution. EnviDat. https://doi.org/10.16904/envidat.332
 # Karger, D.N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H., Soria-Auza, R.W., Zimmermann, N.E., Linder, P., Kessler, M. (2017): Climatologies at high resolution for the Earth land surface areas. Scientific Data. 4 170122. https://doi.org/10.1038/sdata.2017.122
 # too large for GitHub, cached
@@ -121,10 +178,10 @@ plot(euc_occurr, add = TRUE)
 # now extract!
 euc_occurr_mean_MAT <- terra::extract(mat, euc_occurr)
 # and join back to data frame
-occurrences$mat_chelsav2 <- euc_occurr_mean_MAT[, -1]
+occurrences_thinned$mat_chelsav2 <- euc_occurr_mean_MAT[, -1]
 
 # summarise MAT by species!
-species_meanMAT <- occurrences %>%
+species_meanMAT <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAT = mean(mat_chelsav2, na.rm = TRUE))
 summary(species_meanMAT$meanMAT)
@@ -138,13 +195,13 @@ map <- terra::rast("data_cache/CHELSA_bio12_1981-2010_V.2.1.tif")
 # clip to Australia
 map <- terra::crop(map, terra::ext(c(xmin = 112, xmax = 155, ymin = -43.74, ymax = -9.14)))
 # check it out
-plot(map, main = "Annual Precipitation Amount (kg m-2 year-1)")
+plot(map, main = "Annual Precipitation Amount (mm)") # mm equivalent to kg m-2
 plot(aus, add = TRUE)
 
 # export raster image with base R as resolution too high for ggplot
 pdf(file = "figures/maps/aus_mean_annual_precipitation_CHELSAv2.pdf",
     width = 10, height = 10)
-plot(map, main = "Annual Precipitation Amount (kg m-2 year-1)", box = FALSE)
+plot(map, main = "Annual Precipitation Amount (mm)", box = FALSE)
 plot(aus, add = TRUE)
 dev.off()
 
@@ -154,10 +211,10 @@ plot(euc_occurr, add = TRUE)
 # now extract!
 euc_occurr_mean_MAP <- terra::extract(map, euc_occurr)
 # and join back to data frame
-occurrences$map_chelsav2 <- euc_occurr_mean_MAP[, -1]
+occurrences_thinned$map_chelsav2 <- euc_occurr_mean_MAP[, -1]
 
 # summarise MAP by species!
-species_meanMAP <- occurrences %>%
+species_meanMAP <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAP = mean(map_chelsav2, na.rm = TRUE))
 summary(species_meanMAP$meanMAP)
@@ -210,12 +267,18 @@ batranges <- batranges[!(names(batranges) %in% c("Dobsonia_magna_outlier",
                                                  "Pteropus_scapulatus_outlier"))]
 
 # generate blank raster at finer scale than eucalypt ranges raster
-# 20km*20km, each cell with unique integer value
+# 5km*5km to match occurrence thinning, each cell with unique integer value
 # to intersect with bat and bird ranges
-blankrast <- terra::rast(matrix(1:39975, 205),
+
+# generate blank raster with defined resolution (5000 m = 5km)
+blankrast <- terra::rast(resolution = c(5000, 5000),
                          extent = terra::ext(rangerast$cell_id),
                          crs = terra::crs(rangerast$cell_id))
+blankrast[] <- 1:max(terra::cells(blankrast)) # fill cells with unique ID
 plot(blankrast)
+# check resolution correct
+terra::res(blankrast)
+# looks good!
 
 batrange_cells <- dplyr::tibble()
 for(name in names(batranges)) {
@@ -250,23 +313,11 @@ plot(aus, add = TRUE)
 terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.tif",
                    overwrite = TRUE)
 
-# then have to convert this back to df to plot with ggplot
-# tried plotting in base R, resolution very bad for some reason
-rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
-  na.omit()
-head(rbatrichnessdf)
-# convert aus to sf for ggplot plotting
-aus <- sf::st_as_sf(aus)
-
-# plot using ggplot and R colour scale with Aus coastline
-pdf("figures/maps/aus_mean_flower-visiting_bat_richness.pdf", width = 10, height = 10)
-ggplot() +
-  geom_tile(data = rbatrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
-  scale_fill_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
-  scale_colour_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
-  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
-  theme_void() +
-  labs(fill = "Flower-visiting bat\nspecies richness", colour = "Flower-visiting bat\nspecies richness")
+# export raster image with base R as resolution too high for ggplot
+pdf(file = "figures/maps/aus_mean_flower-visiting_bat_richness.pdf",
+    width = 10, height = 10)
+plot(rbatrichness, main = "Flower-visiting bat species richness", box = FALSE)
+plot(aus, add = TRUE)
 dev.off()
 
 # as many zeroes, will just use bat richness as binary i.e. bats or no bats
@@ -278,6 +329,8 @@ plot(rbatrichness)
 rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
   na.omit()
 head(rbatrichnessdf)
+# convert aus to sf for ggplot plotting
+aus <- sf::st_as_sf(aus)
 
 # plot using ggplot and custom colour scale with Aus coastline
 pdf("figures/maps/aus_mean_flower-visiting_bat_presence.pdf", width = 10, height = 10)
@@ -301,16 +354,16 @@ plot(euc_occurr, add = TRUE)
 euc_occurr_mean_batp <- terra::extract(rbatrichness, euc_occurr)
 
 # and join back to data frame
-occurrences$batpresence <- euc_occurr_mean_batp[, -1]
+occurrences_thinned$batpresence <- euc_occurr_mean_batp[, -1]
 
 # now summarise by species!
-species_meanbatpres <- occurrences %>%
+species_meanbatpres <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanbatpres = mean(batpresence, na.rm = TRUE))
 
 # check it out
 summary(species_meanbatpres$meanbatpres)
-hist(species_meanbatpres$meanbatpres) # more 0s with finer resolution
+hist(species_meanbatpres$meanbatpres) # mostly 0 or 1, v few in between
 rm(rbatrichness, euc_occurr_mean_batp)
 
 #### 5 - BIRD RICHNESS #### 
@@ -516,7 +569,7 @@ readr::write_csv(ausflowervisitingbirds, "data_output/aus_flower_visiting_birds.
 # read in massive shapefile for all bird species ranges across Australia
 # Birds of the World by Birdlife International
 # and filter down to only flower-visiting taxa
-
+# too large for GitHub and no permission to share, file cached
 ausbirdranges <- sf::st_read("data_cache/BOTW_ausonly.shp")
 
 ausbirdrangestaxa <- ausbirdranges %>%
@@ -558,6 +611,7 @@ rm(ausbirdrangestaxa, ausbirdranges, ausflowervisitingbirds, mismatches)
 
 # first read in range maps for Australian flower visiting bird species
 # as per above assembled species list
+# also cached, files too large and not permitted to share
 files <- list.files(path = "data_cache/ausflvisbirdliferanges", 
                     pattern = ".shp$", full.names = TRUE)
 birdranges <- lapply(files, FUN = terra::vect)
@@ -578,7 +632,7 @@ plot(birdranges$`Acanthagenys rufogularis`, add = TRUE) # central Aus
 plot(birdranges$`Xanthotis flaviventer`, add = TRUE) # tropical north Qld
 # looks good!
 
-# now, extract blank 20x20km raster cell ID for each bird range map
+# now, extract blank 5x5km raster cell ID for each bird range map
 birdrange_cells <- tibble::tibble()
 for(name in names(birdranges)) {
   temp <- terra::extract(x = blankrast, y = birdranges[[name]])
@@ -604,57 +658,45 @@ rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1,
 names(rbirdrichness) <- "richness"
 plot(rbirdrichness)
 # save raster as output
-terra::writeRaster(rbirdrichness, "data_output/rasters/flvisbird_sprichness_aus.tif",
+terra::writeRaster(rbirdrichness, 
+                   "data_output/rasters/flvisbird_sprichness_aus.tif",
                    overwrite = TRUE)
-# then have to convert this back to df to plot with ggplot
-rbirdrichness <- as.data.frame(rbirdrichness, xy = TRUE) %>%
-  na.omit()
-head(rbirdrichness)
 
-# plot using ggplot and viridis colour scale with Aus coastline
-pdf("figures/maps/aus_mean_flower-visiting_bird_richness.pdf", width = 10, height = 10)
-ggplot() +
-  geom_tile(data = rbirdrichness, aes(x = x, y = y, fill = richness, colour = richness)) +
-  scale_fill_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
-  scale_colour_gradientn(colours = c("#F2F2F2","#EEBEAC", "#EBB065", "#E7CA24", "#C0DD00", "#74CB01", "#36B700", "#00A600")) +
-  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
-  theme_void() +
-  labs(fill = "Flower-visiting bird\nspecies richness", colour = "Flower-visiting bird\nspecies richness")
+#convert aus outline back to terra SpatVect to plot
+aus <- terra::vect(aus)
+# export raster image with base R as resolution too high for ggplot
+pdf(file = "figures/maps/aus_mean_flower-visiting_bird_richness.pdf",
+    width = 10, height = 10)
+plot(rbirdrichness, main = "Flower-visiting bird species richness", box = FALSE)
+plot(aus, add = TRUE)
 dev.off()
-rm(birdranges, birdrange_cells)
+
+rm(birdranges, birdrange_cells, blankrast, aus, birdrichness)
 
 # now calculate mean richness of fl-vis birds in landcsape per species
-# get raster back
-# turn into batrichness raster
-rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1, 
-                              to = birdrichness$richness, others = 0)
-names(rbirdrichness) <- "richness"
-rm(birdrichness)
-
 # extract birdrichness value for each cleaned eucalypt occurrence
 # check it out
-plot(rbirdrichness)
 plot(euc_occurr, add = TRUE)
 
 # now extract!
 euc_occurr_mean_fvbirdr <- terra::extract(rbirdrichness, euc_occurr)
 
 # and join back to data frame
-occurrences$birdrich <- euc_occurr_mean_fvbirdr[, -1]
+occurrences_thinned$birdrich <- euc_occurr_mean_fvbirdr[, -1]
 
 # now summarise by species!
-species_meanbirdrich <- occurrences %>%
+species_meanbirdrich <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanbirdrich = mean(birdrich, na.rm = TRUE))
 
 # check it out
 summary(species_meanbirdrich$meanbirdrich)
 hist(species_meanbirdrich$meanbirdrich)
-rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr, aus, blankrast)
+rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr)
 
 #### FINAL SP MEAN ENV ####
 
-# join all together and rename column
+# join all species environment means together
 spmean_env <- species_meanAVP %>%
   dplyr::left_join(species_meanMAT, by = "range_names") %>%
   dplyr::left_join(species_meanMAP, by = "range_names") %>%
@@ -662,9 +704,9 @@ spmean_env <- species_meanAVP %>%
   dplyr::left_join(species_meanbirdrich, by = "range_names")
 
 # add in median longitude of each eucalypt species
-medianlong <- occurrences %>%
+medianlong <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
-  dplyr::summarise(medianlong = median(longitude, na.rm = TRUE))
+  dplyr::summarise(medianlong = median(Longitude, na.rm = TRUE))
 spmean_env <- spmean_env %>%
   dplyr::left_join(medianlong, by = "range_names")
 
@@ -672,9 +714,10 @@ spmean_env <- spmean_env %>%
 readr::write_csv(spmean_env, "data_output/euc_species_mean_env.csv")
 
 # export eucalypt herbarium records with associated climate and pollinator data
-readr::write_csv(occurrences, "data_output/occurrence_data_with_environment.csv")
+readr::write_csv(occurrences_thinned, 
+                 "data_output/thinned_occurrence_data_with_environment.csv")
 
 rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatpres,
-   species_meanbirdrich, medianlong, occurrences)
+   species_meanbirdrich, medianlong, occurrences_thinned)
 
 })
