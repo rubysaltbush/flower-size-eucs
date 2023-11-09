@@ -104,27 +104,27 @@ summary(multi_reg$leafarea_abiotic)
 # 
 # Residuals:
 #   Min       1Q   Median       3Q      Max 
-# -2.91555 -0.38677  0.03106  0.38317  2.06176 
+# -3.03964 -0.38082  0.02849  0.37837  2.13782 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)     7.15865    0.02226 321.613  < 2e-16 ***
-#   scale(meanMAT)  0.16642    0.02642   6.298 5.02e-10 ***
-#   scale(meanMAP)  0.25297    0.02702   9.364  < 2e-16 ***
-#   scale(meanAVP)  0.14414    0.02985   4.829 1.65e-06 ***
+# (Intercept)     7.15865    0.02227 321.451  < 2e-16 ***
+#   scale(meanMAT)  0.16994    0.02626   6.471 1.72e-10 ***
+#   scale(meanMAP)  0.24094    0.02744   8.782  < 2e-16 ***
+#   scale(meanAVP)  0.15526    0.03007   5.163 3.09e-07 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.624 on 782 degrees of freedom
+# Residual standard error: 0.6243 on 782 degrees of freedom
 # (12 observations deleted due to missingness)
-# Multiple R-squared:  0.2556,	Adjusted R-squared:  0.2528 
-# F-statistic: 89.51 on 3 and 782 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.2549,	Adjusted R-squared:  0.252 
+# F-statistic: 89.16 on 3 and 782 DF,  p-value: < 2.2e-16
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$leafarea_abiotic)
-# meanMAT  meanMAP  meanAVP 
-# 1.408954 1.472960 1.796042 
-# VIF under 1.8 for all, multicollinearity unlikely
+# scale(meanMAT) scale(meanMAP) scale(meanAVP) 
+# 1.390463       1.517761       1.821095 
+# VIF under 1.83 for all, multicollinearity unlikely
 
 #* bud size abiotic ----
 
@@ -144,27 +144,27 @@ summary(multi_reg$budsize_abiotic)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.2711 -0.6229 -0.0639  0.4801  3.7359 
+# -2.3684 -0.6252 -0.0642  0.4782  3.7170 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)     3.74738    0.03207 116.864  < 2e-16 ***
-#   scale(meanMAT) -0.05028    0.03800  -1.323 0.186101    
-# scale(meanMAP) -0.13520    0.03878  -3.486 0.000517 ***
-#   scale(meanAVP) -0.28063    0.04300  -6.526 1.22e-10 ***
+# (Intercept)     3.74785    0.03189 117.524  < 2e-16 ***
+#   scale(meanMAT) -0.06469    0.03755  -1.723  0.08531 .  
+# scale(meanMAP) -0.11271    0.03914  -2.880  0.00409 ** 
+#   scale(meanAVP) -0.31159    0.04304  -7.240 1.08e-12 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8955 on 776 degrees of freedom
+# Residual standard error: 0.8906 on 776 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1347,	Adjusted R-squared:  0.1313 
-# F-statistic: 40.25 on 3 and 776 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1442,	Adjusted R-squared:  0.1408 
+# F-statistic: 43.57 on 3 and 776 DF,  p-value: < 2.2e-16
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$budsize_abiotic)
-# meanMAT  meanMAP  meanAVP 
-# 1.412562 1.469958 1.798264 
-# VIF under 1.8 for all, multicollinearity unlikely
+# scale(meanMAT) scale(meanMAP) scale(meanAVP) 
+# 1.394436       1.513810       1.822927 
+# VIF under 1.83 for all, multicollinearity unlikely
 
 #* bud size full model ----
 
@@ -183,31 +183,31 @@ summary(multi_reg$budsize_full)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.2199 -0.5542 -0.0717  0.4887  3.6779 
+# -2.2854 -0.5713 -0.0620  0.4833  3.6696 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)             3.74910    0.03125 119.967  < 2e-16 ***
-#   scale(meanMAT)          0.04200    0.04310   0.974   0.3302    
-# scale(meanMAP)         -0.01222    0.04312  -0.283   0.7769    
-# scale(meanAVP)         -0.11177    0.04935  -2.265   0.0238 *  
-#   scale(meanbirdrich)    -0.05870    0.05111  -1.148   0.2512    
-# scale(meanbatpres_bin) -0.27703    0.06129  -4.520 7.16e-06 ***
+# (Intercept)             3.749201   0.031244 119.999  < 2e-16 ***
+#   scale(meanMAT)          0.027142   0.043678   0.621   0.5345    
+# scale(meanMAP)         -0.006904   0.043025  -0.160   0.8726    
+# scale(meanAVP)         -0.149774   0.050813  -2.948   0.0033 ** 
+#   scale(meanbirdrich)    -0.050238   0.054113  -0.928   0.3535    
+# scale(meanbatpres_bin) -0.255489   0.062599  -4.081 4.94e-05 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8727 on 774 degrees of freedom
+# Residual standard error: 0.8725 on 774 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1803,	Adjusted R-squared:  0.175 
-# F-statistic: 34.05 on 5 and 774 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1807,	Adjusted R-squared:  0.1754 
+# F-statistic: 34.14 on 5 and 774 DF,  p-value: < 2.2e-16
 
 # bat presence/absence explains most variation, also phosphorus but small effect
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$budsize_full)
 # meanMAT         meanMAP         meanAVP    meanbirdrich meanbatpres_bin 
-# 1.914214        1.913569        2.493547        2.647623        3.836827 
-# VIF below 3.85 for all, generally recommended threshold is 5-10
+# 1.966073        1.905858        2.647471        2.956335        4.004342 
+# VIF below 4.1 for all, generally recommended threshold is 5-10
 
 #* flower colourfulness full model ----
 
@@ -228,31 +228,29 @@ summary(multi_reg$flcolour_full)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)            -2.57542    0.18633 -13.822  < 2e-16 ***
-# scale(meanMAT)          0.20804    0.19106   1.089  0.27620    
-# scale(meanMAP)         -0.09547    0.19317  -0.494  0.62114    
-# scale(meanAVP)         -0.28784    0.20831  -1.382  0.16704    
-# scale(meanbirdrich)    -0.30626    0.23193  -1.320  0.18667    
-# scale(meanbatpres_bin) -0.78231    0.29132  -2.685  0.00724 ** 
+# (Intercept)            -2.60679    0.19384 -13.448   <2e-16 ***
+#   scale(meanMAT)          0.17150    0.19640   0.873   0.3826    
+# scale(meanMAP)         -0.06169    0.19368  -0.319   0.7501    
+# scale(meanAVP)         -0.37688    0.21890  -1.722   0.0851 .  
+# scale(meanbirdrich)    -0.37067    0.25213  -1.470   0.1415    
+# scale(meanbatpres_bin) -0.72379    0.30156  -2.400   0.0164 *  
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 561.46  on 777  degrees of freedom
-# Residual deviance: 481.53  on 772  degrees of freedom
+# Residual deviance: 480.21  on 772  degrees of freedom
 # (20 observations deleted due to missingness)
-# AIC: 493.53
+# AIC: 492.21
 # 
 # Number of Fisher Scoring iterations: 6
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$flcolour_full)
 # meanMAT         meanMAP         meanAVP    meanbirdrich meanbatpres_bin 
-# 1.766085        1.871925        1.472729        1.631975        3.502379 
+# 1.935153        1.881569        1.491282        1.627528        3.734424 
 # VIF still under 4 for all, multicollinearity unlikely
-
-
 
 #### with phylogeny ####
 
@@ -294,33 +292,35 @@ summary(multi_reg$budsize_abiotic_PGLS)
 #                    model = "BM", boot = 1000)
 # 
 # AIC logLik 
-# 2163  -1077 
+# 2166  -1078 
 # 
 # Raw residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.2581 -0.5904 -0.0114  0.5670  3.7340 
+# -2.2247 -0.5939 -0.0186  0.5655  3.7286 
 # 
 # Mean tip height: 58.36226
 # Parameter estimate(s) using ML:
-#   sigma2: 0.8742472 
+#   sigma2: 0.8777655 
 # 
 # Coefficients:
-#   Estimate     StdErr    t.value lowerbootCI upperbootCI   p.value    
-# (Intercept)     3.6767647  2.7088214  1.3573301  -1.4844708      9.1511 0.1751368    
-# scale(meanMAT)  0.0281057  0.0490979  0.5724423  -0.0694359      0.1293 0.5672159    
-# scale(meanMAP) -0.1473231  0.0435913 -3.3796428  -0.2317710     -0.0647 0.0007682 ***
-#   scale(meanAVP)  0.0849894  0.0411703  2.0643359   0.0045727      0.1658 0.0393731 *  
-#   ---
+#   Estimate    StdErr   t.value lowerbootCI upperbootCI  p.value   
+# (Intercept)     3.680441  2.714260  1.355965   -1.507380      8.6192 0.175571   
+# scale(meanMAT)  0.012478  0.049210  0.253572   -0.073031      0.1085 0.799904   
+# scale(meanMAP) -0.140890  0.042895 -3.284518   -0.226152     -0.0592 0.001075 **
+#   scale(meanAVP)  0.030442  0.046718  0.651619   -0.065790      0.1243 0.514872   
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# R-squared: 0.02043	Adjusted R-squared: 0.01601 
+# R-squared: 0.01649	Adjusted R-squared: 0.01205 
 # 
-# sigma2: 0.8742472
-# bootstrap mean: 0.8701213 (on raw scale)
-# 0.8687721 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7797863,0.9666803)
+# sigma2: 0.8777655
+# bootstrap mean: 0.8710828 (on raw scale)
+# 0.8698737 (on log scale, then back transformed)
+# bootstrap 95% CI: (0.7834497,0.9635583)
 # 
 # Parametric bootstrap results based on 1000 fitted replicates
+
+# curious, AVP not sig with updated env data
 
 #* bud size biotic PGLS ----
 
@@ -338,34 +338,34 @@ summary(multi_reg$budsize_biot_PGLS)
 #                    model = "BM", boot = 1000)
 # 
 # AIC logLik 
-# 2162  -1077 
+# 2154  -1073 
 # 
 # Raw residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.3220 -0.5330  0.0686  0.6806  4.0034 
+# -2.3192 -0.5432  0.0743  0.6877  3.9568 
 # 
 # Mean tip height: 58.36226
 # Parameter estimate(s) using ML:
-#   sigma2: 0.8751325 
+#   sigma2: 0.8650889 
 # 
 # Coefficients:
-#   Estimate    StdErr   t.value lowerbootCI upperbootCI  p.value
-# (Intercept)             3.593368  2.707957  1.326966   -1.902009      8.6953 0.184975
-# scale(meanbirdrich)    -0.101673  0.039403 -2.580333   -0.180173     -0.0283 0.010083
-# scale(meanbatpres_bin)  0.130369  0.037732  3.455094    0.057703      0.2005 0.000585
+#   Estimate    StdErr   t.value lowerbootCI upperbootCI   p.value
+# (Intercept)             3.590751  2.692372  1.333676   -1.845639      9.0815 0.1827661
+# scale(meanbirdrich)    -0.155245  0.040617 -3.822201   -0.231522     -0.0785 0.0001447
+# scale(meanbatpres_bin)  0.152366  0.037690  4.042651    0.078735      0.2319 5.903e-05
 # 
 # (Intercept)               
-# scale(meanbirdrich)    *  
+# scale(meanbirdrich)    ***
 #   scale(meanbatpres_bin) ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# R-squared: 0.01944	Adjusted R-squared: 0.01649 
+# R-squared: 0.03069	Adjusted R-squared: 0.02778 
 # 
-# sigma2: 0.8751325
-# bootstrap mean: 0.8730049 (on raw scale)
-# 0.8715921 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7801833,0.9690999)
+# sigma2: 0.8650889
+# bootstrap mean: 0.8616804 (on raw scale)
+# 0.8603878 (on log scale, then back transformed)
+# bootstrap 95% CI: (0.7731418,0.9533291)
 # 
 # Parametric bootstrap results based on 1000 fitted replicates
 
@@ -382,46 +382,46 @@ multi_reg$budsize_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanMAT) +
                                            boot = 1000)
 summary(multi_reg$budsize_PGLS)
 
-# Call:
-#   phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanMAT) + 
-#                      scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#                    data = pgls_data, phy = tree_pgls, model = "BM", boot = 1000)
-# 
+Call:
+  phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanMAT) + 
+                     scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
+                   data = pgls_data, phy = tree_pgls, model = "BM", boot = 1000)
+
 # AIC logLik 
-# 2152  -1069 
+# 2148  -1067 
 # 
 # Raw residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.1459 -0.6222 -0.0109  0.5867  3.7638 
+# -2.1098 -0.6129 -0.0151  0.5619  3.7303 
 # 
 # Mean tip height: 58.36226
 # Parameter estimate(s) using ML:
-#   sigma2: 0.8546448 
+#   sigma2: 0.8496004 
 # 
 # Coefficients:
-#   Estimate     StdErr    t.value lowerbootCI upperbootCI
-# (Intercept)             3.6907998  2.6823198  1.3759731  -1.5222998      8.9625
-# scale(meanMAT)         -0.0562272  0.0536145 -1.0487300  -0.1680211      0.0469
-# scale(meanMAP)         -0.1529602  0.0432445 -3.5371042  -0.2417397     -0.0597
-# scale(meanAVP)          0.0801289  0.0414710  1.9321662   0.0059369      0.1594
-# scale(meanbirdrich)    -0.1288310  0.0409469 -3.1462940  -0.2078447     -0.0518
-# scale(meanbatpres_bin)  0.1474361  0.0411962  3.5788754   0.0722149      0.2296
-# p.value    
-# (Intercept)            0.1692946    
-# scale(meanMAT)         0.2946845    
-# scale(meanMAP)         0.0004328 ***
-# scale(meanAVP)         0.0537647 .  
-# scale(meanbirdrich)    0.0017276 ** 
-# scale(meanbatpres_bin) 0.0003703 ***
+#   Estimate    StdErr   t.value lowerbootCI upperbootCI   p.value
+# (Intercept)             3.693240  2.674384  1.380968   -1.729875      9.2302  0.167754
+# scale(meanMAT)         -0.085780  0.053589 -1.600694   -0.190231      0.0119  0.109921
+# scale(meanMAP)         -0.134165  0.042339 -3.168822   -0.214217     -0.0504  0.001601
+# scale(meanAVP)          0.022618  0.046933  0.481927   -0.069269      0.1137  0.630017
+# scale(meanbirdrich)    -0.171424  0.042278 -4.054705   -0.256607     -0.0902 5.616e-05
+# scale(meanbatpres_bin)  0.170628  0.041506  4.110879    0.092045      0.2560 4.436e-05
+# 
+# (Intercept)               
+# scale(meanMAT)            
+# scale(meanMAP)         ** 
+#   scale(meanAVP)            
+# scale(meanbirdrich)    ***
+#   scale(meanbatpres_bin) ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# R-squared: 0.04239	Adjusted R-squared: 0.03517 
+# R-squared: 0.04805	Adjusted R-squared: 0.04087 
 # 
-# sigma2: 0.8546448
-# bootstrap mean: 0.8493515 (on raw scale)
-# 0.8481553 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7634358,0.9361822)
+# sigma2: 0.8496004
+# bootstrap mean: 0.8416765 (on raw scale)
+# 0.8404355 (on log scale, then back transformed)
+# bootstrap 95% CI: (0.7552477,0.9302625)
 # 
 # Parametric bootstrap results based on 1000 fitted replicates
 
@@ -440,51 +440,48 @@ multi_reg$flcolour_PGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) 
                                              boot = 100)
 summary(multi_reg$flcolour_PGLS)
 
-# Warning messages:
-# 1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
-# the estimate of 'alpha' (0.935315443447423) reached the upper bound (0.935504358152755).
-# This may simply reflect a flat likelihood at large alpha values,
-# meaning that the phylogenetic correlation is estimated to be negligible.
-# 2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
-# phyloglm failed to converge.
+# Warning message:
+#  In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
+#  the estimate of 'alpha' (0.92163414891527) reached the upper bound (0.935504358152755).
+#  This may simply reflect a flat likelihood at large alpha values,
+#  meaning that the phylogenetic correlation is estimated to be negligible.
 #                                                   
-# > summary(multi_reg$flcolour_PGLS)
-#                                                   
-#  Call:
-#    phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) + 
-#                      scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#                      data = pgls_data, phy = tree_pgls, method = "logistic_IG10", 
-#                      boot = 100)
-#  AIC     logLik Pen.logLik 
-#  416       -201       -191 
-#                                                   
-#  Method: logistic_IG10
-#  Mean tip height: 58.36226
-#  Parameter estimate(s): alpha: 0.9353154 
-#  bootstrap mean: 0.6773605 (on log scale, then back transformed)
-#  so possible downward bias.
-#  bootstrap 95% CI: (0.1521449,0.9352338)
-#                                                   
-#  Coefficients:
-#  Estimate     StdErr    z.value lowerbootCI upperbootCI p.value
-#  (Intercept)             -2.465102   0.228064 -10.808823   -3.049390     -1.9663 < 2e-16
-#  scale(meanMAT)           0.422187   0.214603   1.967290    0.017509      0.8781 0.04915
-#  scale(meanMAP)          -0.044699   0.191254  -0.233717   -0.345850      0.2738 0.81521
-#  scale(meanAVP)          -0.033402   0.216146  -0.154534   -0.482564      0.3259 0.87719
-#  scale(meanbirdrich)     -0.252156   0.231828  -1.087685   -0.646708      0.2108 0.27673
-#  scale(meanbatpres_bin)  -0.682025   0.283976  -2.401700   -1.180479     -0.1798 0.01632
-#                                                   
-#  (Intercept)            ***
-#  scale(meanMAT)         *  
-#  scale(meanMAP)            
-#  scale(meanAVP)            
-#  scale(meanbirdrich)       
-#  scale(meanbatpres_bin) *  
-#  ---
-#  Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#                                                   
-#  Note: Wald-type p-values for coefficients, conditional on alpha=0.9353154
-#  Parametric bootstrap results based on 100 fitted replicates
+# Call:
+#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) + 
+#                       scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
+#                     data = pgls_data, phy = tree_pgls, method = "logistic_IG10", 
+#                     boot = 100)
+# AIC     logLik Pen.logLik 
+# 416.4     -201.2     -191.2 
+# 
+# Method: logistic_IG10
+# Mean tip height: 58.36226
+# Parameter estimate(s):
+#   alpha: 0.9216341 
+# bootstrap mean: 0.5611803 (on log scale, then back transformed)
+# so possible downward bias.
+# bootstrap 95% CI: (0.1087595,0.9353957)
+# 
+# Coefficients:
+#   Estimate      StdErr     z.value lowerbootCI upperbootCI
+# (Intercept)             -2.4468578   0.2264412 -10.8057104  -2.9739735     -1.9196
+# scale(meanMAT)           0.3726886   0.2120531   1.7575250  -0.0180384      0.8957
+# scale(meanMAP)          -0.0324701   0.1826080  -0.1778130  -0.4460400      0.3401
+# scale(meanAVP)          -0.0056982   0.2243294  -0.0254012  -0.4140431      0.4181
+# scale(meanbirdrich)     -0.3877675   0.2311509  -1.6775517  -0.6751863      0.0870
+# scale(meanbatpres_bin)  -0.5712757   0.2694750  -2.1199582  -1.2254959     -0.1124
+# p.value    
+# (Intercept)            < 2e-16 ***
+#   scale(meanMAT)         0.07883 .  
+# scale(meanMAP)         0.85887    
+# scale(meanAVP)         0.97973    
+# scale(meanbirdrich)    0.09343 .  
+# scale(meanbatpres_bin) 0.03401 *  
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Note: Wald-type p-values for coefficients, conditional on alpha=0.9216341
+# Parametric bootstrap results based on 100 fitted replicates
 
 #### dominance analysis ####
 
@@ -495,7 +492,7 @@ dominanceanalysis <- domir::domin(logbudsize_mm2 ~ scale(meanMAT) +
                                   fitstat = list(summary, "r.squared"),
                                   data = euc_traits_nosubsp)
 dominanceanalysis
-# output suggests bats then birds then AVP then MAP then MAT best predictors
+# output suggests bats then AVP then birds then MAP then MAT best predictors
 # when all considered separately
 
 # compare models with BIC
