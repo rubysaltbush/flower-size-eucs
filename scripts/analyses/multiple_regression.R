@@ -126,6 +126,8 @@ car::vif(multi_reg$leafarea_abiotic)
 # 1.390463       1.517761       1.821095 
 # VIF under 1.83 for all, multicollinearity unlikely
 
+# adjusted R2 decent at 0.252
+
 #* bud size abiotic ----
 
 # to compare with leaf area multiple regression, expect that leaf area
@@ -165,6 +167,44 @@ car::vif(multi_reg$budsize_abiotic)
 # scale(meanMAT) scale(meanMAP) scale(meanAVP) 
 # 1.394436       1.513810       1.822927 
 # VIF under 1.83 for all, multicollinearity unlikely
+
+# adjusted R2 defs lower than for leaf area at 0.14
+
+#* bud size biotic model ----
+
+multi_reg$budsize_biotic <- lm(logbudsize_mm2 ~ scale(meanbirdrich) + 
+                               scale(meanbatpres_bin), #biotic
+                             data = euc_traits_nosubsp)
+summary(multi_reg$budsize_biotic)
+
+# Call:
+#   lm(formula = logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin), 
+#      data = euc_traits_nosubsp)
+# 
+# Residuals:
+#   Min      1Q  Median      3Q     Max 
+# -2.0831 -0.5612 -0.0655  0.4599  3.7358 
+# 
+# Coefficients:
+#   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)             3.74975    0.03150 119.041  < 2e-16 ***
+#   scale(meanbirdrich)    -0.15381    0.04487  -3.428  0.00064 ***
+#   scale(meanbatpres_bin) -0.26594    0.04460  -5.963 3.75e-09 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.8797 on 777 degrees of freedom
+# (18 observations deleted due to missingness)
+# Multiple R-squared:  0.164,	Adjusted R-squared:  0.1618 
+# F-statistic:  76.2 on 2 and 777 DF,  p-value: < 2.2e-16
+
+# double check for multicollinearity using Variance Inflation Factor (VIF)
+car::vif(multi_reg$budsize_biotic)
+# scale(meanbirdrich) scale(meanbatpres_bin) 
+# 1.999415               1.999415 
+# VIF under 2 for all, multicollinearity unlikely
+
+# some improvement in adjusted R2 with biotic rather than abiotic predictors at 0.16
 
 #* bud size full model ----
 
@@ -208,23 +248,130 @@ car::vif(multi_reg$budsize_full)
 # meanMAT         meanMAP         meanAVP    meanbirdrich meanbatpres_bin 
 # 1.966073        1.905858        2.647471        2.956335        4.004342 
 # VIF below 4.1 for all, generally recommended threshold is 5-10
+# higher VIF for bat presence here suggests some overlap with other predictors
+
+#* AIC/BIC to compare bud size models (Bayesian Information Criterion) ----
+
+# first BIC (penalises models with too many variables, lowest BIC model best)
+
+BIC(multi_reg$budsize_abiotic, multi_reg$budsize_biotic, multi_reg$budsize_full)
+
+#                           df      BIC
+# multi_reg$budsize_abiotic  5 2062.106
+# multi_reg$budsize_biotic   4 2037.176
+# multi_reg$budsize_full     7 2041.373
+
+# biotic model has lowest BIC
+
+# now AIC (doesn't penalise additional variables so consider difference between
+# full model and biotic/abiotic models - if dropping X variables leads to larger
+# change in AIC, then they are likely more significant to model)
+
+AIC(multi_reg$budsize_abiotic, multi_reg$budsize_biotic, multi_reg$budsize_full)
+
+#                           df      AIC
+# multi_reg$budsize_abiotic  5 2038.809
+# multi_reg$budsize_biotic   4 2018.539
+# multi_reg$budsize_full     7 2008.758
+
+# dif between full and abiotic (~30) larger than dif between full and biotic (~10)
+# suggesting biotic variables more important to model
+
+#* flower colourfulness abiotic ----
+
+# one observation missing biotic but not abiotic variable, remove from data
+# for these models
+tempflcol <- euc_traits_nosubsp %>%
+  dplyr::select(apc_nosubsp, colour_fullbinary, meanMAT, meanMAP, meanAVP,
+                meanbirdrich, meanbatpres_bin) %>%
+  dplyr::filter(complete.cases(.))
+
+# using glm with binomial distribution for logistic regression
+multi_reg$flcolour_abiotic <- glm(colour_fullbinary ~ scale(meanMAT) + 
+                                 scale(meanMAP) + 
+                                 scale(meanAVP),
+                               data = tempflcol,
+                               family = binomial)
+summary(multi_reg$flcolour_abiotic)
+
+# Call:
+#   glm(formula = as.numeric(colour_fullbinary) ~ scale(meanMAT) + 
+#         scale(meanMAP) + scale(meanAVP), family = binomial(), data = tempflcol)
+# 
+# Coefficients:
+#   Estimate Std. Error z value Pr(>|z|)    
+# (Intercept)     -2.4105     0.1570 -15.350  < 2e-16 ***
+#   scale(meanMAT)  -0.0880     0.1532  -0.574  0.56564    
+#   scale(meanMAP)  -0.4667     0.1800  -2.593  0.00951 ** 
+#   scale(meanAVP)  -0.8042     0.2026  -3.970 7.19e-05 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# (Dispersion parameter for binomial family taken to be 1)
+# 
+# Null deviance: 561.46  on 777  degrees of freedom
+# Residual deviance: 499.87  on 774  degrees of freedom
+# AIC: 507.87
+# 
+# Number of Fisher Scoring iterations: 6
+
+# double check for multicollinearity using Variance Inflation Factor (VIF)
+car::vif(multi_reg$flcolour_abiotic)
+# scale(meanMAT) scale(meanMAP) scale(meanAVP) 
+# 1.170342       1.416815       1.411756 
+# VIF  under 1.8 for all, multicollinearity unlikely
+
+#* flower colourfulness biotic ----
+
+# using glm with binomial distribution for logistic regression
+multi_reg$flcolour_biotic <- glm(colour_fullbinary ~ scale(meanbirdrich) + 
+                                 scale(meanbatpres_bin),
+                               data = tempflcol,
+                               family = binomial)
+summary(multi_reg$flcolour_biotic)
+
+# Call:
+#   glm(formula = colour_fullbinary ~ scale(meanbirdrich) + 
+#         scale(meanbatpres_bin), family = binomial, data = tempflcol)
+# 
+# Coefficients:
+#   Estimate Std. Error z value Pr(>|z|)    
+# (Intercept)             -2.4785     0.1676 -14.789  < 2e-16 ***
+#   scale(meanbirdrich)     -0.4260     0.2117  -2.013   0.0442 *  
+#   scale(meanbatpres_bin)  -0.7960     0.1960  -4.061 4.89e-05 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# (Dispersion parameter for binomial family taken to be 1)
+# 
+# Null deviance: 561.46  on 777  degrees of freedom
+# Residual deviance: 489.00  on 775  degrees of freedom
+# AIC: 495
+# 
+# Number of Fisher Scoring iterations: 6
+
+# double check for multicollinearity using Variance Inflation Factor (VIF)
+car::vif(multi_reg$flcolour_biotic)
+# scale(meanbirdrich) scale(meanbatpres_bin) 
+# 1.602602               1.602602  
+# VIF under 1.65, multicollinearity unlikely
 
 #* flower colourfulness full model ----
 
 # using glm with binomial distribution for logistic regression
-multi_reg$flcolour_full <- glm(as.numeric(colour_fullbinary) ~ scale(meanMAT) + 
-                                                               scale(meanMAP) + 
-                                                               scale(meanAVP) + 
-                                                               scale(meanbirdrich) + 
-                                                               scale(meanbatpres_bin),
-                                          data = euc_traits_nosubsp,
+multi_reg$flcolour_full <- glm(colour_fullbinary ~ scale(meanMAT) + 
+                                                   scale(meanMAP) + 
+                                                   scale(meanAVP) + 
+                                                   scale(meanbirdrich) + 
+                                                   scale(meanbatpres_bin),
+                                          data = tempflcol,
                                           family = binomial())
 summary(multi_reg$flcolour_full)
 
 # Call:
-#   glm(formula = as.numeric(colour_fullbinary) ~ scale(meanMAT) + 
+#   glm(formula = colour_fullbinary ~ scale(meanMAT) + 
 #         scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#       family = binomial(), data = euc_traits_nosubsp)
+#       family = binomial, data = tempflcol)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
@@ -252,6 +399,35 @@ car::vif(multi_reg$flcolour_full)
 # 1.935153        1.881569        1.491282        1.627528        3.734424 
 # VIF still under 4 for all, multicollinearity unlikely
 
+#* AIC/BIC to compare flower colourfulness models ----
+
+# first BIC (penalises models with too many variables, lowest BIC model best)
+
+BIC(multi_reg$flcolour_abiotic, multi_reg$flcolour_biotic, multi_reg$flcolour_full)
+
+#                             df      BIC
+# multi_reg$flcolour_abiotic  4 526.4958
+# multi_reg$flcolour_biotic   3 508.9739
+# multi_reg$flcolour_full     6 520.1455
+
+# biotic model has lowest BIC
+
+# now AIC (doesn't penalise additional variables so consider difference between
+# full model and biotic/abiotic models - if dropping X variables leads to larger
+# change in AIC, then they are likely more significant to model)
+
+AIC(multi_reg$flcolour_abiotic, multi_reg$flcolour_biotic, multi_reg$flcolour_full)
+
+#                             df      AIC
+# multi_reg$flcolour_abiotic  4 507.8689
+# multi_reg$flcolour_biotic   3 495.0037
+# multi_reg$flcolour_full     6 492.2051
+
+# dif between full and abiotic (~15) larger than dif between full and biotic (~3)
+# suggesting biotic variables more important to model
+
+rm(tempflcol)
+
 #### with phylogeny ####
 
 # subset data to phylogenetic least squares regression variables
@@ -277,153 +453,149 @@ pgls_data[,1] <- NULL
 
 #* bud size abiotic PGLS ----
 
-multi_reg$budsize_abiotic_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanMAT) + 
-                                             scale(meanMAP) + 
-                                             scale(meanAVP),
-                                           data = pgls_data,
-                                           phy = tree_pgls,
-                                           model = "BM",
-                                           boot = 1000)
+spp <- rownames(pgls_data) # set species names as reference point
+multi_reg$budsize_abiotic_PGLS <- nlme::gls(logbudsize_mm2 ~ 
+                                                     scale(meanMAT) + 
+                                                     scale(meanMAP) + 
+                                                     scale(meanAVP),
+                                            data = pgls_data,
+                                            correlation = 
+                                              ape::corBrownian(phy = tree_pgls, 
+                                                               form = ~spp),
+                                            method = "ML")
 summary(multi_reg$budsize_abiotic_PGLS)
 
-# Call:
-#   phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanMAT) + 
-#                      scale(meanMAP) + scale(meanAVP), data = pgls_data, phy = tree_pgls, 
-#                    model = "BM", boot = 1000)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2165.808 2188.337 -1077.904
 # 
-# AIC logLik 
-# 2166  -1078 
-# 
-# Raw residuals:
-#   Min      1Q  Median      3Q     Max 
-# -2.2247 -0.5939 -0.0186  0.5655  3.7286 
-# 
-# Mean tip height: 58.36226
-# Parameter estimate(s) using ML:
-#   sigma2: 0.8777655 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
 # 
 # Coefficients:
-#   Estimate    StdErr   t.value lowerbootCI upperbootCI  p.value   
-# (Intercept)     3.680441  2.714260  1.355965   -1.507380      8.6192 0.175571   
-# scale(meanMAT)  0.012478  0.049210  0.253572   -0.073031      0.1085 0.799904   
-# scale(meanMAP) -0.140890  0.042895 -3.284518   -0.226152     -0.0592 0.001075 **
-#   scale(meanAVP)  0.030442  0.046718  0.651619   -0.065790      0.1243 0.514872   
-# ---
-#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#   Value Std.Error   t-value p-value
+# (Intercept)     3.680442 2.7142600  1.355965  0.1756
+# scale(meanMAT)  0.012478 0.0492099  0.253572  0.7999
+# scale(meanMAP) -0.140890 0.0428950 -3.284518  0.0011
+# scale(meanAVP)  0.030442 0.0467182  0.651619  0.5149
 # 
-# R-squared: 0.01649	Adjusted R-squared: 0.01205 
+# Correlation: 
+#   (Intr) s(MAT) s(MAP)
+# scale(meanMAT) -0.010              
+# scale(meanMAP) -0.008  0.092       
+# scale(meanAVP) -0.001  0.282 -0.209
 # 
-# sigma2: 0.8777655
-# bootstrap mean: 0.8710828 (on raw scale)
-# 0.8698737 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7834497,0.9635583)
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.310820476 -0.082971603 -0.002602373  0.079007903  0.520943997 
 # 
-# Parametric bootstrap results based on 1000 fitted replicates
-
-# curious, AVP not sig with updated env data
+# Residual standard error: 7.1574 
+# Degrees of freedom: 669 total; 665 residual
 
 #* bud size biotic PGLS ----
 
-multi_reg$budsize_biot_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanbirdrich) + 
-                                             scale(meanbatpres_bin),
-                                           data = pgls_data,
-                                           phy = tree_pgls,
-                                           model = "BM",
-                                           boot = 1000)
+multi_reg$budsize_biot_PGLS <- nlme::gls(logbudsize_mm2 ~ 
+                                           scale(meanbirdrich) + 
+                                           scale(meanbatpres_bin),
+                                         data = pgls_data,
+                                         correlation = 
+                                           ape::corBrownian(phy = tree_pgls, 
+                                                            form = ~spp),
+                                         method = "ML")
 summary(multi_reg$budsize_biot_PGLS)
 
-# Call:
-#   phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanbirdrich) + 
-#                      scale(meanbatpres_bin), data = pgls_data, phy = tree_pgls, 
-#                    model = "BM", boot = 1000)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin) 
+# Data: pgls_data 
+# AIC    BIC    logLik
+# 2154.076 2172.1 -1073.038
 # 
-# AIC logLik 
-# 2154  -1073 
-# 
-# Raw residuals:
-#   Min      1Q  Median      3Q     Max 
-# -2.3192 -0.5432  0.0743  0.6877  3.9568 
-# 
-# Mean tip height: 58.36226
-# Parameter estimate(s) using ML:
-#   sigma2: 0.8650889 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
 # 
 # Coefficients:
-#   Estimate    StdErr   t.value lowerbootCI upperbootCI   p.value
-# (Intercept)             3.590751  2.692372  1.333676   -1.845639      9.0815 0.1827661
-# scale(meanbirdrich)    -0.155245  0.040617 -3.822201   -0.231522     -0.0785 0.0001447
-# scale(meanbatpres_bin)  0.152366  0.037690  4.042651    0.078735      0.2319 5.903e-05
+#   Value Std.Error   t-value p-value
+# (Intercept)             3.590751 2.6923724  1.333676  0.1828
+# scale(meanbirdrich)    -0.155245 0.0406167 -3.822201  0.0001
+# scale(meanbatpres_bin)  0.152366 0.0376897  4.042652  0.0001
 # 
-# (Intercept)               
-# scale(meanbirdrich)    ***
-#   scale(meanbatpres_bin) ***
-#   ---
-#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Correlation: 
+#   (Intr) scl(m)
+# scale(meanbirdrich)     0.001       
+# scale(meanbatpres_bin) -0.003 -0.470
 # 
-# R-squared: 0.03069	Adjusted R-squared: 0.02778 
+# Standardized residuals:
+#   Min          Q1         Med          Q3         Max 
+# -0.32638726 -0.07644885  0.01045039  0.09677704  0.55686787 
 # 
-# sigma2: 0.8650889
-# bootstrap mean: 0.8616804 (on raw scale)
-# 0.8603878 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7731418,0.9533291)
-# 
-# Parametric bootstrap results based on 1000 fitted replicates
+# Residual standard error: 7.105529 
+# Degrees of freedom: 669 total; 666 residual
 
 #* bud size full PGLS ----
 
-multi_reg$budsize_PGLS <- phylolm::phylolm(logbudsize_mm2 ~ scale(meanMAT) + 
+multi_reg$budsize_PGLS <- nlme::gls(logbudsize_mm2 ~ scale(meanMAT) + 
                                                      scale(meanMAP) + 
                                                      scale(meanAVP) + 
                                                      scale(meanbirdrich) + 
                                                      scale(meanbatpres_bin),
                                            data = pgls_data,
-                                           phy = tree_pgls,
-                                           model = "BM",
-                                           boot = 1000)
+                                           correlation = 
+                                             ape::corBrownian(phy = tree_pgls, 
+                                                              form = ~spp),
+                                           method = "ML")
 summary(multi_reg$budsize_PGLS)
 
-Call:
-  phylolm::phylolm(formula = logbudsize_mm2 ~ scale(meanMAT) + 
-                     scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-                   data = pgls_data, phy = tree_pgls, model = "BM", boot = 1000)
-
-# AIC logLik 
-# 2148  -1067 
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) +      scale(meanbirdrich) + scale(meanbatpres_bin) 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2147.99 2179.531 -1066.995
 # 
-# Raw residuals:
-#   Min      1Q  Median      3Q     Max 
-# -2.1098 -0.6129 -0.0151  0.5619  3.7303 
-# 
-# Mean tip height: 58.36226
-# Parameter estimate(s) using ML:
-#   sigma2: 0.8496004 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
 # 
 # Coefficients:
-#   Estimate    StdErr   t.value lowerbootCI upperbootCI   p.value
-# (Intercept)             3.693240  2.674384  1.380968   -1.729875      9.2302  0.167754
-# scale(meanMAT)         -0.085780  0.053589 -1.600694   -0.190231      0.0119  0.109921
-# scale(meanMAP)         -0.134165  0.042339 -3.168822   -0.214217     -0.0504  0.001601
-# scale(meanAVP)          0.022618  0.046933  0.481927   -0.069269      0.1137  0.630017
-# scale(meanbirdrich)    -0.171424  0.042278 -4.054705   -0.256607     -0.0902 5.616e-05
-# scale(meanbatpres_bin)  0.170628  0.041506  4.110879    0.092045      0.2560 4.436e-05
+#   Value Std.Error   t-value p-value
+# (Intercept)             3.693240 2.6743845  1.380968  0.1678
+# scale(meanMAT)         -0.085780 0.0535892 -1.600694  0.1099
+# scale(meanMAP)         -0.134165 0.0423390 -3.168822  0.0016
+# scale(meanAVP)          0.022618 0.0469329  0.481927  0.6300
+# scale(meanbirdrich)    -0.171424 0.0422779 -4.054705  0.0001
+# scale(meanbatpres_bin)  0.170628 0.0415065  4.110879  0.0000
 # 
-# (Intercept)               
-# scale(meanMAT)            
-# scale(meanMAP)         ** 
-#   scale(meanAVP)            
-# scale(meanbirdrich)    ***
-#   scale(meanbatpres_bin) ***
-#   ---
-#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Correlation: 
+#   (Intr) s(MAT) s(MAP) s(AVP) scl(m)
+# scale(meanMAT)         -0.009                            
+# scale(meanMAP)         -0.008  0.062                     
+# scale(meanAVP)         -0.001  0.296 -0.215              
+# scale(meanbirdrich)    -0.001  0.254 -0.005 -0.065       
+# scale(meanbatpres_bin)  0.001 -0.424  0.053 -0.123 -0.517
 # 
-# R-squared: 0.04805	Adjusted R-squared: 0.04087 
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.299615533 -0.087045080 -0.002149824  0.079794330  0.529754487 
 # 
-# sigma2: 0.8496004
-# bootstrap mean: 0.8416765 (on raw scale)
-# 0.8404355 (on log scale, then back transformed)
-# bootstrap 95% CI: (0.7552477,0.9302625)
-# 
-# Parametric bootstrap results based on 1000 fitted replicates
+# Residual standard error: 7.041633 
+# Degrees of freedom: 669 total; 663 residual
+
+#* BIC to compare bud size PGLS ----
+
+BIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsize_PGLS)
+
+#                                 df      BIC
+# multi_reg$budsize_abiotic_PGLS  5 2188.337
+# multi_reg$budsize_biot_PGLS     4 2172.100
+# multi_reg$budsize_PGLS          7 2179.531
+
+# bigger change from full to abiotic model (~9) than to biotic model (~-7)
 
 #* flower colourfulness full model ----
 
@@ -483,42 +655,125 @@ summary(multi_reg$flcolour_PGLS)
 # Note: Wald-type p-values for coefficients, conditional on alpha=0.9216341
 # Parametric bootstrap results based on 100 fitted replicates
 
-#### dominance analysis ####
+#* flower colourfulness abiotic model ----
 
-dominanceanalysis <- domir::domin(logbudsize_mm2 ~ scale(meanMAT) + 
-                                    scale(meanMAP) + scale(meanAVP) + 
-                                    scale(meanbirdrich) + scale(meanbatpres_bin),
-                                  reg = lm,
-                                  fitstat = list(summary, "r.squared"),
-                                  data = euc_traits_nosubsp)
-dominanceanalysis
-# output suggests bats then AVP then birds then MAP then MAT best predictors
-# when all considered separately
+# using phylolm to run phylogenetic logistic regression by Ives & Garland method
+# VERY SLOW/COMPUTATIONALLY INTENSE
+multi_reg$flcolour_abioticPGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + 
+                                               scale(meanMAP) + 
+                                               scale(meanAVP),
+                                             data = pgls_data,
+                                             phy = tree_pgls,
+                                             method = "logistic_IG10", 
+                                             boot = 100)
+summary(multi_reg$flcolour_abioticPGLS)
 
-# compare models with BIC
-BIC(multi_reg$budsize_abiotic, multi_reg$budsize_full)
+# Warning messages:
+#   1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
+#   the estimate of 'alpha' (0.935002387515753) reached the upper bound (0.935504358152755).
+#   This may simply reflect a flat likelihood at large alpha values,
+#   meaning that the phylogenetic correlation is estimated to be negligible.
+#   2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
+#   the boundary of the linear predictor has been reached during the optimization procedure.
+#   You can increase this bound by increasing 'btol'.
+#                                                   
+# Call:
+#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) +
+#                       scale(meanMAP) + scale(meanAVP), data = pgls_data, phy = tree_pgls,
+#                     method = "logistic_IG10", boot = 100)
+# AIC     logLik Pen.logLik
+# 424.6     -207.3     -200.3
+# 
+# Method: logistic_IG10
+# Mean tip height: 58.36226
+# Parameter estimate(s):
+#   alpha: 0.9350024
+# bootstrap mean: 0.6983564 (on log scale, then back transformed)
+# so possible downward bias.
+# bootstrap 95% CI: (0.2185395,0.9351291)
+# 
+# Coefficients:
+#   Estimate     StdErr    z.value lowerbootCI upperbootCI p.value
+# (Intercept)     -2.288204   0.203393 -11.250185   -2.793611     -1.8605 < 2e-16 ***
+#   scale(meanMAT)   0.217935   0.167753   1.299144   -0.054573      0.5065 0.19389
+# scale(meanMAP)  -0.456089   0.177682  -2.566884   -0.955646     -0.1234 0.01026 *
+#   scale(meanAVP)  -0.279404   0.204229  -1.368096   -0.598215      0.0614 0.17128
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Note: Wald-type p-values for coefficients, conditional on alpha=0.9350024
+# Parametric bootstrap results based on 100 fitted replicates
 
-# no BIC for PGLS, AIC?
-c(multi_reg$budsize_abiotic_PGLS$aic, multi_reg$budsize_biot_PGLS$aic,
-  multi_reg$budsize_PGLS$aic)
-# log likelihood?
-c(multi_reg$budsize_abiotic_PGLS$logLik, multi_reg$budsize_biot_PGLS$logLik,
-  multi_reg$budsize_PGLS$logLik)
+#* flower colourfulness biotic model ----
+
+# using phylolm to run phylogenetic logistic regression by Ives & Garland method
+# VERY SLOW/COMPUTATIONALLY INTENSE
+multi_reg$flcolour_bioticPGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + 
+                                               scale(meanbatpres_bin),
+                                             data = pgls_data,
+                                             phy = tree_pgls,
+                                             method = "logistic_IG10", 
+                                             boot = 100)
+summary(multi_reg$flcolour_bioticPGLS)
+
+# Warning messages:
+#   1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
+#   the estimate of 'alpha' (0.921940772659661) reached the upper bound (0.935504358152755).
+#   This may simply reflect a flat likelihood at large alpha values,
+#   meaning that the phylogenetic correlation is estimated to be negligible.
+#   2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
+#   the boundary of the linear predictor has been reached during the optimization procedure.
+#   You can increase this bound by increasing 'btol'.
+
+# Call:
+#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanbirdrich) + 
+#                       scale(meanbatpres_bin), data = pgls_data, phy = tree_pgls, 
+#                     method = "logistic_IG10", boot = 100)
+# AIC     logLik Pen.logLik 
+# 418.6     -205.3     -200.1 
+# 
+# Method: logistic_IG10
+# Mean tip height: 58.36226
+# Parameter estimate(s):
+#   alpha: 0.9219408 
+# bootstrap mean: 0.5448469 (on log scale, then back transformed)
+# so possible downward bias.
+# bootstrap 95% CI: (0.07379715,0.9353375)
+# 
+# Coefficients:
+#   Estimate    StdErr   z.value lowerbootCI upperbootCI p.value    
+# (Intercept)             -2.30201   0.20371 -11.30025    -2.71243     -1.8081 < 2e-16 ***
+#   scale(meanbirdrich)     -0.48803   0.20315  -2.40228    -0.84913     -0.1235 0.01629 *  
+#   scale(meanbatpres_bin)  -0.38649   0.18964  -2.03803    -0.67594     -0.0822 0.04155 *  
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Note: Wald-type p-values for coefficients, conditional on alpha=0.9219408
+# Parametric bootstrap results based on 100 fitted replicates
+
+#* AIC to compare flower colourfulness PGLS ----
+
+# now AIC (doesn't penalise additional variables so consider difference between
+# full model and biotic/abiotic models - if dropping X variables leads to larger
+# change in AIC, then they are likely more significant to model)
+
+c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
+  multi_reg$flcolour_bioticPGLS$aic,  # 418.5980
+  multi_reg$flcolour_PGLS$aic).       # 416.3765
+
+# dif between full model and biotic (~2) smaller than dif between full
+# model and abiotic (~8)
+
 
 #### conclusions ####
 
 # comparing all these models, my interpretations are that: 
-# 1) including biotic variables improves model R2 for bud size (.135 with 
-# abiotic only to 0.18 with biotic included)
-# 2) with full model precipitation becomes a less significant predictor, as
-# bud size mostly explained by presence/absence of bats in a eucalypt's 
-# environment  
-# 3) this matches result of full model for flower colourfulness, bat presence
-# best predictor
-# 4) with phylogenetic relatedness included via PGLS, bat presence still a 
-# significant predictor of bud size and flower colourfulness but mean annual
-# precipitation also considered a significant predictor of both, plus bird
-# richness for bud size - model doesn't seem to be accounting for significant
-# covariance in these predictors? will need to ask someone more expert in PGLS
+# 1) including biotic variables improves model adjusted R2 for bud size 
+# (0.14 for abiotic only, 0.16 for biotic only, to 0.18 full model)
+
+# 2) this matches result of full model for flower colourfulness...
+
+# FINISH MONDAY
+
 
 rm(spp, tree_pgls, multi_reg, pgls_data)

@@ -13,7 +13,8 @@ library(RColorBrewer)
 library(GGally)
 library(car)
 library(plotrix)
-library(domir)
+library(nlme)
+library(AICcmodavg)
 # library(APCalign) was used for aligning taxonomy but not needed in current workflow
 
 # function to cache pre-prepared R data. If RDS already in cache will read data
@@ -43,6 +44,9 @@ source("scripts/analyses/single_regressions.R")
 
 # main analysis, multiple regressions
 source("scripts/analyses/multiple_regression.R")
+
+# supports main analysis, model averaging
+source("scripts/analyses/model_averaging.R")
 
 # supporting phylogenetic regressions for evolutionary relationships
 source("scripts/analyses/PGLS.R")
