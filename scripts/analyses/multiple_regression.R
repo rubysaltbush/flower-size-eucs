@@ -764,16 +764,20 @@ c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
 # dif between full model and biotic (~2) smaller than dif between full
 # model and abiotic (~8)
 
-
 #### conclusions ####
 
 # comparing all these models, my interpretations are that: 
-# 1) including biotic variables improves model adjusted R2 for bud size 
-# (0.14 for abiotic only, 0.16 for biotic only, to 0.18 full model)
+# 1) comparing BIC between the full models, models with biotic variables only & 
+#    models with abiotic variables only suggests that biotic variables better
+#    predict eucalypt bud size and flower colour than abiotic variables. This is
+#    true both with and without the phylogenetic relatedness of eucalypt species
+#    accounted for.
+# 2) in least squares regressions (without phylogeny) abiotic variables
+#    explain 25 % of the variation in species mean leaf area, while they only 
+#    explain only 14 % of variation in species mean bud size.
+# 3) looking at effect sizes
 
-# 2) this matches result of full model for flower colourfulness...
 
-# FINISH MONDAY
 
 
 rm(spp, tree_pgls, multi_reg, pgls_data)

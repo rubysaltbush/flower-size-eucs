@@ -9,8 +9,8 @@
 
 # subset data for modelling
 eucvarscaled <- euc_traits_nosubsp %>%
-  dplyr::select(apc_nosubsp, logbudsize_mm2, colour_fullbinary, meanMAT, 
-                meanMAP, meanAVP, meanbirdrich, meanbatpres_bin)
+  dplyr::select(apc_nosubsp, logbudsize_mm2, colour_fullbinary,  
+                meanMAT, meanMAP, meanAVP, meanbirdrich, meanbatpres_bin)
 # scale all predictor variables
 eucvarscaled[4:8] <- mapply(FUN = scale, eucvarscaled[4:8])
 # make colour binary factor for logistic regression
@@ -143,6 +143,7 @@ AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # Model-averaged estimate: -0.06 
 # Unconditional SE: 0.05 
 # 95% Unconditional confidence interval: -0.16, 0.04
+
 AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # Multimodel inference on "meanbatpres_bin" based on AIC
 # 
