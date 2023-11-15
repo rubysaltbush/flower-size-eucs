@@ -586,7 +586,7 @@ summary(multi_reg$budsize_PGLS)
 # Residual standard error: 7.041633 
 # Degrees of freedom: 669 total; 663 residual
 
-#* BIC to compare bud size PGLS ----
+#* AIC/BIC to compare bud size PGLS ----
 
 BIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsize_PGLS)
 
@@ -596,6 +596,19 @@ BIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsi
 # multi_reg$budsize_PGLS          7 2179.531
 
 # bigger change from full to abiotic model (~9) than to biotic model (~-7)
+
+# now AIC (doesn't penalise additional variables so consider difference between
+# full model and biotic/abiotic models - if dropping X variables leads to larger
+# change in AIC, then they are likely more significant to model)
+
+AIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsize_PGLS)
+
+#                                 df      AIC
+# multi_reg$budsize_abiotic_PGLS  5 2165.808
+# multi_reg$budsize_biot_PGLS     4 2154.076
+# multi_reg$budsize_PGLS          7 2147.990
+
+# dif from full to abiotic (18) larger than full to biotic (7)
 
 #* flower colourfulness full model ----
 
@@ -753,9 +766,8 @@ summary(multi_reg$flcolour_bioticPGLS)
 
 #* AIC to compare flower colourfulness PGLS ----
 
-# now AIC (doesn't penalise additional variables so consider difference between
-# full model and biotic/abiotic models - if dropping X variables leads to larger
-# change in AIC, then they are likely more significant to model)
+# can't compute BIC for phylogenetic logistic regressions easily, 
+# have to rely just on AIC
 
 c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
   multi_reg$flcolour_bioticPGLS$aic,  # 418.5980
@@ -775,9 +787,12 @@ c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
 # 2) in least squares regressions (without phylogeny) abiotic variables
 #    explain 25 % of the variation in species mean leaf area, while they only 
 #    explain only 14 % of variation in species mean bud size.
-# 3) looking at effect sizes
-
-
+# 3) looking at effect sizes, in all models bat presence/absence has the 
+#    strongest effect on bud size or flower colour, except in some phylogenetic
+#    models where bird richness (highly correlated with bat presence/absence) 
+#    has an equal if opposite effect (i.e. more birds = smaller flowers)
+#    In OLS regressions soil phosphorus has the strongest effect of any abiotic
+#    predictor, while in PGLS MAP has a stronger effect
 
 
 rm(spp, tree_pgls, multi_reg, pgls_data)

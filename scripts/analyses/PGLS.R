@@ -71,6 +71,8 @@ caper::phylo.d(data = flcol,
 # D is <1 (so shows some phylogenetic signal) but >0 (so different to Brownian
 # motion expectation)
 
+rm(flcol, tree_flcol)
+
 # bud size and median longitude ----
 
 #* prepare data and tree ----
