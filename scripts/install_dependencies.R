@@ -9,6 +9,7 @@ install.packages("terra") # does both raster and vector data, compatible with ch
 install.packages("ape") # basic package for phylogenetic trees and analysis, v5.7-1
 install.packages("phytools") # package for phylogenetic visualisations, v1.9-16
 install.packages("phylolm") # phylogenetic logistic regressions, v2.6.2
+install.packages("caper") # to test phylogenetic signal in binary trait, v1.0.3
 install.packages("ggpubr") # for publication ready ggplots v0.6.0
 install.packages("RColorBrewer") # for plot colours, v1.1-3
 install.packages("GGally") # for correlation plots, v2.1.2
