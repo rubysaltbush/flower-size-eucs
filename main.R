@@ -49,6 +49,9 @@ source("scripts/analyses/multiple_regression.R")
 # supports main analysis, model averaging
 source("scripts/analyses/model_averaging.R")
 
+# supporting test of phylogenetic signal for bud size and flower colour
+source("scripts/analyses/phylogenetic_signal.R")
+
 # supporting phylogenetic regressions for evolutionary relationships
 source("scripts/analyses/PGLS.R")
 
