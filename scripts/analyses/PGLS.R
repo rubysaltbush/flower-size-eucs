@@ -1,5 +1,8 @@
 # phylogenetic regressions to test (evolutionary) relationships between some traits
 
+# list to store all models
+pgls_models <- list()
+
 # bud size and median longitude ----
 
 #* prepare data and tree ----
@@ -21,11 +24,11 @@ pgls_data[,1] <- NULL
 
 #* run PGLS ----
 spp <- rownames(pgls_data) # set species names as reference point
-pglsModel <- nlme::gls(logbudsize_mm2 ~ medianlong, 
+pgls_models$medlong <- nlme::gls(logbudsize_mm2 ~ medianlong, 
                        correlation = ape::corBrownian(phy = tree_budsz, 
                                                       form = ~spp),
                        data = pgls_data, method = "ML")
-summary(pglsModel)
+summary(pgls_models$medlong)
 # Generalized least squares fit by maximum likelihood
 # Model: logbudsize_mm2 ~ medianlong 
 # Data: pgls_data 
@@ -54,14 +57,15 @@ summary(pglsModel)
 # Degrees of freedom: 675 total; 673 residual
 
 plot(logbudsize_mm2 ~ medianlong, data = pgls_data)
-abline(a = coef(pglsModel)[1], b = coef(pglsModel)[2])
+abline(a = coef(pgls_models$medlong)[1], b = coef(pgls_models$medlong)[2])
 # significant, P = 0.005
 
 #* figure ----
 # scatter plot with points coloured by flower colour
 ggplot(euc_traits_nosubsp, aes(x = medianlong, y = logbudsize_mm2)) +
   geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
-  geom_abline(intercept = coef(pglsModel)[1], slope = coef(pglsModel)[2], colour = "black") +
+  geom_abline(intercept = coef(pgls_models$medlong)[1], 
+              slope = coef(pgls_models$medlong)[2], colour = "black") +
   theme_pubr(legend = "right") +
   scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   scale_color_manual(values = c("#DFBF5B", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
@@ -92,11 +96,11 @@ pgls_data[,1] <- NULL
 
 #* run PGLS ----
 spp <- rownames(pgls_data) # set species names as reference point
-pglsModel <- nlme::gls(logbudsize_mm2 ~ colour_binary, 
-                       correlation = ape::corBrownian(phy = tree_budsz, 
+pgls_models$colbin <- nlme::gls(logbudsize_mm2 ~ colour_binary,
+                                correlation = ape::corBrownian(phy = tree_budsz, 
                                                       form = ~spp),
-                       data = pgls_data, method = "ML")
-summary(pglsModel)
+                                data = pgls_data, method = "ML")
+summary(pgls_models$colbin)
 # Generalized least squares fit by maximum likelihood
 # Model: logbudsize_mm2 ~ colour_binary 
 # Data: pgls_data 
@@ -126,6 +130,7 @@ summary(pglsModel)
 # Residual standard error: 6.823389 
 # Degrees of freedom: 673 total; 670 residual
 plot(logbudsize_mm2 ~ colour_binary, data = pgls_data)
+abline(a = coef(pgls_models$colbin)[1], b = coef(pgls_models$colbin)[2])
 # significant differences between 3 groups, p < 0.001
 
 #* figure ----
@@ -142,8 +147,6 @@ euc_traits_nosubsp %>%
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14))
 ggsave("figures/regressions/bud size by flower colourfulness.pdf", width = 8, height = 5)
-
-rm(pglsModel, pgls_data, tree_budsz, spp)
 
 # bud size and other traits ----
 
@@ -167,7 +170,6 @@ rownames(pgls_data) <- pgls_data[,1]
 pgls_data[,1] <- NULL
 
 #* run PGLS models ----
-pgls_models <- list()
 spp <- rownames(pgls_data) # set species names as reference point
 
 #** fruit size ----
