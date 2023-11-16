@@ -40,7 +40,7 @@ source("scripts/my_colours.R")
 
 #### ANALYSES ####
 
-# initial regression analyses and figures
+# initial regression analyses and figures for relationships with environment
 source("scripts/analyses/single_regressions.R")
 
 # main analysis, multiple regressions

@@ -7,7 +7,7 @@ remotes::install_github("traitecoevo/austraits", upgrade = "ask") # access to au
 install.packages("sf") # for spatial data, run version 1.0-12
 install.packages("terra") # does both raster and vector data, compatible with changes to R spatial data, v1.7-39
 install.packages("ape") # basic package for phylogenetic trees and analysis, v5.7-1
-install.packages("phytools") # package for phylogenetic visualisations, v1.9-16
+install.packages("phytools") # package for phylogenetic visualisations, v2.0-3
 install.packages("phylolm") # phylogenetic logistic regressions, v2.6.2
 install.packages("caper") # to test phylogenetic signal in binary trait, v1.0.3
 install.packages("ggpubr") # for publication ready ggplots v0.6.0

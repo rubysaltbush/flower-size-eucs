@@ -217,3 +217,209 @@ euc_traits_nosubsp %>%
 ggsave("figures/regressions/bud size by flower colourfulness.pdf", width = 8, height = 5)
 
 rm(pglsModel, pgls_data, tree_budsz, spp)
+
+# bud size and other traits ----
+
+# check relationship between bud size and other trait correlates
+# max plant height, number of flowers per umbel, and fruit size
+
+#* prepare data and tree ----
+
+# subset data to variables of interest for phylogenetic least squares regression
+# remove data with no match in tree
+pgls_data <- euc_traits_nosubsp %>%
+  dplyr::select(tree_names, logbudsize_mm2, frtsize_mm2, max_height_m, bud_n_mean) %>%
+  dplyr::filter(complete.cases(.)) %>%
+  as.data.frame()
+
+# drop outgroups and missing data tips from tree
+tree_budsz <- ape::drop.tip(treeML1, treeML1$tip.label[-match(pgls_data$tree_names, treeML1$tip.label)])
+length(tree_budsz$tip.label) # 678 tips remain
+
+rownames(pgls_data) <- pgls_data[,1]
+pgls_data[,1] <- NULL
+
+#* run PGLS models ----
+pgls_models <- list()
+spp <- rownames(pgls_data) # set species names as reference point
+
+#** fruit size ----
+pgls_models$frtsize <- nlme::gls(logbudsize_mm2 ~ log(frtsize_mm2), 
+                                 correlation = ape::corBrownian(phy = tree_budsz, 
+                                                                form = ~spp),
+                                 data = pgls_data, method = "ML")
+summary(pgls_models$frtsize)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ log(frtsize_mm2) 
+# Data: pgls_data 
+# AIC     BIC    logLik
+# 1263.053 1276.61 -628.5263
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error  t-value p-value
+# (Intercept)      -0.4660002 1.3756448 -0.33875  0.7349
+# log(frtsize_mm2)  0.8728617 0.0196537 44.41203  0.0000
+# 
+# Correlation: 
+#   (Intr)
+# log(frtsize_mm2) -0.067
+# 
+# Standardized residuals:
+#   Min          Q1         Med          Q3         Max 
+# -0.50176592  0.04764318  0.18489750  0.28123935  0.62643000 
+# 
+# Residual standard error: 3.625188 
+# Degrees of freedom: 678 total; 676 residual
+
+# scatter plot with PGLS line
+ggplot(pgls_data, aes(x = log(frtsize_mm2), y = logbudsize_mm2)) +
+  geom_point(size = 3, shape = 21) +
+  geom_abline(intercept = coef(pgls_models$frtsize)[1], slope = coef(pgls_models$frtsize)[2], colour = "black") +
+  theme_pubr(legend = "right") +
+  xlab("Eucalypt fruit size (log mm²)") +
+  ylab("Eucalypt bud size (log mm²)") +
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  labs(title = "PGLS p < 0.001")
+ggsave("figures/regressions/bud size by fruit size PGLS.pdf", width = 8, height = 5)
+
+#** max height ----
+pgls_models$maxht <- nlme::gls(logbudsize_mm2 ~ log(max_height_m), 
+                                 correlation = ape::corBrownian(phy = tree_budsz, 
+                                                                form = ~spp),
+                                 data = pgls_data, method = "ML")
+summary(pgls_models$maxht)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ log(max_height_m) 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2186.148 2199.705 -1090.074
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error  t-value p-value
+# (Intercept)       3.473299 2.7127657 1.280353  0.2009
+# log(max_height_m) 0.055123 0.0333593 1.652397  0.0989
+# 
+# Correlation: 
+#   (Intr)
+# log(max_height_m) -0.033
+# 
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.325228879 -0.073447813  0.009259175  0.090625232  0.556473820 
+# 
+# Residual standard error: 7.161038 
+# Degrees of freedom: 678 total; 676 residual
+
+# scatter plot with PGLS line
+ggplot(pgls_data, aes(x = log(max_height_m), y = logbudsize_mm2)) +
+  geom_point(size = 3, shape = 21) +
+  theme_pubr(legend = "right") +
+  xlab("Eucalypt maximum height (log m)") +
+  ylab("Eucalypt bud size (log mm²)") +
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  labs(title = "PGLS p = 0.09")
+ggsave("figures/regressions/bud size by max height PGLS.pdf", width = 8, height = 5)
+
+#** flower number ----
+pgls_models$budn <- nlme::gls(logbudsize_mm2 ~ bud_n_mean, 
+                               correlation = ape::corBrownian(phy = tree_budsz, 
+                                                              form = ~spp),
+                               data = pgls_data, method = "ML")
+summary(pgls_models$budn)
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ bud_n_mean 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2120.484 2134.041 -1057.242
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error   t-value p-value
+# (Intercept)  4.234040 2.5841520  1.638464  0.1018
+# bud_n_mean  -0.086532 0.0102153 -8.470772  0.0000
+# 
+# Correlation: 
+#   (Intr)
+# bud_n_mean -0.028
+# 
+# Standardized residuals:
+#   Min          Q1         Med          Q3         Max 
+# -0.33808027 -0.07132347  0.01325601  0.10026038  0.52923343 
+# 
+# Residual standard error: 6.822527 
+# Degrees of freedom: 678 total; 676 residual
+
+# scatter plot with PGLS line
+ggplot(pgls_data, aes(x = bud_n_mean, y = logbudsize_mm2)) +
+  geom_point(size = 3, shape = 21) +
+  geom_abline(intercept = coef(pgls_models$budn)[1], slope = coef(pgls_models$budn)[2], colour = "black") +
+  theme_pubr(legend = "right") +
+  xlab("Mean number of buds per umbel") +
+  ylab("Eucalypt bud size (log mm²)") +
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  labs(title = "PGLS p < 0.001")
+ggsave("figures/regressions/bud size by bud number PGLS.pdf", width = 8, height = 5)
+
+#** combined trait model ----
+
+pgls_models$all <- nlme::gls(logbudsize_mm2 ~ scale(bud_n_mean) + 
+                               scale(log(frtsize_mm2)) + scale(log(max_height_m)), 
+                              correlation = ape::corBrownian(phy = tree_budsz, 
+                                                             form = ~spp),
+                              data = pgls_data, method = "ML")
+summary(pgls_models$all)
+
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ scale(bud_n_mean) + scale(log(frtsize_mm2)) +      scale(log(max_height_m)) 
+# Data: pgls_data 
+# AIC      BIC   logLik
+# 1247.292 1269.888 -618.646
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#                             Value Std.Error  t-value p-value
+# (Intercept)              3.1393448 1.3547572  2.31727  0.0208
+# scale(bud_n_mean)        0.0202043 0.0164157  1.23080  0.2188
+# scale(log(frtsize_mm2))  0.8835418 0.0210358 42.00176  0.0000
+# scale(log(max_height_m)) 0.0576350 0.0137181  4.20139  0.0000
+# 
+# Correlation: 
+# (Intr) sc(__) s((_2)
+# scale(bud_n_mean)        -0.001              
+# scale(log(frtsize_mm2))  -0.007  0.389       
+# scale(log(max_height_m)) -0.003 -0.066 -0.006
+#                   
+# Standardized residuals:
+# Min          Q1         Med          Q3         Max 
+# -0.49869982  0.05162114  0.19478540  0.29354325  0.64430579 
+#                   
+# Residual standard error: 3.572743 
+# Degrees of freedom: 678 total; 674 residual
+
+#### conclusions ####
+
+# 1) buds/flowers larger in more westerly eucalypts
+
+# 2) bud size and flower colour evolutionarily correlated, eucalypts with 
+#    larger buds tend to have more colourful flowers
+
+# 3) fruit size is strongest trait correlate of bud size, which makes sense given
+#    buds become the flowers which become the fruit
