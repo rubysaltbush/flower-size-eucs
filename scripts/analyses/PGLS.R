@@ -60,6 +60,10 @@ plot(logbudsize_mm2 ~ medianlong, data = pgls_data)
 abline(a = coef(pgls_models$medlong)[1], b = coef(pgls_models$medlong)[2])
 # significant, P = 0.005
 
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$medlong, phy = tree_budsz)
+# 0.3337541
+
 #* figure ----
 # scatter plot with points coloured by flower colour
 ggplot(euc_traits_nosubsp, aes(x = medianlong, y = logbudsize_mm2)) +
@@ -133,6 +137,10 @@ plot(logbudsize_mm2 ~ colour_binary, data = pgls_data)
 abline(a = coef(pgls_models$colbin)[1], b = coef(pgls_models$colbin)[2])
 # significant differences between 3 groups, p < 0.001
 
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$colbin, phy = tree_budsz)
+# 0.4339345
+
 #* figure ----
 # boxplot figure to show bud size vs flower colourfulness
 euc_traits_nosubsp %>%
@@ -205,6 +213,10 @@ summary(pgls_models$frtsize)
 # Residual standard error: 3.625188 
 # Degrees of freedom: 678 total; 676 residual
 
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$frtsize, phy = tree_budsz)
+# 0.8528477
+
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = log(frtsize_mm2), y = logbudsize_mm2)) +
   geom_point(size = 3, shape = 21) +
@@ -249,6 +261,10 @@ summary(pgls_models$maxht)
 # Residual standard error: 7.161038 
 # Degrees of freedom: 678 total; 676 residual
 
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$maxht, phy = tree_budsz)
+# 0.3243248
+
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = log(max_height_m), y = logbudsize_mm2)) +
   geom_point(size = 3, shape = 21) +
@@ -291,6 +307,10 @@ summary(pgls_models$budn)
 # 
 # Residual standard error: 6.822527 
 # Degrees of freedom: 678 total; 676 residual
+
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$budn, phy = tree_budsz)
+# 0.4200307
 
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = bud_n_mean, y = logbudsize_mm2)) +
@@ -342,6 +362,10 @@ summary(pgls_models$all)
 #                   
 # Residual standard error: 3.572743 
 # Degrees of freedom: 678 total; 674 residual
+
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$all, phy = tree_budsz)
+# 0.8504395
 
 #### conclusions ####
 

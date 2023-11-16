@@ -16,6 +16,7 @@ library(car)
 library(plotrix)
 library(nlme)
 library(AICcmodavg)
+library(rr2)
 # library(APCalign) was used for aligning taxonomy but not needed in current workflow
 
 # function to cache pre-prepared R data. If RDS already in cache will read data
