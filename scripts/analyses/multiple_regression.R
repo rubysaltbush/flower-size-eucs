@@ -433,8 +433,8 @@ rm(tempflcol)
 # subset data to phylogenetic least squares regression variables
 # removing data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
-  dplyr::select(tree_names, logbudsize_mm2, colour_fullbinary, meanAVP, meanMAT, 
-                meanMAP, meanbirdrich, meanbatpres_bin) %>%
+  dplyr::select(tree_names, logbudsize_mm2, colour_fullbinary, leafarea_mm2,
+                meanAVP, meanMAT, meanMAP, meanbirdrich, meanbatpres_bin) %>%
   dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
 
@@ -451,9 +451,53 @@ rm(to_drop)
 rownames(pgls_data) <- pgls_data[,1] # tree names to row names
 pgls_data[,1] <- NULL
 
+spp <- rownames(pgls_data) # set species names as reference point
+
+#* leaf area abiotic PGLS ----
+
+multi_reg$leafarea_abiotic_PGLS <- nlme::gls(log(leafarea_mm2) ~ 
+                                              scale(meanMAT) + 
+                                              scale(meanMAP) + 
+                                              scale(meanAVP),
+                                            data = pgls_data,
+                                            correlation = 
+                                              ape::corBrownian(phy = tree_pgls, 
+                                                               form = ~spp),
+                                            method = "ML")
+summary(multi_reg$leafarea_abiotic_PGLS)
+# Generalized least squares fit by maximum likelihood
+# Model: log(leafarea_mm2) ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 2161.433 2183.962 -1075.717
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error  t-value p-value
+# (Intercept)    7.131628 2.7053986 2.636073  0.0086
+# scale(meanMAT) 0.163732 0.0490493 3.338113  0.0009
+# scale(meanMAP) 0.161853 0.0427550 3.785599  0.0002
+# scale(meanAVP) 0.151162 0.0465656 3.246221  0.0012
+# 
+# Correlation: 
+#   (Intr) s(MAT) s(MAP)
+# scale(meanMAT) -0.010              
+# scale(meanMAP) -0.008  0.092       
+# scale(meanAVP) -0.001  0.282 -0.209
+# 
+# Standardized residuals:
+#   Min           Q1          Med           Q3          Max 
+# -0.379910600 -0.049892467  0.005336775  0.060107270  0.275523427 
+# 
+# Residual standard error: 7.134033 
+# Degrees of freedom: 669 total; 665 residual
+
 #* bud size abiotic PGLS ----
 
-spp <- rownames(pgls_data) # set species names as reference point
 multi_reg$budsize_abiotic_PGLS <- nlme::gls(logbudsize_mm2 ~ 
                                                      scale(meanMAT) + 
                                                      scale(meanMAP) + 
@@ -783,7 +827,7 @@ for(name in names(multi_reg[1:7])) {
   r2[[name]] <- rr2::R2(multi_reg[[name]])
 }
 # phylogenetic models (slow!)
-for(name in names(multi_reg[8:10])) {
+for(name in names(multi_reg[8:11])) {
   r2[[name]] <- rr2::R2(multi_reg[[name]], phy = tree_pgls)
 }
 # build list into exportable data frame
