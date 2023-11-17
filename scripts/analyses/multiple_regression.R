@@ -27,7 +27,7 @@ hist(log(euc_traits_nosubsp$budsize_mm2))
 # second response variable is flower colourfulness, binary
 plot(euc_traits_nosubsp$colour_fullbinary)
 table(euc_traits_nosubsp$colour_fullbinary)
-# 63 colourful (1), 696 white-cream (0) taxa
+# 93 colourful (1), 696 white-cream (0) taxa
 
 #* predictor variables ----
 
@@ -643,25 +643,18 @@ summary(multi_reg$flcolour_PGLS)
 # Mean tip height: 58.36226
 # Parameter estimate(s):
 #   alpha: 0.9216341 
-# bootstrap mean: 0.5611803 (on log scale, then back transformed)
+# bootstrap mean: 0.6977975 (on log scale, then back transformed)
 # so possible downward bias.
-# bootstrap 95% CI: (0.1087595,0.9353957)
+# bootstrap 95% CI: (0.1240605,0.935332)
 # 
 # Coefficients:
-#   Estimate      StdErr     z.value lowerbootCI upperbootCI
-# (Intercept)             -2.4468578   0.2264412 -10.8057104  -2.9739735     -1.9196
-# scale(meanMAT)           0.3726886   0.2120531   1.7575250  -0.0180384      0.8957
-# scale(meanMAP)          -0.0324701   0.1826080  -0.1778130  -0.4460400      0.3401
-# scale(meanAVP)          -0.0056982   0.2243294  -0.0254012  -0.4140431      0.4181
-# scale(meanbirdrich)     -0.3877675   0.2311509  -1.6775517  -0.6751863      0.0870
-# scale(meanbatpres_bin)  -0.5712757   0.2694750  -2.1199582  -1.2254959     -0.1124
-# p.value    
-# (Intercept)            < 2e-16 ***
-#   scale(meanMAT)         0.07883 .  
-# scale(meanMAP)         0.85887    
-# scale(meanAVP)         0.97973    
-# scale(meanbirdrich)    0.09343 .  
-# scale(meanbatpres_bin) 0.03401 *  
+#                           Estimate      StdErr     z.value lowerbootCI upperbootCI p.value    
+# (Intercept)             -2.4468578   0.2264412 -10.8057104  -2.8386050     -2.0149 < 2e-16 ***
+# scale(meanMAT)           0.3726886   0.2120531   1.7575250  -0.0837049      0.8343 0.07883 .  
+# scale(meanMAP)          -0.0324701   0.1826080  -0.1778130  -0.3621440      0.3777 0.85887    
+# scale(meanAVP)          -0.0056982   0.2243294  -0.0254012  -0.3998315      0.3970 0.97973    
+# scale(meanbirdrich)     -0.3877675   0.2311509  -1.6775517  -0.8049731      0.1154 0.09343 .  
+# scale(meanbatpres_bin)  -0.5712757   0.2694750  -2.1199582  -1.1795147     -0.0820 0.03401 *  
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
@@ -682,35 +675,35 @@ multi_reg$flcolour_abioticPGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(me
 summary(multi_reg$flcolour_abioticPGLS)
 
 # Warning messages:
-#   1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
-#   the estimate of 'alpha' (0.935002387515753) reached the upper bound (0.935504358152755).
-#   This may simply reflect a flat likelihood at large alpha values,
-#   meaning that the phylogenetic correlation is estimated to be negligible.
-#   2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
-#   the boundary of the linear predictor has been reached during the optimization procedure.
-#   You can increase this bound by increasing 'btol'.
+# 1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
+# the estimate of 'alpha' (0.935002387515753) reached the upper bound (0.935504358152755).
+# This may simply reflect a flat likelihood at large alpha values,
+# meaning that the phylogenetic correlation is estimated to be negligible.
+# 2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
+# the boundary of the linear predictor has been reached during the optimization procedure.
+# You can increase this bound by increasing 'btol'.
 #                                                   
 # Call:
-#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) +
-#                       scale(meanMAP) + scale(meanAVP), data = pgls_data, phy = tree_pgls,
+#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) + 
+#                       scale(meanMAP) + scale(meanAVP), data = pgls_data, phy = tree_pgls, 
 #                     method = "logistic_IG10", boot = 100)
-# AIC     logLik Pen.logLik
-# 424.6     -207.3     -200.3
+# AIC     logLik Pen.logLik 
+# 424.6     -207.3     -200.3 
 # 
 # Method: logistic_IG10
 # Mean tip height: 58.36226
 # Parameter estimate(s):
-#   alpha: 0.9350024
-# bootstrap mean: 0.6983564 (on log scale, then back transformed)
+#   alpha: 0.9350024 
+# bootstrap mean: 0.6651825 (on log scale, then back transformed)
 # so possible downward bias.
-# bootstrap 95% CI: (0.2185395,0.9351291)
+# bootstrap 95% CI: (0.118989,0.9354489)
 # 
 # Coefficients:
-#   Estimate     StdErr    z.value lowerbootCI upperbootCI p.value
-# (Intercept)     -2.288204   0.203393 -11.250185   -2.793611     -1.8605 < 2e-16 ***
-#   scale(meanMAT)   0.217935   0.167753   1.299144   -0.054573      0.5065 0.19389
-# scale(meanMAP)  -0.456089   0.177682  -2.566884   -0.955646     -0.1234 0.01026 *
-#   scale(meanAVP)  -0.279404   0.204229  -1.368096   -0.598215      0.0614 0.17128
+#   Estimate    StdErr   z.value lowerbootCI upperbootCI p.value    
+# (Intercept)     -2.28820   0.20339 -11.25019    -2.72537     -1.9273 < 2e-16 ***
+#   scale(meanMAT)   0.21793   0.16775   1.29914    -0.13215      0.6447 0.19389    
+# scale(meanMAP)  -0.45609   0.17768  -2.56688    -0.82434     -0.1935 0.01026 *  
+#   scale(meanAVP)  -0.27940   0.20423  -1.36810    -0.72533      0.2315 0.17128    
 # ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
@@ -730,51 +723,96 @@ multi_reg$flcolour_bioticPGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(mea
 summary(multi_reg$flcolour_bioticPGLS)
 
 # Warning messages:
-#   1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
-#   the estimate of 'alpha' (0.921940772659661) reached the upper bound (0.935504358152755).
-#   This may simply reflect a flat likelihood at large alpha values,
-#   meaning that the phylogenetic correlation is estimated to be negligible.
-#   2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
-#   the boundary of the linear predictor has been reached during the optimization procedure.
-#   You can increase this bound by increasing 'btol'.
+# 1: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
+# the estimate of 'alpha' (0.934366113283262) reached the upper bound (0.935504358152755).
+# This may simply reflect a flat likelihood at large alpha values,
+# meaning that the phylogenetic correlation is estimated to be negligible.
+# 2: In phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin),  :
+# the boundary of the linear predictor has been reached during the optimization procedure.
+# You can increase this bound by increasing 'btol'.
 
 # Call:
 #   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanbirdrich) + 
 #                       scale(meanbatpres_bin), data = pgls_data, phy = tree_pgls, 
 #                     method = "logistic_IG10", boot = 100)
 # AIC     logLik Pen.logLik 
-# 418.6     -205.3     -200.1 
+# 418.4     -205.2     -200.0 
 # 
 # Method: logistic_IG10
 # Mean tip height: 58.36226
 # Parameter estimate(s):
-#   alpha: 0.9219408 
-# bootstrap mean: 0.5448469 (on log scale, then back transformed)
+#   alpha: 0.9343661 
+# bootstrap mean: 0.6186314 (on log scale, then back transformed)
 # so possible downward bias.
-# bootstrap 95% CI: (0.07379715,0.9353375)
+# bootstrap 95% CI: (0.1290787,0.9351898)
 # 
 # Coefficients:
 #   Estimate    StdErr   z.value lowerbootCI upperbootCI p.value    
-# (Intercept)             -2.30201   0.20371 -11.30025    -2.71243     -1.8081 < 2e-16 ***
-#   scale(meanbirdrich)     -0.48803   0.20315  -2.40228    -0.84913     -0.1235 0.01629 *  
-#   scale(meanbatpres_bin)  -0.38649   0.18964  -2.03803    -0.67594     -0.0822 0.04155 *  
+# (Intercept)             -2.30540   0.20343 -11.33241    -2.67654     -1.8922 < 2e-16 ***
+#   scale(meanbirdrich)     -0.48955   0.20348  -2.40595    -0.87614     -0.1000 0.01613 *  
+#   scale(meanbatpres_bin)  -0.38736   0.18983  -2.04057    -0.84920     -0.0295 0.04129 *  
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Note: Wald-type p-values for coefficients, conditional on alpha=0.9219408
+# Note: Wald-type p-values for coefficients, conditional on alpha=0.9343661
 # Parametric bootstrap results based on 100 fitted replicates
 
-#* AIC to compare flower colourfulness PGLS ----
+#* flower colourfulness PGLS ----
 
-# can't compute BIC for phylogenetic logistic regressions easily, 
-# have to rely just on AIC
+# for all phyloglm, the estimate of alpha has reached the upper bound
+# suggesting that "the phylogenetic correlation is estimated to be negligible"
+# this strongly suggests I should just use the above glm models for flower 
+# colourfulness, and disregard these phyloglm models
+# (though in any case the differences in AIC support biotic > abiotic at
+# predicting flower colourfulness)
 
-c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
-  multi_reg$flcolour_bioticPGLS$aic,  # 418.5980
-  multi_reg$flcolour_PGLS$aic).       # 416.3765
+# remove phyloglm models from list
+multi_reg$flcolour_PGLS <- NULL
+multi_reg$flcolour_abioticPGLS <- NULL
+multi_reg$flcolour_bioticPGLS <- NULL
 
-# dif between full model and biotic (~2) smaller than dif between full
-# model and abiotic (~8)
+rm(spp, pgls_data)
+
+### partial R2 ####
+
+# calculate partial/pseudo R2 for all models, using R2 from Ives (2019) as 
+# these are made to work with phylogenetic models
+r2 <- list()
+# non-phylogenetic models
+for(name in names(multi_reg[1:7])) {
+  r2[[name]] <- rr2::R2(multi_reg[[name]])
+}
+# phylogenetic models (slow!)
+for(name in names(multi_reg[8:10])) {
+  r2[[name]] <- rr2::R2(multi_reg[[name]], phy = tree_pgls)
+}
+# build list into exportable data frame
+r2_results <- data.frame(model = character(0),
+                         R2_lik = numeric(0),
+                         R2_resid = numeric(0),
+                         R2_pred = numeric(0))
+for(name in names(r2)) {
+  r2_results <- tibble::add_row(r2_results, 
+                                model = name, 
+                                R2_lik = r2[[name]][1],
+                                R2_resid = r2[[name]][2], 
+                                R2_pred = r2[[name]][3])
+}
+# add in BIC and AIC from models while I'm here, and n as well
+BIC <- c()
+AIC <- c()
+nobs <- c()
+for(name in names(multi_reg)) {
+  BIC <- c(BIC, BIC(multi_reg[[name]]))
+  AIC <- c(AIC, AIC(multi_reg[[name]]))
+  nobs <- c(nobs, nobs(multi_reg[[name]]))
+}
+
+r2_results <- tibble::add_column(r2_results, BIC, AIC, nobs)
+
+# export results to csv
+readr::write_csv(r2_results, "results/model_summaries.csv")
+rm(name, r2, r2_results, AIC, BIC, nobs)
 
 #### conclusions ####
 
@@ -786,7 +824,7 @@ c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
 #    accounted for.
 # 2) in least squares regressions (without phylogeny) abiotic variables
 #    explain 25 % of the variation in species mean leaf area, while they only 
-#    explain only 14 % of variation in species mean bud size.
+#    explain only 14 % of variation in species mean bud size (by R2).
 # 3) looking at effect sizes, in all models bat presence/absence has the 
 #    strongest effect on bud size or flower colour, except in some phylogenetic
 #    models where bird richness (highly correlated with bat presence/absence) 
@@ -795,4 +833,4 @@ c(multi_reg$flcolour_abioticPGLS$aic, # 424.5613
 #    predictor, while in PGLS MAP has a stronger effect
 
 
-rm(spp, tree_pgls, multi_reg, pgls_data)
+rm(tree_pgls, multi_reg)
