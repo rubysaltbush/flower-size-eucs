@@ -552,7 +552,7 @@ multi_reg$budsize_PGLS <- nlme::gls(logbudsize_mm2 ~ scale(meanMAT) +
 summary(multi_reg$budsize_PGLS)
 
 # Generalized least squares fit by maximum likelihood
-# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) +      scale(meanbirdrich) + scale(meanbatpres_bin) 
+# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) +  scale(meanbirdrich) + scale(meanbatpres_bin) 
 # Data: pgls_data 
 # AIC      BIC    logLik
 # 2147.99 2179.531 -1066.995
@@ -563,7 +563,7 @@ summary(multi_reg$budsize_PGLS)
 #   numeric(0)
 # 
 # Coefficients:
-#   Value Std.Error   t-value p-value
+#                             Value Std.Error   t-value p-value
 # (Intercept)             3.693240 2.6743845  1.380968  0.1678
 # scale(meanMAT)         -0.085780 0.0535892 -1.600694  0.1099
 # scale(meanMAP)         -0.134165 0.0423390 -3.168822  0.0016
