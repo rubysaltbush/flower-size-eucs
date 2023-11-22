@@ -10,10 +10,12 @@
 
 # subset data for modelling
 eucvarscaled <- euc_traits_nosubsp %>%
-  dplyr::select(apc_nosubsp, tree_names, logbudsize_mm2, colour_fullbinary,  
+  dplyr::select(apc_nosubsp, logbudsize_mm2, colour_fullbinary, leafarea_mm2,
                 meanMAT, meanMAP, meanAVP, meanbirdrich, meanbatpres_bin)
 # scale all predictor variables
 eucvarscaled[5:9] <- mapply(FUN = scale, eucvarscaled[5:9])
+# log transform leaf area
+eucvarscaled[4] <- log(eucvarscaled[4])
 # make colour binary factor for logistic regression
 eucvarscaled$colour_fullbinary <- as.factor(eucvarscaled$colour_fullbinary)
 
@@ -335,5 +337,69 @@ AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # model averaged estimate is strongest for bat presence/absence (-0.77), then 
 # for phosphorus (-0.44), then bird richness (-0.42), then MAT (0.26), then MAP (-0.07)
 
+#### leaf area model averaging ####
 
-rm(cand_mod, formulas, paste0.na.omit, i, eucvarscaled, pgls_data, tree_pgls, spp)
+# set all formulas
+formulas <- apply(data.frame(expand.grid(c("meanMAT", NA), c("meanMAP", NA),
+                                         c("meanAVP", NA))), 1, 
+                  paste0.na.omit)
+formulas[length(formulas)] <- "1"
+formulas <- paste0("leafarea_mm2 ~ ", formulas)
+formulas
+
+# run all candidate models          
+cand_mod <- list()
+for(i in 1:length(formulas)){
+  cand_mod[[i]] <- lm(as.formula(formulas[[i]]), 
+                      data = eucvarscaled)
+}
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
+# Multimodel inference on "meanMAT" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 1496.08      0.00     1     0.17 0.03
+# Mod3 4 1568.00     71.92     0     0.25 0.03
+# Mod5 4 1523.15     27.07     0     0.10 0.02
+# Mod7 3 1701.93    205.86     0     0.13 0.03
+# 
+# Model-averaged estimate: 0.17 
+# Unconditional SE: 0.03 
+# 95% Unconditional confidence interval: 0.12, 0.22
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
+# Multimodel inference on "meanMAP" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 1496.08      0.00     1     0.24 0.03
+# Mod2 4 1535.08     39.00     0     0.31 0.03
+# Mod5 4 1523.15     27.07     0     0.32 0.02
+# Mod6 3 1540.02     43.95     0     0.33 0.02
+# 
+# Model-averaged estimate: 0.24 
+# Unconditional SE: 0.03 
+# 95% Unconditional confidence interval: 0.19, 0.29
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
+# Multimodel inference on "meanAVP" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 1496.08      0.00     1     0.16 0.03
+# Mod2 4 1535.08     39.00     0     0.05 0.03
+# Mod3 4 1568.00     71.92     0     0.31 0.03
+# Mod4 3 1658.42    162.34     0     0.20 0.02
+# 
+# Model-averaged estimate: 0.16 
+# Unconditional SE: 0.03 
+# 95% Unconditional confidence interval: 0.1, 0.21
+
+rm(cand_mod, formulas, paste0.na.omit, i, eucvarscaled)

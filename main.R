@@ -42,7 +42,6 @@ source("scripts/my_colours.R")
 #### ANALYSES ####
 
 # initial regression analyses and figures for relationships with environment
-# POSSIBLY GET RID OF THESE/REPLACE WITH PGLS FOR ALL???
 source("scripts/analyses/single_regressions.R")
 
 # main analysis, multiple regressions
