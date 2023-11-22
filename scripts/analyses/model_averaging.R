@@ -69,6 +69,7 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
 # Model-averaged estimate: 0.04 
 # Unconditional SE: 0.04 
 # 95% Unconditional confidence interval: -0.05, 0.12
+
 AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # Multimodel inference on "meanMAP" based on AIC
 # 
@@ -95,6 +96,7 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # Model-averaged estimate: 0 
 # Unconditional SE: 0.04 
 # 95% Unconditional confidence interval: -0.09, 0.08
+
 AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # Multimodel inference on "meanAVP" based on AIC
 # 
@@ -121,6 +123,7 @@ AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # Model-averaged estimate: -0.17 
 # Unconditional SE: 0.05 
 # 95% Unconditional confidence interval: -0.26, -0.08
+
 AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # Multimodel inference on "meanbirdrich" based on AIC
 # 
@@ -335,7 +338,7 @@ AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # 95% Unconditional confidence interval: -1.31, -0.24
 
 # model averaged estimate is strongest for bat presence/absence (-0.77), then 
-# for phosphorus (-0.44), then bird richness (-0.42), then MAT (0.26), then MAP (-0.07)
+# for phosphorus (-0.44), then bird richness (-0.42), then MAT (0.24), then MAP (-0.07)
 
 #### leaf area model averaging ####
 
@@ -401,5 +404,70 @@ AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # Model-averaged estimate: 0.16 
 # Unconditional SE: 0.03 
 # 95% Unconditional confidence interval: 0.1, 0.21
+
+#### bud size abiotic only ####
+
+# set all formulas
+formulas <- apply(data.frame(expand.grid(c("meanMAT", NA), c("meanMAP", NA),
+                                         c("meanAVP", NA))), 1, 
+                  paste0.na.omit)
+formulas[length(formulas)] <- "1"
+formulas <- paste0("logbudsize_mm2 ~ ", formulas)
+formulas
+
+# run all candidate models          
+cand_mod <- list()
+for(i in 1:length(formulas)){
+  cand_mod[[i]] <- lm(as.formula(formulas[[i]]), 
+                      data = eucvarscaled)
+}
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
+# Multimodel inference on "meanMAT" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 2038.81      0.00  0.96    -0.06 0.04
+# Mod3 4 2045.10      6.29  0.04    -0.10 0.04
+# Mod5 4 2087.79     48.98  0.00     0.08 0.03
+# Mod7 3 2153.54    114.73  0.00     0.06 0.03
+# 
+# Model-averaged estimate: -0.07 
+# Unconditional SE: 0.04 
+# 95% Unconditional confidence interval: -0.14, 0.01
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
+# Multimodel inference on "meanMAP" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 2038.81      0.00  0.62    -0.11 0.04
+# Mod2 4 2039.79      0.98  0.38    -0.14 0.04
+# Mod5 4 2087.79     48.98  0.00    -0.28 0.03
+# Mod6 3 2091.49     52.69  0.00    -0.27 0.03
+# 
+# Model-averaged estimate: -0.12 
+# Unconditional SE: 0.04 
+# 95% Unconditional confidence interval: -0.2, -0.04
+
+# use modavg to get the model averaged standardised regression coefficients
+AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
+# Multimodel inference on "meanAVP" based on AIC
+# 
+# AIC table used to obtain model-averaged estimate:
+#   
+#   K     AIC Delta_AIC AICWt Estimate   SE
+# Mod1 5 2038.81      0.00  0.60    -0.31 0.04
+# Mod2 4 2039.79      0.98  0.37    -0.27 0.04
+# Mod3 4 2045.10      6.29  0.03    -0.38 0.04
+# Mod4 3 2051.79     12.98  0.00    -0.34 0.03
+# 
+# Model-averaged estimate: -0.3 
+# Unconditional SE: 0.05 
+# 95% Unconditional confidence interval: -0.39, -0.21
 
 rm(cand_mod, formulas, paste0.na.omit, i, eucvarscaled)

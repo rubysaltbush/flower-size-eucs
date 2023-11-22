@@ -71,7 +71,7 @@ plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23,
 
 # then label eucalyptae crown age at 52 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52, 
-                     border = "grey", lty = 2)
+                     border = "grey", lty = 3)
 
 # plot contMap again
 par(new = TRUE) # hack to force below to plot on top of above 
