@@ -166,9 +166,15 @@ ggsave("figures/regressions/bud size by flower colourfulness.pdf", width = 8, he
 # subset data to variables of interest for phylogenetic least squares regression
 # remove data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
-  dplyr::select(tree_names, logbudsize_mm2, frtsize_mm2, max_height_m, bud_n_mean) %>%
+  dplyr::select(tree_names, logbudsize_mm2, frtsize_mm2, max_height_m, bud_n_mean, leafarea_mm2) %>%
   dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
+
+# join colour on for plotting purposes
+colour <- dplyr::select(euc_traits_nosubsp, tree_names, colour_binary)
+pgls_data <- pgls_data %>%
+  dplyr::left_join(colour, by = "tree_names")
+rm(colour)
 
 # drop outgroups and missing data tips from tree
 tree_budsz <- ape::drop.tip(treeML1, treeML1$tip.label[-match(pgls_data$tree_names, treeML1$tip.label)])
@@ -219,13 +225,16 @@ rr2::R2_pred(mod = pgls_models$frtsize, phy = tree_budsz)
 
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = log(frtsize_mm2), y = logbudsize_mm2)) +
-  geom_point(size = 3, shape = 21) +
-  geom_abline(intercept = coef(pgls_models$frtsize)[1], slope = coef(pgls_models$frtsize)[2], colour = "black") +
+  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
+  geom_abline(intercept = coef(pgls_models$frtsize)[1], 
+              slope = coef(pgls_models$frtsize)[2], colour = "black") +
   theme_pubr(legend = "right") +
+  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_color_manual(values = c("#DFBF5B", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   xlab("Eucalypt fruit size (log mm²)") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = "PGLS p < 0.001")
+  labs(title = "PGLS p < 0.001, R² = 0.85")
 ggsave("figures/regressions/bud size by fruit size PGLS.pdf", width = 8, height = 5)
 
 #** max height ----
@@ -267,8 +276,10 @@ rr2::R2_pred(mod = pgls_models$maxht, phy = tree_budsz)
 
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = log(max_height_m), y = logbudsize_mm2)) +
-  geom_point(size = 3, shape = 21) +
+  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
   theme_pubr(legend = "right") +
+  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_color_manual(values = c("#DFBF5B", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   xlab("Eucalypt maximum height (log m)") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
@@ -314,29 +325,29 @@ rr2::R2_pred(mod = pgls_models$budn, phy = tree_budsz)
 
 # scatter plot with PGLS line
 ggplot(pgls_data, aes(x = bud_n_mean, y = logbudsize_mm2)) +
-  geom_point(size = 3, shape = 21) +
-  geom_abline(intercept = coef(pgls_models$budn)[1], slope = coef(pgls_models$budn)[2], colour = "black") +
+  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
+  geom_abline(intercept = coef(pgls_models$budn)[1], 
+              slope = coef(pgls_models$budn)[2], colour = "black") +
   theme_pubr(legend = "right") +
+  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_color_manual(values = c("#DFBF5B", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   xlab("Mean number of buds per umbel") +
   ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = "PGLS p < 0.001")
+  labs(title = "PGLS p < 0.001, R² = 0.42")
 ggsave("figures/regressions/bud size by bud number PGLS.pdf", width = 8, height = 5)
 
-#** combined trait model ----
-
-pgls_models$all <- nlme::gls(logbudsize_mm2 ~ scale(bud_n_mean) + 
-                               scale(log(frtsize_mm2)) + scale(log(max_height_m)), 
+#** leaf area ----
+pgls_models$lfarea <- nlme::gls(logbudsize_mm2 ~ log(leafarea_mm2), 
                               correlation = ape::corBrownian(phy = tree_budsz, 
                                                              form = ~spp),
                               data = pgls_data, method = "ML")
-summary(pgls_models$all)
-
+summary(pgls_models$lfarea)
 # Generalized least squares fit by maximum likelihood
-# Model: logbudsize_mm2 ~ scale(bud_n_mean) + scale(log(frtsize_mm2)) +      scale(log(max_height_m)) 
+# Model: logbudsize_mm2 ~ log(leafarea_mm2) 
 # Data: pgls_data 
-# AIC      BIC   logLik
-# 1247.292 1269.888 -618.646
+# AIC      BIC    logLik
+# 2108.227 2121.785 -1051.114
 # 
 # Correlation Structure: corBrownian
 # Formula: ~spp 
@@ -344,28 +355,86 @@ summary(pgls_models$all)
 #   numeric(0)
 # 
 # Coefficients:
-#                             Value Std.Error  t-value p-value
-# (Intercept)              3.1393448 1.3547572  2.31727  0.0208
-# scale(bud_n_mean)        0.0202043 0.0164157  1.23080  0.2188
-# scale(log(frtsize_mm2))  0.8835418 0.0210358 42.00176  0.0000
-# scale(log(max_height_m)) 0.0576350 0.0137181  4.20139  0.0000
+#   Value Std.Error  t-value p-value
+# (Intercept)       1.2381937 2.5728420 0.481255  0.6305
+# log(leafarea_mm2) 0.3267733 0.0353616 9.240899  0.0000
 # 
 # Correlation: 
-# (Intr) sc(__) s((_2)
-# scale(bud_n_mean)        -0.001              
-# scale(log(frtsize_mm2))  -0.007  0.389       
-# scale(log(max_height_m)) -0.003 -0.066 -0.006
-#                   
+#   (Intr)
+# log(leafarea_mm2) -0.1  
+# 
 # Standardized residuals:
-# Min          Q1         Med          Q3         Max 
-# -0.49869982  0.05162114  0.19478540  0.29354325  0.64430579 
-#                   
-# Residual standard error: 3.572743 
-# Degrees of freedom: 678 total; 674 residual
+#   Min          Q1         Med          Q3         Max 
+# -0.29916956 -0.06902394  0.01208918  0.10172686  0.56655566 
+# 
+# Residual standard error: 6.761139 
+# Degrees of freedom: 678 total; 676 residual
+
+# calculate pseudo-R2, R2-pred from Ives (2019)
+rr2::R2_pred(mod = pgls_models$lfarea, phy = tree_budsz)
+# 0.4544733
+
+# scatter plot with PGLS line
+ggplot(pgls_data, aes(x = log(leafarea_mm2), y = logbudsize_mm2)) +
+  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
+  geom_abline(intercept = coef(pgls_models$lfarea)[1], 
+              slope = coef(pgls_models$lfarea)[2], colour = "black") +
+  theme_pubr(legend = "right") +
+  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_color_manual(values = c("#DFBF5B", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  xlab("Eucalypt leaf area (log mm²)") +
+  ylab("Eucalypt bud size (log mm²)") +
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  labs(title = "PGLS p < 0.001, R² = 0.45")
+ggsave("figures/regressions/bud size by leaf area PGLS.pdf", width = 8, height = 5)
+
+#** combined trait model ----
+
+pgls_models$all <- nlme::gls(logbudsize_mm2 ~ scale(bud_n_mean) + 
+                               scale(log(frtsize_mm2)) + 
+                               scale(log(max_height_m)) +
+                               scale(log(leafarea_mm2)), 
+                              correlation = ape::corBrownian(phy = tree_budsz, 
+                                                             form = ~spp),
+                              data = pgls_data, method = "ML")
+summary(pgls_models$all)
+
+# Generalized least squares fit by maximum likelihood
+# Model: logbudsize_mm2 ~ scale(bud_n_mean) + scale(log(frtsize_mm2)) +      scale(log(max_height_m)) + scale(log(leafarea_mm2)) 
+# Data: pgls_data 
+# AIC      BIC    logLik
+# 1249.051 1276.166 -618.5257
+# 
+# Correlation Structure: corBrownian
+# Formula: ~spp 
+# Parameter estimate(s):
+#   numeric(0)
+# 
+# Coefficients:
+#   Value Std.Error  t-value p-value
+# (Intercept)               3.1376785 1.3555270  2.31473  0.0209
+# scale(bud_n_mean)         0.0239117 0.0180916  1.32170  0.1867
+# scale(log(frtsize_mm2))   0.8897157 0.0245467 36.24588  0.0000
+# scale(log(max_height_m))  0.0602139 0.0147049  4.09482  0.0000
+# scale(log(leafarea_mm2)) -0.0084195 0.0172248 -0.48880  0.6251
+# 
+# Correlation: 
+#                         (Intr) sc(__) scl(lg(f_2)) s((__)
+# scale(bud_n_mean)        -0.002                           
+# scale(log(frtsize_mm2))  -0.008  0.519                    
+# scale(log(max_height_m)) -0.003  0.095  0.180             
+# scale(log(leafarea_mm2))  0.003 -0.419 -0.515       -0.359
+#                                
+#  Standardized residuals:
+#   Min          Q1         Med          Q3         Max 
+# -0.50730758  0.05348465  0.19577377  0.29454502  0.64305651 
+#                                
+# Residual standard error: 3.572109 
+# Degrees of freedom: 678 total; 673 residual
 
 # calculate pseudo-R2, R2-pred from Ives (2019)
 rr2::R2_pred(mod = pgls_models$all, phy = tree_budsz)
-# 0.8504395
+# 0.8491617
 
 #### conclusions ####
 
