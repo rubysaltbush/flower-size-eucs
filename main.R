@@ -9,6 +9,7 @@ library(phylolm)
 library(caper)
 library(sf)
 library(terra)
+library(spThin)
 library(ggpubr)
 library(RColorBrewer)
 library(GGally)
@@ -17,6 +18,7 @@ library(plotrix)
 library(nlme)
 library(AICcmodavg)
 library(rr2)
+library(galah)
 # library(APCalign) was used for aligning taxonomy but not needed in current workflow
 
 # function to cache pre-prepared R data. If RDS already in cache will read data

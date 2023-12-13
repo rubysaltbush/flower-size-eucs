@@ -17,3 +17,5 @@ install.packages("plotrix") # for drawing circles on phylogenies, v3.8-2
 install.packages("nlme") # for PGLS, a special case of mixed-effects models, v3.1-163
 install.packages("AICcmodavg") # for model averaging v 2.3-2
 install.packages("rr2") # for PGLS R2 per Ives (2019), v1.1.1
+install.packages("galah") # for insect pollinator map, v2.0.0
+install.packages("spThin") # for thinning euc occurrences, v0.2.0

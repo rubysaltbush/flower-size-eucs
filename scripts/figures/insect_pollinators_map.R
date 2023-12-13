@@ -2,8 +2,6 @@
 # Atlas of Living Australia (ALA), intersect them with a grid raster and 
 # calculate species richness of insect pollinators for each grid cell
 
-library(galah)
-
 # get records for all possible pollinator insects across Australia from ALA
 insectpollrecords <- cache_RDS("data_cache/insectpollinatorrecordsAus.csv", 
                                 read_function = readr::read_csv,
