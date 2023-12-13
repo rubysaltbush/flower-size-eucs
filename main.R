@@ -64,6 +64,9 @@ source("scripts/figures/phylogeny.R")
 # trait maps for figures
 source("scripts/figures/maps.R")
 
+# map of insect pollinators across Australia
+source("scripts/figures/insect_pollinators_map.R")
+
 #### SUPPORTING ####
 
 source("scripts/analyses/field_data.R")
