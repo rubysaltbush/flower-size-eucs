@@ -308,6 +308,10 @@ plot(rbatrichness, main = "Flower-visiting bat species richness", box = FALSE)
 rm(batrichness)
 # change aus outline projection to match raster
 aus <- terra::project(aus, crs(rangerast$cell_id))
+
+# now mask raster to only cells within aus polygon
+rbatrichness <- terra::mask(rbatrichness, mask = aus, touches = TRUE)
+plot(rbatrichness)
 plot(aus, add = TRUE)
 # save raster as output
 terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.tif",
@@ -320,6 +324,25 @@ plot(rbatrichness, main = "Flower-visiting bat species richness", box = FALSE)
 plot(aus, add = TRUE)
 dev.off()
 
+# convert raster back to df to plot with ggplot
+rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
+  na.omit()
+head(rbatrichnessdf)
+# convert aus to sf for ggplot plotting
+aus <- sf::st_as_sf(aus)
+
+# plot using ggplot and viridis colour scale with Aus coastline
+pdf("figures/maps/aus_flowervis_bat_richness_ggplot.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rbatrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting bat\nspecies richness",
+       colour = "Flower-visiting bat\nspecies richness")
+dev.off()
+
 # as many zeroes, will just use bat richness as binary i.e. bats or no bats
 # reduce raster to 1 (bats present) or 0 (no bats in area)
 rbatrichness <- terra::ifel(rbatrichness$richness >=1, 1, 0)
@@ -329,8 +352,6 @@ plot(rbatrichness)
 rbatrichnessdf <- as.data.frame(rbatrichness, xy = TRUE) %>%
   na.omit()
 head(rbatrichnessdf)
-# convert aus to sf for ggplot plotting
-aus <- sf::st_as_sf(aus)
 
 # plot using ggplot and custom colour scale with Aus coastline
 pdf("figures/maps/aus_mean_flower-visiting_bat_presence.pdf", width = 10, height = 10)
@@ -654,7 +675,7 @@ summary(birdrichness)
 
 # turn into birdrichness raster
 rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1, 
-                              to = birdrichness$richness, others = 0)
+                              to = birdrichness$richness, others = NA)
 names(rbirdrichness) <- "richness"
 plot(rbirdrichness)
 # save raster as output
@@ -671,7 +692,26 @@ plot(rbirdrichness, main = "Flower-visiting bird species richness", box = FALSE)
 plot(aus, add = TRUE)
 dev.off()
 
-rm(birdranges, birdrange_cells, blankrast, aus, birdrichness)
+# convert raster back to df to plot with ggplot
+rbirdrichnessdf <- as.data.frame(rbirdrichness, xy = TRUE) %>%
+  na.omit()
+head(rbirdrichnessdf)
+# convert aus to sf for ggplot plotting
+aus <- sf::st_as_sf(aus)
+
+# plot using ggplot and viridis colour scale with Aus coastline
+pdf("figures/maps/aus_flowervis_bird_richness_ggplot.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rbirdrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting bird\nspecies richness",
+       colour = "Flower-visiting bird\nspecies richness")
+dev.off()
+
+rm(birdranges, birdrange_cells, blankrast, aus, birdrichness, rbirdrichnessdf)
 
 # now calculate mean richness of fl-vis birds in landcsape per species
 # extract birdrichness value for each cleaned eucalypt occurrence
