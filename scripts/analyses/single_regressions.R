@@ -16,14 +16,6 @@ regressions_todo <- list(
     ylabel = "Eucalypt bud size (log mm²)",
     output_path = "figures/regressions/residuals/budsize vs AVP"
   ),
-  # leaf v available phosphorus
-  lmlfszavp = list(
-    xdata = log(euc_traits_nosubsp$meanAVP), # log transform to improve residuals
-    ydata = log(euc_traits_nosubsp$leafarea_mm2),
-    xlabel = "Species mean available phosphorus (log mg/kg 0-30cm depth)",
-    ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/residuals/leafsize vs AVP"
-  ),
   # bud v temperature
   lmbudszmat = list(
     xdata = euc_traits_nosubsp$meanMAT,
@@ -31,14 +23,6 @@ regressions_todo <- list(
     xlabel = "Species mean annual temperature (ºC)",
     ylabel = "Eucalypt bud size (log mm²)",
     output_path = "figures/regressions/residuals/budsize vs MAT"
-  ),
-  # leaf v temperature
-  lmlfszmat = list(
-    xdata = euc_traits_nosubsp$meanMAT,
-    ydata = log(euc_traits_nosubsp$leafarea_mm2),
-    xlabel = "Species mean annual temperature (ºC)",
-    ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/residuals/leafsize vs MAT"
   ),
   # bud v precipitation
   lmbudszmap = list(
@@ -48,21 +32,21 @@ regressions_todo <- list(
     ylabel = "Eucalypt bud size (log mm²)",
     output_path = "figures/regressions/residuals/budsize vs MAP"
   ),
-  # leaf v precipitation
-  lmlfszmap = list(
-    xdata = log(euc_traits_nosubsp$meanMAP),
-    ydata = log(euc_traits_nosubsp$leafarea_mm2),
-    xlabel = "Species mean annual precipitation (log mm)",
-    ylabel = "Eucalypt leaf area (log mm²)",
-    output_path = "figures/regressions/residuals/leafsize vs MAP"
-  ),
-  # bud v flower-visiting bat species richness
+  # bud v flower-visiting bat presence
   lmbudszbat = list(
     xdata = euc_traits_nosubsp$meanbatpres_bin,
     ydata = euc_traits_nosubsp$logbudsize_mm2,
     xlabel = "Species flower-visiting bat presence",
     ylabel = "Eucalypt bud size (log mm²)",
     output_path = "figures/regressions/residuals/budsize vs bats"
+  ),
+  # bud v flower-visiting bird species richness
+  lmbudszbird = list(
+    xdata = euc_traits_nosubsp$meanbirdrich,
+    ydata = euc_traits_nosubsp$logbudsize_mm2,
+    xlabel = "Species flower-visiting bird species richness",
+    ylabel = "Eucalypt bud size (log mm²)",
+    output_path = "figures/regressions/residuals/budsize vs birds"
   )
 )
 
@@ -105,20 +89,6 @@ ggplot(euc_traits_nosubsp, aes(x = meanMAT, y = logbudsize_mm2)) +
                      "    P = ", format.pval(summary(regressions$lmbudszmat)$coef[2,4], eps = .001, digits = 2)))
 ggsave("figures/regressions/budsize vs MAT.pdf", width = 8, height = 5)
 
-# leaf size and MAT
-ggplot(euc_traits_nosubsp, aes(x = meanMAT, y = log(leafarea_mm2))) +
-  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
-  geom_smooth(method = "lm", colour = "black") +
-  theme_pubr(legend = "right") +
-  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  xlab("Species mean annual temperature (ºC)") +
-  ylab("Eucalypt leaf area (log mm²)") +
-  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = paste("R² = ", signif(summary(regressions$lmlfszmat)$r.squared, 2),
-                     "    P = ", format.pval(summary(regressions$lmlfszmat)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs MAT.pdf", width = 8, height = 5)
-
 # bud size and MAP
 ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = logbudsize_mm2)) +
   geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
@@ -132,20 +102,6 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = logbudsize_mm2)) +
   labs(title = paste("R² = ", signif(summary(regressions$lmbudszmap)$r.squared, 2),
                      "    P = ", format.pval(summary(regressions$lmbudszmap)$coef[2,4], eps = .001, digits = 2)))
 ggsave("figures/regressions/budsize vs MAP.pdf", width = 8, height = 5)
-
-# leaf size and MAP
-ggplot(euc_traits_nosubsp, aes(x = log(meanMAP), y = log(leafarea_mm2))) +
-  geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
-  geom_smooth(method = "lm", colour = "black") +
-  theme_pubr(legend = "right") +
-  scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  xlab("Species mean annual precipitation (log mm)") +
-  ylab("Eucalypt leaf area (log mm²)") +
-  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = paste("R² = ", signif(summary(regressions$lmlfszmap)$r.squared, 2),
-                     "    P = ", format.pval(summary(regressions$lmlfszmap)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs MAP.pdf", width = 8, height = 5)
 
 # bud size and AVP
 ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = logbudsize_mm2)) +
@@ -161,19 +117,19 @@ ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = logbudsize_mm2)) +
                      "    P = ", format.pval(summary(regressions$lmbudszavp)$coef[2,4], eps = .001, digits = 2)))
 ggsave("figures/regressions/budsize vs AVP.pdf", width = 8, height = 5)
 
-# leaf size and AVP
-ggplot(euc_traits_nosubsp, aes(x = log(meanAVP), y = log(leafarea_mm2))) +
+# bud size and bird species richness
+ggplot(euc_traits_nosubsp, aes(x = meanbirdrich, y = logbudsize_mm2)) +
   geom_point(aes(colour = colour_binary, fill = colour_binary), size = 3, shape = 21) +
   geom_smooth(method = "lm", colour = "black") +
   theme_pubr(legend = "right") +
   scale_fill_manual(values = c("#faebcd", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
-  xlab("Species mean available phosphorus (log mg/kg)") +
-  ylab("Eucalypt leaf area (log mm²)") +
+  xlab("Species mean flower-visiting bird species richness") +
+  ylab("Eucalypt bud size (log mm²)") +
   theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
-  labs(title = paste("R² = ", signif(summary(regressions$lmlfszavp)$r.squared, 2),
-                     "    P = ", format.pval(summary(regressions$lmlfszavp)$coef[2,4], eps = .001, digits = 2)))
-ggsave("figures/regressions/leafsize vs AVP.pdf", width = 8, height = 5)
+  labs(title = paste("R² = ", signif(summary(regressions$lmbudszbird)$r.squared, 2),
+                     "    P = ", format.pval(summary(regressions$lmbudszbird)$coef[2,4], eps = .001, digits = 2)))
+ggsave("figures/regressions/budsize vs birdrich.pdf", width = 8, height = 5)
 
 # bud size and bat richness boxplot
 euc_traits_nosubsp %>%
