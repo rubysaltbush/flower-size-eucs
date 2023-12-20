@@ -13,8 +13,6 @@ euc_traits_nosubsp_filled.csv - Ruby Stephens - added 2023-08-22 - updated 2023-
 
 Eucalypts_ML1_dated_r8s.phy - Andrew Thornhill et al. 2019 - added 2023-08-22 - main dated eucalypt phylogeny from Thornhill, A. H., Crisp, M. D., Külheim, C., Lam, K. E., Nelson, L. A., Yeates, D. K., Miller, J. T. (2019). A dated molecular perspective of eucalypt taxonomy, evolution and diversification. Australian Systematic Botany, 32(1), 29–48. https://doi.org/10.1071/SB18015, downloaded from https://doi.org/10.25919/5c6a53564d748 CSIRO data portal and processed to clean tip names of r8s version and make usable
 
-leaf_dim_nosub.csv - EUCLID and Ruby Stephens - added 2023-08-28 - eucalypt leaf dimensions extracted using text mining from EUCLID species descriptions and manually updated for a few species not on EUCLID, names matched to Australian Plant Census, leaf area in mm2 summarised per species as 2/3*mean(min+max length)*mean(min+max width). Checked these literature-derived values against field measured leaf area values from AusTraits, R2 = 0.66.
-
 occurrence_data_Ruby_fromBree.csv - Bree Laugier-Kitchener - added 2023-08-22 - eucalypt species occurrences downloaded from AVH and cleaned by manual comparison to distributions on EUCLID by Bree Laugier-Kitchener. "I used EUCLID to compare maps for the species and finally D. Nicolle to determine dubious species and combine species that EUCLID treats as separate."
 occurrence_data
 taxon = includes all subspecies
@@ -24,6 +22,7 @@ MAP = mean annual precipitation (from CHELSA https://chelsa-climate.org/)
 MPDM = mean precipitation warmest month (from CHELSA https://chelsa-climate.org/)
 speciesLevel = amalgamated at species level (e.g. Angophora bakeri subsp. crassifolia = Angophora bakeri)
 speciesLevelUpdated = some species I further amalgamated because they were considered another species by D. Nicolles classification of eucalypts (e.g. Eucalyptus sp. Flinders Ranges (D.Nicolle 562) = Eucalyptus cajuputea)
+** note - columns for climate data contain errors and should be discarded
 
 clades_forlabelling.csv - Ruby Stephens and David Coleman - added 2023-10-19 - Thornhill et al (2019) tree names, subgenus and position in tree matched to eucalypt section and selected subgenus and section labels excluding smaller clades and paraphyletic taxa
 
