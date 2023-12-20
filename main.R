@@ -2,7 +2,6 @@
 #source("scripts/install_dependencies.R")
 
 library(tidyverse)
-library(austraits)
 library(ape)
 library(phytools)
 library(phylolm)

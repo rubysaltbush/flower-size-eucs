@@ -87,28 +87,3 @@ table(colour$colours_austraits)
 
 # will have to individually determine dominant colour by checking other resources
 # and manually align all colours to AusTraits colour categories
-
-#### leaf area ####
-
-# extract leaf dimensions
-eucleaf <- data.frame()
-for (n in 1:nrow(euclid)) {
-  description <- euclid[n, "description"] # get description
-  leaf_desc <- str_extract(description, "blade.*?wide[, \\.\\)]") # just blade...wide
-  # below regex adapted from above, matches different elements in leaf description 
-  # and returns the useful bits in different groups
-  leaf_pattern <- "blade.*?(?:\\([\\d.]+\\))?(\\d[\\d.]*)(?:[^\\d.](\\d[\\d.]*))?[ ]?(?:\\([\\d.]+\\))? (\\w+) long.*? (?:\\([\\d.]+\\))?(\\d[\\d.]*)(?:[^\\d.](\\d[\\d.]*))?(?:\\([\\d.]+\\))? (\\w+) wide"
-  #                blade.. (0.1)             0.9           -       1.2               (3.0)              cm     long .. (0.1)             1.2          -       3.4            (4.0)              cm     wide
-  # now extract leaf dimensions using above regex from above leaf description
-  temp <- as.data.frame(stringr::str_match(leaf_desc, leaf_pattern))
-  temp$desc <- leaf_desc
-  temp <- cbind(euclid[n, c("species", "url", "description")], temp)
-  eucleaf <- rbind(eucleaf, temp)
-}
-rm(n, temp, description, leaf_desc, leaf_pattern)
-names(eucleaf) <- c("species", "url", "description", "bladematched", "leaflength_min", "leaflength_max", 
-                    "leaflength_unit", "leafwidth_min", "leafwidth_max", "leafwidth _unit", "leaf_desc")
-problems <- eucleaf[is.na(eucleaf$bladematched),]
-# missing 44 taxa, mostly due to random spaces or lack of the word "blade"
-# that will do, now export for manual checking
-
