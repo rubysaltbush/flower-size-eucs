@@ -53,12 +53,6 @@ table(euc_traits_nosubsp$colour_binary)
 # for logistic regression where need full binary
 euc_traits_nosubsp$colour_fullbinary <- gsub("0.5", "1", euc_traits_nosubsp$colour_binary)
 table(euc_traits_nosubsp$colour_fullbinary)
-                                  
-# take mean of buds per umbel max and min
-euc_traits_nosubsp$bud_n_mean <- rowMeans(dplyr::select(euc_traits_nosubsp, 
-                                                        bud_n_max, bud_n_min), 
-                                          na.rm = TRUE)
-hist(euc_traits_nosubsp$bud_n_mean)
 
 # add in data on species' mean environment (phosphorus, temperature, precipitation
 # flower-visiting bat species richness and flower-visiting bird species richness)
@@ -79,7 +73,14 @@ ggsave("figures/Fig S8 euc species mean bat presence histogram.pdf", width = 7, 
 # will have 50% cutoff for now
 euc_traits_nosubsp$meanbatpres_bin <- ifelse(euc_traits_nosubsp$meanbatpres > 0.5, 1, 0)
 table(euc_traits_nosubsp$meanbatpres_bin)
-                                  
+
+# remove irrelevant columns
+euc_traits_nosubsp <- euc_traits_nosubsp %>%
+  dplyr::select(apc_nosubsp, tree_names, range_names, subgenus, budsize_mm2, 
+                logbudsize_mm2, colours_all, colour_binary, colour_fullbinary,
+                frtsize_mm2, medianlong, meanMAT, meanMAP, meanAVP, meanbirdrich,
+                meanbatpres, meanbatpres_bin)
+
 # write data to folder so it can be cached
 readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")
 
