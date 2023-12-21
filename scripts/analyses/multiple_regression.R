@@ -38,7 +38,7 @@ hist(euc_traits_nosubsp$meanbirdrich)
 
 # visually check relationships between predictor and response variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(19, 21, 24, 25, 23, 27, 29), 
+                columns = c(6, 9, 12, 13, 14, 15, 17), 
                 columnLabels = c("Bud size (log)",
                                  "Flower colour",
                                  "Temperature", 
@@ -55,7 +55,7 @@ ggsave("figures/regressions/full pairwise correlation plot.pdf",
 
 # check for collinearity among predictor variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(24, 25, 23, 27, 29), 
+                columns = c(12, 13, 14, 15, 17), 
                 columnLabels = c("Temperature", 
                                  "Precipitation",
                                  "Phosphorus",
