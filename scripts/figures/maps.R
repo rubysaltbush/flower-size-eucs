@@ -102,50 +102,6 @@ dev.off()
 
 rm(rColour, colour_bin, meanColour)
 
-#* leaf area ----
-# prepare leaf area data
-leafarea_mm2 <- euc_traits_nosubsp %>%
-  dplyr::select(apc_nosubsp, leafarea_mm2) %>%
-  dplyr::filter(!is.na(leafarea_mm2)) %>%
-  dplyr::mutate(leafarea_mm2 = log(leafarea_mm2))
-leafarea_mm2 <- merge(leafarea_mm2, rangerast$taxa, by.x = "apc_nosubsp", by.y = "taxon_name", all.x = FALSE)
-# lose 11 taxa with no range data
-leafarea_mm2 <- leafarea_mm2 %>%
-  merge(rangerast$cell_taxa, by = "taxon_id", all.x = FALSE)
-
-# calculate mean per grid cell
-meanleafarea <- leafarea_mm2 %>%
-  dplyr::group_by(cell_id) %>%
-  dplyr::summarise(mean_leafarea = mean(leafarea_mm2))
-summary(meanleafarea)
-
-# match to ranges raster
-rmeanleafarea <- terra::subst(rangerast$cell_id, from = meanleafarea$cell_id, 
-                              to = meanleafarea$mean_leafarea)
-names(rmeanleafarea) <- "mean_leafarea"
-plot(rmeanleafarea)
-
-# save raster as output
-terra::writeRaster(rmeanleafarea, "data_output/rasters/aus_mean_log_euc_leaf_area.tif",
-                   overwrite = TRUE)
-
-# convert raster to df to plot with ggplot
-rmeanleafarea <- as.data.frame(rmeanleafarea, xy = TRUE) %>%
-  na.omit()
-head(rmeanleafarea)
-
-# plot using ggplot and custom colour scale with Aus coastline
-pdf("figures/maps/mean_euc_log_leafarea_map.pdf", width = 10, height = 10)
-ggplot() +
-  geom_tile(data = rmeanleafarea, aes(x = x, y = y, fill = mean_leafarea)) +
-  scale_fill_gradientn(colours = my_colours$leafarea) +
-  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "darkgrey") +
-  theme_void() +
-  labs(fill = "Mean eucalypt\nleaf area (log mm²)")
-dev.off()
-
-rm(rmeanleafarea, meanleafarea, leafarea_mm2)
-
 #* species richness ----
 # calculate richness of euc species across Australia
 richness <- rangerast$cell_taxa %>%
@@ -172,11 +128,12 @@ head(rRichness)
 # plot using ggplot and viridis colour scale with Aus coastline
 pdf("figures/maps/euc_species_richness_map.pdf", width = 10, height = 10)
 ggplot() +
-  geom_tile(data = rRichness, aes(x = x, y = y, fill = richness)) +
+  geom_tile(data = rRichness, aes(x = x, y = y, fill = richness, colour = richness)) +
   scale_fill_viridis_c(breaks = c(10, 50, 100, 150)) +
+  scale_colour_viridis_c(breaks = c(10, 50, 100, 150)) +
   geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
   theme_void() +
-  labs(fill = "Eucalypt species richness")
+  labs(fill = "Eucalypt species richness", colour = "Eucalypt species richness")
 dev.off()
 
 rm(rRichness, richness)

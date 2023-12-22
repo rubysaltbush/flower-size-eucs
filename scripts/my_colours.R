@@ -15,6 +15,3 @@ my_colours$budsz <- c("#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac")
 
 # flower colourfulness (continuous)
 my_colours$flcol_cont <- c("#faebcd", "light pink")
-
-# leaf area (continuous)
-my_colours$leafarea <- c("#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c")

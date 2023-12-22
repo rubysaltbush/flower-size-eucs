@@ -310,7 +310,15 @@ rm(batrichness)
 aus <- terra::project(aus, crs(rangerast$cell_id))
 
 # now mask raster to only cells within aus polygon
-rbatrichness <- terra::mask(rbatrichness, mask = aus, touches = TRUE)
+# first read in more detailed aus polygon to be sure accurate
+# read in shapefile of Aus outline for plotting
+aus2 <- terra::vect("data_input/Aus_outline.shp")
+# crop to remove Norfolk and Christmas Islands from outline
+aus2 <- terra::crop(aus2, terra::ext(c(xmin = 112, xmax = 155, ymin = -43.74, ymax = -9.14)))
+# change aus outline projection to match raster
+aus2 <- terra::project(aus2, crs(rangerast$cell_id))
+rbatrichness <- terra::mask(rbatrichness, mask = aus2, touches = FALSE)
+rm(aus2)
 plot(rbatrichness)
 plot(aus, add = TRUE)
 # save raster as output
@@ -342,6 +350,16 @@ ggplot() +
   labs(fill = "Flower-visiting bat\nspecies richness",
        colour = "Flower-visiting bat\nspecies richness")
 dev.off()
+# then png version for figure
+ggplot() +
+  geom_tile(data = rbatrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting bat\nspecies richness",
+       colour = "Flower-visiting bat\nspecies richness")
+ggsave("figures/maps/aus_flowervis_bat_richness_ggplot.png", width = 10, height = 10)
 
 # as many zeroes, will just use bat richness as binary i.e. bats or no bats
 # reduce raster to 1 (bats present) or 0 (no bats in area)
@@ -677,7 +695,7 @@ summary(birdrichness)
 rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1, 
                               to = birdrichness$richness, others = NA)
 names(rbirdrichness) <- "richness"
-plot(rbirdrichness)
+
 # save raster as output
 terra::writeRaster(rbirdrichness, 
                    "data_output/rasters/flvisbird_sprichness_aus.tif",
@@ -700,6 +718,7 @@ head(rbirdrichnessdf)
 aus <- sf::st_as_sf(aus)
 
 # plot using ggplot and viridis colour scale with Aus coastline
+# pdf first
 pdf("figures/maps/aus_flowervis_bird_richness_ggplot.pdf", width = 10, height = 10)
 ggplot() +
   geom_tile(data = rbirdrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
@@ -710,12 +729,23 @@ ggplot() +
   labs(fill = "Flower-visiting bird\nspecies richness",
        colour = "Flower-visiting bird\nspecies richness")
 dev.off()
+# then png version
+ggplot() +
+  geom_tile(data = rbirdrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting bird\nspecies richness",
+       colour = "Flower-visiting bird\nspecies richness")
+ggsave("figures/maps/aus_flowervis_bird_richness_ggplot.png", width = 10, height = 10)
 
 rm(birdranges, birdrange_cells, blankrast, aus, birdrichness, rbirdrichnessdf)
 
 # now calculate mean richness of fl-vis birds in landcsape per species
 # extract birdrichness value for each cleaned eucalypt occurrence
 # check it out
+plot(rbirdrichness)
 plot(euc_occurr, add = TRUE)
 
 # now extract!
@@ -737,9 +767,9 @@ rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr)
 #### FINAL SP MEAN ENV ####
 
 # join all species environment means together
-spmean_env <- species_meanAVP %>%
-  dplyr::left_join(species_meanMAT, by = "range_names") %>%
+spmean_env <- species_meanMAT %>%
   dplyr::left_join(species_meanMAP, by = "range_names") %>%
+  dplyr::left_join(species_meanAVP, by = "range_names") %>%
   dplyr::left_join(species_meanbatpres, by = "range_names") %>%
   dplyr::left_join(species_meanbirdrich, by = "range_names")
 

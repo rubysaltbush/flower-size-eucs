@@ -233,11 +233,12 @@ InsectPollinatorRichnessdf$richness <- log(InsectPollinatorRichnessdf$richness)
 # plot using ggplot and viridis colour scale with Aus coastline
 pdf("figures/maps/insectpollinator_species_richness_map.pdf", width = 10, height = 10)
 ggplot() +
-  geom_tile(data = InsectPollinatorRichnessdf, aes(x = x, y = y, fill = richness)) +
+  geom_tile(data = InsectPollinatorRichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
   scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
   geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
   theme_void() +
-  labs(fill = "Insect pollinator\nspecies richness (log)")
+  labs(fill = "Flower-visiting\ninsect species\nrichness (log)", colour = "Flower-visiting\ninsect species\nrichness (log)")
 dev.off()
 
 # can fine tune in illustrator to display raw numbers on scale

@@ -10,12 +10,10 @@
 
 # subset data for modelling
 eucvarscaled <- euc_traits_nosubsp %>%
-  dplyr::select(apc_nosubsp, logbudsize_mm2, colour_fullbinary, leafarea_mm2,
+  dplyr::select(apc_nosubsp, logbudsize_mm2, colour_fullbinary,
                 meanMAT, meanMAP, meanAVP, meanbirdrich, meanbatpres_bin)
 # scale all predictor variables
-eucvarscaled[5:9] <- mapply(FUN = scale, eucvarscaled[5:9])
-# log transform leaf area
-eucvarscaled[4] <- log(eucvarscaled[4])
+eucvarscaled[4:8] <- mapply(FUN = scale, eucvarscaled[4:8])
 # make colour binary factor for logistic regression
 eucvarscaled$colour_fullbinary <- as.factor(eucvarscaled$colour_fullbinary)
 
@@ -49,26 +47,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1  7 2008.76      3.13  0.10     0.03 0.04
-# Mod3  6 2006.78      1.15  0.26     0.03 0.04
-# Mod5  6 2015.46      9.83  0.00     0.09 0.04
-# Mod7  5 2014.17      8.54  0.01     0.10 0.04
-# Mod9  6 2007.63      2.00  0.17     0.04 0.04
-# Mod11 5 2005.63      0.00  0.46     0.04 0.04
-# Mod13 5 2016.04     10.41  0.00     0.13 0.03
-# Mod15 4 2014.59      8.96  0.01     0.13 0.03
-# Mod17 6 2023.37     17.74  0.00    -0.07 0.04
-# Mod19 5 2025.49     19.86  0.00    -0.10 0.03
-# Mod21 5 2039.09     33.46  0.00     0.00 0.03
-# Mod23 4 2052.64     47.01  0.00    -0.03 0.03
-# Mod25 5 2038.81     33.18  0.00    -0.06 0.04
-# Mod27 4 2045.10     39.47  0.00    -0.10 0.04
-# Mod29 4 2087.79     82.16  0.00     0.08 0.03
-# Mod31 3 2153.54    147.91  0.00     0.06 0.03
+# Mod1  7 2008.76      3.98  0.07     0.04 0.04
+# Mod3  6 2006.76      1.98  0.19     0.04 0.04
+# Mod5  6 2016.17     11.39  0.00     0.11 0.04
+# Mod7  5 2014.54      9.76  0.00     0.11 0.04
+# Mod9  6 2006.78      2.00  0.19     0.04 0.04
+# Mod11 5 2004.78      0.00  0.52     0.04 0.04
+# Mod13 5 2014.74      9.96  0.00     0.13 0.03
+# Mod15 4 2013.12      8.34  0.01     0.13 0.03
+# Mod17 6 2027.80     23.02  0.00    -0.07 0.04
+# Mod19 5 2029.15     24.37  0.00    -0.10 0.03
+# Mod21 5 2046.53     41.75  0.00     0.00 0.03
+# Mod23 4 2057.68     52.90  0.00    -0.03 0.03
+# Mod25 5 2038.81     34.03  0.00    -0.06 0.04
+# Mod27 4 2045.10     40.32  0.00    -0.10 0.04
+# Mod29 4 2087.79     83.01  0.00     0.08 0.03
+# Mod31 3 2153.54    148.76  0.00     0.06 0.03
 # 
-# Model-averaged estimate: 0.04 
+# Model-averaged estimate: 0.05 
 # Unconditional SE: 0.04 
-# 95% Unconditional confidence interval: -0.05, 0.12
+# 95% Unconditional confidence interval: -0.04, 0.13
 
 AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # Multimodel inference on "meanMAP" based on AIC
@@ -76,26 +74,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1  7 2008.76      2.13  0.13    -0.01 0.04
-# Mod2  6 2007.15      0.52  0.28    -0.01 0.04
-# Mod5  6 2015.46      8.83  0.00    -0.04 0.04
-# Mod6  5 2019.49     12.86  0.00    -0.04 0.04
-# Mod9  6 2007.63      1.00  0.22     0.00 0.04
-# Mod10 5 2006.63      0.00  0.36     0.00 0.04
-# Mod13 5 2016.04      9.41  0.00    -0.03 0.04
-# Mod14 4 2029.37     22.74  0.00    -0.04 0.04
-# Mod17 6 2023.37     16.74  0.00    -0.08 0.04
-# Mod18 5 2024.82     18.19  0.00    -0.11 0.04
-# Mod21 5 2039.09     32.46  0.00    -0.15 0.04
-# Mod22 4 2037.09     30.46  0.00    -0.15 0.04
-# Mod25 5 2038.81     32.18  0.00    -0.11 0.04
-# Mod26 4 2039.79     33.16  0.00    -0.14 0.04
-# Mod29 4 2087.79     81.16  0.00    -0.28 0.03
-# Mod30 3 2091.49     84.86  0.00    -0.27 0.03
+# Mod1  7 2008.76      2.80  0.10     0.00 0.04
+# Mod2  6 2007.69      1.72  0.18     0.00 0.04
+# Mod5  6 2016.17     10.20  0.00    -0.03 0.04
+# Mod6  5 2022.69     16.72  0.00    -0.03 0.04
+# Mod9  6 2006.78      0.81  0.28     0.00 0.04
+# Mod10 5 2005.97      0.00  0.42     0.01 0.04
+# Mod13 5 2014.74      8.78  0.01    -0.03 0.04
+# Mod14 4 2028.70     22.74  0.00    -0.04 0.04
+# Mod17 6 2027.80     21.83  0.00    -0.07 0.04
+# Mod18 5 2029.42     23.45  0.00    -0.10 0.04
+# Mod21 5 2046.53     40.57  0.00    -0.14 0.04
+# Mod22 4 2044.54     38.58  0.00    -0.14 0.04
+# Mod25 5 2038.81     32.84  0.00    -0.11 0.04
+# Mod26 4 2039.79     33.82  0.00    -0.14 0.04
+# Mod29 4 2087.79     81.83  0.00    -0.28 0.03
+# Mod30 3 2091.49     85.53  0.00    -0.27 0.03
 # 
 # Model-averaged estimate: 0 
 # Unconditional SE: 0.04 
-# 95% Unconditional confidence interval: -0.09, 0.08
+# 95% Unconditional confidence interval: -0.08, 0.09
 
 AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # Multimodel inference on "meanAVP" based on AIC
@@ -103,26 +101,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1  7 2008.76      4.13  0.03    -0.15 0.05
-# Mod2  6 2007.15      2.52  0.08    -0.17 0.04
-# Mod3  6 2006.78      2.15  0.09    -0.15 0.05
-# Mod4  5 2005.16      0.53  0.21    -0.17 0.04
-# Mod9  6 2007.63      3.00  0.06    -0.16 0.05
-# Mod10 5 2006.63      2.00  0.10    -0.19 0.04
-# Mod11 5 2005.63      1.00  0.16    -0.16 0.05
-# Mod12 4 2004.63      0.00  0.27    -0.19 0.04
-# Mod17 6 2023.37     18.74  0.00    -0.21 0.05
-# Mod18 5 2024.82     20.19  0.00    -0.17 0.04
-# Mod19 5 2025.49     20.86  0.00    -0.25 0.05
-# Mod20 4 2031.12     26.48  0.00    -0.20 0.04
-# Mod25 5 2038.81     34.18  0.00    -0.31 0.04
-# Mod26 4 2039.79     35.16  0.00    -0.27 0.04
-# Mod27 4 2045.10     40.47  0.00    -0.38 0.04
-# Mod28 3 2051.79     47.16  0.00    -0.34 0.03
+# Mod1  7 2008.76      4.78  0.03    -0.16 0.05
+# Mod2  6 2007.69      3.71  0.05    -0.18 0.04
+# Mod3  6 2006.76      2.78  0.08    -0.16 0.05
+# Mod4  5 2005.69      1.71  0.13    -0.18 0.04
+# Mod9  6 2006.78      2.80  0.08    -0.16 0.05
+# Mod10 5 2005.97      1.99  0.12    -0.19 0.04
+# Mod11 5 2004.78      0.80  0.21    -0.16 0.05
+# Mod12 4 2003.98      0.00  0.31    -0.19 0.04
+# Mod17 6 2027.80     23.82  0.00    -0.22 0.05
+# Mod18 5 2029.42     25.44  0.00    -0.18 0.04
+# Mod19 5 2029.15     25.17  0.00    -0.26 0.05
+# Mod20 4 2034.64     30.66  0.00    -0.21 0.04
+# Mod25 5 2038.81     34.83  0.00    -0.31 0.04
+# Mod26 4 2039.79     35.81  0.00    -0.27 0.04
+# Mod27 4 2045.10     41.12  0.00    -0.38 0.04
+# Mod28 3 2051.79     47.81  0.00    -0.34 0.03
 # 
-# Model-averaged estimate: -0.17 
+# Model-averaged estimate: -0.18 
 # Unconditional SE: 0.05 
-# 95% Unconditional confidence interval: -0.26, -0.08
+# 95% Unconditional confidence interval: -0.27, -0.08
 
 AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # Multimodel inference on "meanbirdrich" based on AIC
@@ -130,26 +128,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1  7 2008.76      3.59  0.08    -0.05 0.05
-# Mod2  6 2007.15      1.98  0.19    -0.06 0.05
-# Mod3  6 2006.78      1.62  0.22    -0.05 0.05
-# Mod4  5 2005.16      0.00  0.50    -0.06 0.05
-# Mod5  6 2015.46     10.30  0.00    -0.08 0.05
-# Mod6  5 2019.49     14.32  0.00    -0.15 0.04
-# Mod7  5 2014.17      9.01  0.01    -0.08 0.05
-# Mod8  4 2018.54     13.38  0.00    -0.15 0.04
-# Mod17 6 2023.37     18.20  0.00    -0.18 0.04
-# Mod18 5 2024.82     19.65  0.00    -0.18 0.04
-# Mod19 5 2025.49     20.32  0.00    -0.20 0.04
-# Mod20 4 2031.12     25.95  0.00    -0.21 0.04
-# Mod21 5 2039.09     33.93  0.00    -0.28 0.04
-# Mod22 4 2037.09     31.93  0.00    -0.28 0.04
-# Mod23 4 2052.64     47.47  0.00    -0.35 0.03
-# Mod24 3 2051.44     46.28  0.00    -0.34 0.03
+# Mod1  7 2008.76      3.07  0.10    -0.01 0.06
+# Mod2  6 2007.69      1.99  0.17    -0.03 0.05
+# Mod3  6 2006.76      1.07  0.27    -0.01 0.06
+# Mod4  5 2005.69      0.00  0.46    -0.03 0.05
+# Mod5  6 2016.17     10.48  0.00    -0.04 0.05
+# Mod6  5 2022.69     17.00  0.00    -0.13 0.05
+# Mod7  5 2014.54      8.84  0.01    -0.04 0.05
+# Mod8  4 2021.21     15.52  0.00    -0.13 0.05
+# Mod17 6 2027.80     22.10  0.00    -0.16 0.04
+# Mod18 5 2029.42     23.72  0.00    -0.16 0.04
+# Mod19 5 2029.15     23.46  0.00    -0.18 0.04
+# Mod20 4 2034.64     28.95  0.00    -0.19 0.04
+# Mod21 5 2046.53     40.84  0.00    -0.26 0.04
+# Mod22 4 2044.54     38.85  0.00    -0.26 0.04
+# Mod23 4 2057.68     51.99  0.00    -0.34 0.03
+# Mod24 3 2056.33     50.64  0.00    -0.33 0.03
 # 
-# Model-averaged estimate: -0.06 
+# Model-averaged estimate: -0.02 
 # Unconditional SE: 0.05 
-# 95% Unconditional confidence interval: -0.16, 0.04
+# 95% Unconditional confidence interval: -0.13, 0.08
 
 AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # Multimodel inference on "meanbatpres_bin" based on AIC
@@ -157,29 +155,29 @@ AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1  7 2008.76      4.13  0.03    -0.26 0.06
-# Mod2  6 2007.15      2.52  0.08    -0.23 0.05
-# Mod3  6 2006.78      2.15  0.09    -0.26 0.06
-# Mod4  5 2005.16      0.53  0.20    -0.24 0.04
-# Mod5  6 2015.46     10.83  0.00    -0.31 0.06
-# Mod6  5 2019.49     14.85  0.00    -0.24 0.05
-# Mod7  5 2014.17      9.54  0.00    -0.33 0.05
-# Mod8  4 2018.54     13.91  0.00    -0.27 0.04
-# Mod9  6 2007.63      3.00  0.06    -0.29 0.05
-# Mod10 5 2006.63      2.00  0.10    -0.27 0.04
-# Mod11 5 2005.63      1.00  0.16    -0.29 0.04
-# Mod12 4 2004.63      0.00  0.27    -0.27 0.04
-# Mod13 5 2016.04     11.40  0.00    -0.38 0.04
-# Mod14 4 2029.37     24.74  0.00    -0.35 0.04
-# Mod15 4 2014.59      9.96  0.00    -0.40 0.03
-# Mod16 3 2028.25     23.62  0.00    -0.37 0.03
+# Mod1  7 2008.76      4.78  0.03    -0.29 0.06
+# Mod2  6 2007.69      3.71  0.05    -0.26 0.05
+# Mod3  6 2006.76      2.78  0.08    -0.29 0.06
+# Mod4  5 2005.69      1.71  0.13    -0.26 0.05
+# Mod5  6 2016.17     12.19  0.00    -0.35 0.06
+# Mod6  5 2022.69     18.71  0.00    -0.26 0.05
+# Mod7  5 2014.54     10.56  0.00    -0.37 0.05
+# Mod8  4 2021.21     17.23  0.00    -0.28 0.05
+# Mod9  6 2006.78      2.80  0.08    -0.30 0.05
+# Mod10 5 2005.97      1.99  0.11    -0.27 0.05
+# Mod11 5 2004.78      0.80  0.21    -0.30 0.05
+# Mod12 4 2003.98      0.00  0.31    -0.27 0.04
+# Mod13 5 2014.74     10.77  0.00    -0.38 0.04
+# Mod14 4 2028.70     24.72  0.00    -0.35 0.04
+# Mod15 4 2013.12      9.14  0.00    -0.40 0.03
+# Mod16 3 2027.40     23.42  0.00    -0.38 0.03
 # 
-# Model-averaged estimate: -0.26 
+# Model-averaged estimate: -0.28 
 # Unconditional SE: 0.05 
-# 95% Unconditional confidence interval: -0.36, -0.16
+# 95% Unconditional confidence interval: -0.37, -0.18
 
-# model averaged estimate is strongest for bat presence/absence (-0.26), then 
-# for phosphorus (-0.17), close to 0 for all other variables
+# model averaged estimate is strongest for bat presence/absence (-0.28), then 
+# for phosphorus (-0.18), close to 0 for all other variables
 
 
 #### flower colourfulness model averaging ####
@@ -208,26 +206,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K    AIC Delta_AIC AICWt Estimate   SE
-# Mod1  6 492.21      1.90  0.12     0.17 0.20
-# Mod3  5 490.31      0.00  0.31     0.18 0.19
-# Mod5  5 495.32      5.02  0.03     0.29 0.17
-# Mod7  4 493.84      3.53  0.05     0.34 0.16
-# Mod9  5 492.34      2.03  0.11     0.28 0.18
-# Mod11 4 490.35      0.04  0.31     0.28 0.18
-# Mod13 4 496.62      6.31  0.01     0.41 0.16
-# Mod15 3 494.64      4.33  0.04     0.42 0.16
-# Mod17 5 496.61      6.31  0.01    -0.16 0.15
-# Mod19 4 498.17      7.86  0.01    -0.25 0.13
-# Mod21 4 504.30     13.99  0.00    -0.04 0.13
-# Mod23 3 516.49     26.18  0.00    -0.05 0.11
-# Mod25 4 507.87     17.56  0.00    -0.09 0.15
-# Mod27 3 513.13     22.82  0.00    -0.26 0.14
-# Mod29 3 528.54     38.23  0.00     0.10 0.14
-# Mod31 2 569.43     79.12  0.00     0.06 0.11
+# Mod1  6 491.47      2.00  0.09     0.19 0.20
+# Mod3  5 489.48      0.00  0.23     0.19 0.20
+# Mod5  5 492.34      2.86  0.06     0.33 0.18
+# Mod7  4 490.47      0.99  0.14     0.36 0.16
+# Mod9  5 491.68      2.21  0.08     0.31 0.19
+# Mod11 4 489.73      0.26  0.20     0.31 0.18
+# Mod13 4 492.47      2.99  0.05     0.44 0.17
+# Mod15 3 490.47      0.99  0.14     0.44 0.16
+# Mod17 5 495.93      6.45  0.01    -0.18 0.14
+# Mod19 4 496.21      6.73  0.01    -0.24 0.13
+# Mod21 4 502.09     12.61  0.00    -0.05 0.13
+# Mod23 3 511.08     21.61  0.00    -0.05 0.11
+# Mod25 4 507.87     18.39  0.00    -0.09 0.15
+# Mod27 3 513.13     23.65  0.00    -0.26 0.14
+# Mod29 3 528.54     39.06  0.00     0.10 0.14
+# Mod31 2 569.43     79.95  0.00     0.06 0.11
 # 
-# Model-averaged estimate: 0.24 
-# Unconditional SE: 0.2 
-# 95% Unconditional confidence interval: -0.16, 0.64
+# Model-averaged estimate: 0.3 
+# Unconditional SE: 0.21 
+# 95% Unconditional confidence interval: -0.12, 0.72
 
 AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # Multimodel inference on "meanMAP" based on AIC
@@ -235,26 +233,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K    AIC Delta_AIC AICWt Estimate   SE
-# Mod1  6 492.21      1.24  0.19    -0.06 0.19
-# Mod2  5 490.97      0.00  0.35    -0.09 0.19
-# Mod5  5 495.32      4.36  0.04    -0.13 0.19
-# Mod6  4 496.28      5.31  0.02    -0.25 0.17
-# Mod9  5 492.34      1.38  0.18     0.01 0.19
-# Mod10 4 492.76      1.79  0.14    -0.01 0.20
-# Mod13 4 496.62      5.65  0.02    -0.03 0.18
-# Mod14 3 501.18     10.22  0.00    -0.16 0.18
-# Mod17 5 496.61      5.65  0.02    -0.31 0.17
-# Mod18 4 495.85      4.88  0.03    -0.37 0.16
-# Mod21 4 504.30     13.33  0.00    -0.52 0.15
-# Mod22 3 502.37     11.41  0.00    -0.52 0.15
-# Mod25 4 507.87     16.90  0.00    -0.47 0.18
-# Mod26 3 506.20     15.24  0.00    -0.50 0.17
-# Mod29 3 528.54     37.57  0.00    -0.89 0.15
-# Mod30 2 527.09     36.12  0.00    -0.89 0.16
+# Mod1  6 491.47      1.15  0.16    -0.01 0.19
+# Mod2  5 490.32      0.00  0.29    -0.05 0.19
+# Mod5  5 492.34      2.01  0.11    -0.07 0.19
+# Mod6  4 493.84      3.52  0.05    -0.21 0.17
+# Mod9  5 491.68      1.36  0.15     0.04 0.20
+# Mod10 4 492.46      2.14  0.10     0.01 0.20
+# Mod13 4 492.47      2.15  0.10     0.00 0.19
+# Mod14 3 497.70      7.38  0.01    -0.16 0.18
+# Mod17 5 495.93      5.60  0.02    -0.25 0.17
+# Mod18 4 495.46      5.13  0.02    -0.31 0.16
+# Mod21 4 502.09     11.77  0.00    -0.46 0.15
+# Mod22 3 500.23      9.91  0.00    -0.46 0.15
+# Mod25 4 507.87     17.54  0.00    -0.47 0.18
+# Mod26 3 506.20     15.88  0.00    -0.50 0.17
+# Mod29 3 528.54     38.21  0.00    -0.89 0.15
+# Mod30 2 527.09     36.76  0.00    -0.89 0.16
 # 
-# Model-averaged estimate: -0.07 
-# Unconditional SE: 0.21 
-# 95% Unconditional confidence interval: -0.48, 0.34
+# Model-averaged estimate: -0.04 
+# Unconditional SE: 0.2 
+# 95% Unconditional confidence interval: -0.44, 0.36
 
 AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # Multimodel inference on "meanAVP" based on AIC
@@ -262,26 +260,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K    AIC Delta_AIC AICWt Estimate   SE
-# Mod1  6 492.21      3.00  0.06    -0.38 0.22
-# Mod2  5 490.97      1.77  0.11    -0.46 0.20
-# Mod3  5 490.31      1.11  0.16    -0.39 0.22
-# Mod4  4 489.20      0.00  0.27    -0.49 0.19
-# Mod9  5 492.34      3.14  0.06    -0.36 0.21
-# Mod10 4 492.76      3.56  0.05    -0.51 0.20
-# Mod11 4 490.35      1.15  0.15    -0.36 0.21
-# Mod12 3 490.76      1.56  0.12    -0.51 0.19
-# Mod17 5 496.61      7.41  0.01    -0.59 0.21
-# Mod18 4 495.85      6.65  0.01    -0.52 0.20
-# Mod19 4 498.17      8.97  0.00    -0.78 0.19
-# Mod20 3 500.03     10.83  0.00    -0.68 0.19
-# Mod25 4 507.87     18.67  0.00    -0.80 0.20
-# Mod26 3 506.20     17.00  0.00    -0.76 0.19
-# Mod27 3 513.13     23.93  0.00    -1.11 0.17
-# Mod28 2 515.16     25.96  0.00    -1.03 0.17
+# Mod1  6 491.47      3.08  0.06    -0.36 0.22
+# Mod2  5 490.32      1.93  0.11    -0.45 0.20
+# Mod3  5 489.48      1.08  0.17    -0.36 0.22
+# Mod4  4 488.39      0.00  0.29    -0.47 0.19
+# Mod9  5 491.68      3.29  0.06    -0.35 0.21
+# Mod10 4 492.46      4.07  0.04    -0.51 0.20
+# Mod11 4 489.73      1.34  0.15    -0.34 0.21
+# Mod12 3 490.46      2.07  0.10    -0.51 0.19
+# Mod17 5 495.93      7.53  0.01    -0.57 0.21
+# Mod18 4 495.46      7.06  0.01    -0.50 0.20
+# Mod19 4 496.21      7.82  0.01    -0.72 0.19
+# Mod20 3 497.75      9.36  0.00    -0.63 0.19
+# Mod25 4 507.87     19.48  0.00    -0.80 0.20
+# Mod26 3 506.20     17.81  0.00    -0.76 0.19
+# Mod27 3 513.13     24.74  0.00    -1.11 0.17
+# Mod28 2 515.16     26.76  0.00    -1.03 0.17
 # 
-# Model-averaged estimate: -0.44 
+# Model-averaged estimate: -0.42 
 # Unconditional SE: 0.21 
-# 95% Unconditional confidence interval: -0.86, -0.03
+# 95% Unconditional confidence interval: -0.84, -0.01
 
 AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # Multimodel inference on "meanbirdrich" based on AIC
@@ -289,26 +287,26 @@ AICcmodavg::modavg(cand_mod, parm = "meanbirdrich", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K    AIC Delta_AIC AICWt Estimate   SE
-# Mod1  6 492.21      3.00  0.09    -0.37 0.25
-# Mod2  5 490.97      1.77  0.17    -0.45 0.23
-# Mod3  5 490.31      1.11  0.23    -0.35 0.24
-# Mod4  4 489.20      0.00  0.40    -0.43 0.23
-# Mod5  5 495.32      6.12  0.02    -0.42 0.23
-# Mod6  4 496.28      7.08  0.01    -0.56 0.21
-# Mod7  4 493.84      4.64  0.04    -0.37 0.22
-# Mod8  3 496.62      7.42  0.01    -0.48 0.21
-# Mod17 5 496.61      7.41  0.01    -0.73 0.20
-# Mod18 4 495.85      6.65  0.01    -0.71 0.20
-# Mod19 4 498.17      8.97  0.00    -0.78 0.19
-# Mod20 3 500.03     10.83  0.00    -0.79 0.20
-# Mod21 4 504.30     15.10  0.00    -0.86 0.17
-# Mod22 3 502.37     13.17  0.00    -0.85 0.17
-# Mod23 3 516.49     27.29  0.00    -0.99 0.15
-# Mod24 2 514.70     25.50  0.00    -0.99 0.15
+# Mod1  6 491.47      3.08  0.07    -0.40 0.27
+# Mod2  5 490.32      1.93  0.13    -0.50 0.25
+# Mod3  5 489.48      1.08  0.20    -0.40 0.26
+# Mod4  4 488.39      0.00  0.35    -0.49 0.24
+# Mod5  5 492.34      3.94  0.05    -0.37 0.25
+# Mod6  4 493.84      5.45  0.02    -0.55 0.23
+# Mod7  4 490.47      2.08  0.12    -0.35 0.25
+# Mod8  3 493.53      5.14  0.03    -0.51 0.23
+# Mod17 5 495.93      7.53  0.01    -0.80 0.21
+# Mod18 4 495.46      7.06  0.01    -0.78 0.22
+# Mod19 4 496.21      7.82  0.01    -0.86 0.21
+# Mod20 3 497.75      9.36  0.00    -0.89 0.21
+# Mod21 4 502.09     13.70  0.00    -0.89 0.19
+# Mod22 3 500.23     11.84  0.00    -0.88 0.19
+# Mod23 3 511.08     22.69  0.00    -1.05 0.17
+# Mod24 2 509.31     20.91  0.00    -1.05 0.17
 # 
-# Model-averaged estimate: -0.42 
-# Unconditional SE: 0.24 
-# 95% Unconditional confidence interval: -0.9, 0.06
+# Model-averaged estimate: -0.46 
+# Unconditional SE: 0.26 
+# 95% Unconditional confidence interval: -0.97, 0.06
 
 AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # Multimodel inference on "meanbatpres_bin" based on AIC
@@ -316,158 +314,28 @@ AICcmodavg::modavg(cand_mod, parm = "meanbatpres_bin", second.ord = FALSE)
 # AIC table used to obtain model-averaged estimate:
 #   
 #   K    AIC Delta_AIC AICWt Estimate   SE
-# Mod1  6 492.21      3.00  0.06    -0.72 0.30
-# Mod2  5 490.97      1.77  0.11    -0.56 0.23
-# Mod3  5 490.31      1.11  0.15    -0.78 0.25
-# Mod4  4 489.20      0.00  0.26    -0.62 0.19
-# Mod5  5 495.32      6.12  0.01    -0.84 0.28
-# Mod6  4 496.28      7.08  0.01    -0.58 0.22
-# Mod7  4 493.84      4.64  0.03    -0.97 0.21
-# Mod8  3 496.62      7.42  0.01    -0.77 0.19
-# Mod9  5 492.34      3.14  0.05    -1.00 0.25
-# Mod10 4 492.76      3.56  0.04    -0.81 0.21
-# Mod11 4 490.35      1.15  0.14    -0.99 0.21
-# Mod12 3 490.76      1.56  0.12    -0.82 0.18
-# Mod13 4 496.62      7.42  0.01    -1.18 0.22
-# Mod14 3 501.18     11.98  0.00    -0.97 0.19
-# Mod15 3 494.64      5.44  0.02    -1.20 0.17
-# Mod16 2 500.04     10.84  0.00    -1.08 0.15
+# Mod1  6 491.47      3.08  0.05    -0.76 0.31
+# Mod2  5 490.32      1.93  0.08    -0.56 0.23
+# Mod3  5 489.48      1.08  0.13    -0.77 0.26
+# Mod4  4 488.39      0.00  0.22    -0.59 0.19
+# Mod5  5 492.34      3.94  0.03    -0.92 0.29
+# Mod6  4 493.84      5.45  0.01    -0.59 0.22
+# Mod7  4 490.47      2.08  0.08    -0.99 0.23
+# Mod8  3 493.53      5.14  0.02    -0.75 0.20
+# Mod9  5 491.68      3.29  0.04    -1.05 0.26
+# Mod10 4 492.46      4.07  0.03    -0.83 0.21
+# Mod11 4 489.73      1.34  0.11    -1.01 0.21
+# Mod12 3 490.46      2.07  0.08    -0.82 0.18
+# Mod13 4 492.47      4.08  0.03    -1.21 0.23
+# Mod14 3 497.70      9.31  0.00    -0.96 0.19
+# Mod15 3 490.47      2.08  0.08    -1.21 0.17
+# Mod16 2 496.56      8.17  0.00    -1.07 0.15
 # 
-# Model-averaged estimate: -0.77 
-# Unconditional SE: 0.27 
-# 95% Unconditional confidence interval: -1.31, -0.24
+# Model-averaged estimate: -0.82 
+# Unconditional SE: 0.31 
+# 95% Unconditional confidence interval: -1.43, -0.22
 
-# model averaged estimate is strongest for bat presence/absence (-0.77), then 
-# for phosphorus (-0.44), then bird richness (-0.42), then MAT (0.24), then MAP (-0.07)
-
-#### leaf area model averaging ####
-
-# set all formulas
-formulas <- apply(data.frame(expand.grid(c("meanMAT", NA), c("meanMAP", NA),
-                                         c("meanAVP", NA))), 1, 
-                  paste0.na.omit)
-formulas[length(formulas)] <- "1"
-formulas <- paste0("leafarea_mm2 ~ ", formulas)
-formulas
-
-# run all candidate models          
-cand_mod <- list()
-for(i in 1:length(formulas)){
-  cand_mod[[i]] <- lm(as.formula(formulas[[i]]), 
-                      data = eucvarscaled)
-}
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
-# Multimodel inference on "meanMAT" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 1496.08      0.00     1     0.17 0.03
-# Mod3 4 1568.00     71.92     0     0.25 0.03
-# Mod5 4 1523.15     27.07     0     0.10 0.02
-# Mod7 3 1701.93    205.86     0     0.13 0.03
-# 
-# Model-averaged estimate: 0.17 
-# Unconditional SE: 0.03 
-# 95% Unconditional confidence interval: 0.12, 0.22
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
-# Multimodel inference on "meanMAP" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 1496.08      0.00     1     0.24 0.03
-# Mod2 4 1535.08     39.00     0     0.31 0.03
-# Mod5 4 1523.15     27.07     0     0.32 0.02
-# Mod6 3 1540.02     43.95     0     0.33 0.02
-# 
-# Model-averaged estimate: 0.24 
-# Unconditional SE: 0.03 
-# 95% Unconditional confidence interval: 0.19, 0.29
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
-# Multimodel inference on "meanAVP" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 1496.08      0.00     1     0.16 0.03
-# Mod2 4 1535.08     39.00     0     0.05 0.03
-# Mod3 4 1568.00     71.92     0     0.31 0.03
-# Mod4 3 1658.42    162.34     0     0.20 0.02
-# 
-# Model-averaged estimate: 0.16 
-# Unconditional SE: 0.03 
-# 95% Unconditional confidence interval: 0.1, 0.21
-
-#### bud size abiotic only ####
-
-# set all formulas
-formulas <- apply(data.frame(expand.grid(c("meanMAT", NA), c("meanMAP", NA),
-                                         c("meanAVP", NA))), 1, 
-                  paste0.na.omit)
-formulas[length(formulas)] <- "1"
-formulas <- paste0("logbudsize_mm2 ~ ", formulas)
-formulas
-
-# run all candidate models          
-cand_mod <- list()
-for(i in 1:length(formulas)){
-  cand_mod[[i]] <- lm(as.formula(formulas[[i]]), 
-                      data = eucvarscaled)
-}
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanMAT", second.ord = FALSE)
-# Multimodel inference on "meanMAT" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 2038.81      0.00  0.96    -0.06 0.04
-# Mod3 4 2045.10      6.29  0.04    -0.10 0.04
-# Mod5 4 2087.79     48.98  0.00     0.08 0.03
-# Mod7 3 2153.54    114.73  0.00     0.06 0.03
-# 
-# Model-averaged estimate: -0.07 
-# Unconditional SE: 0.04 
-# 95% Unconditional confidence interval: -0.14, 0.01
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanMAP", second.ord = FALSE)
-# Multimodel inference on "meanMAP" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 2038.81      0.00  0.62    -0.11 0.04
-# Mod2 4 2039.79      0.98  0.38    -0.14 0.04
-# Mod5 4 2087.79     48.98  0.00    -0.28 0.03
-# Mod6 3 2091.49     52.69  0.00    -0.27 0.03
-# 
-# Model-averaged estimate: -0.12 
-# Unconditional SE: 0.04 
-# 95% Unconditional confidence interval: -0.2, -0.04
-
-# use modavg to get the model averaged standardised regression coefficients
-AICcmodavg::modavg(cand_mod, parm = "meanAVP", second.ord = FALSE)
-# Multimodel inference on "meanAVP" based on AIC
-# 
-# AIC table used to obtain model-averaged estimate:
-#   
-#   K     AIC Delta_AIC AICWt Estimate   SE
-# Mod1 5 2038.81      0.00  0.60    -0.31 0.04
-# Mod2 4 2039.79      0.98  0.37    -0.27 0.04
-# Mod3 4 2045.10      6.29  0.03    -0.38 0.04
-# Mod4 3 2051.79     12.98  0.00    -0.34 0.03
-# 
-# Model-averaged estimate: -0.3 
-# Unconditional SE: 0.05 
-# 95% Unconditional confidence interval: -0.39, -0.21
+# model averaged estimate is strongest for bat presence/absence (-0.82), then 
+# bird richness (-0.46), then phosphorus (-0.42), then MAT (0.3), then MAP (-0.04)
 
 rm(cand_mod, formulas, paste0.na.omit, i, eucvarscaled)
