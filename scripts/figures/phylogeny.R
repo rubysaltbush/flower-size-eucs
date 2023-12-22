@@ -25,6 +25,17 @@ names(flcol) <- contMap_data$tree_names
 flcol <- flcol[tree_budsz$tip.label]
 # set factor colours
 cols <- setNames(c(my_colours$flcol_fill[1], my_colours$flcol_fill[2], my_colours$flcol_fill[3]), c("0", "0.5", "1"))
+# and prep median longitude data also
+medlong <- contMap_data$medianlong
+names(medlong) <- contMap_data$tree_names
+# order medlong in same order as tree
+medlong <- medlong[tree_budsz$tip.label]
+# set color ramp for median longitude
+colsmedlong <- colorRampPalette(c("#f0f921", "#f89540", "#cc4778", "#7e03a8", "#0d0887"))
+# rank medlong for colour assignment
+# first make data frame
+medlong <- as.data.frame(medlong)
+medlong$order <- findInterval(medlong$medlong, sort(medlong$medlong))
 
 # add column with species' tip position in tree for plotting
 treetips <- data.frame(tree_names = tree_budsz$tip.label, position = c(1:680))
@@ -37,7 +48,9 @@ cladelabs <- readr::read_csv("data_input/clades_forlabelling.csv")
 
 # match to data with tip position
 contMap_data <- contMap_data %>%
-  dplyr::left_join(cladelabs, by = c("tree_names", "subgenus", "position"))
+  dplyr::left_join(cladelabs, by = c("tree_names", "subgenus", "position")) %>%
+  dplyr::select(-section) %>%
+  dplyr::distinct()
 rm(cladelabs)
 
 #### visualise phylogeny ####
@@ -56,6 +69,12 @@ dev.off()
 
 # plot contmap with data on flower colour displayed at tips with phytools
 # workaround from http://blog.phytools.org/2022/06/how-to-plot-tip-node-labels-without.html
+
+# TO DO
+# - expand plot limits
+# - move clade labels out further
+# - can I do points for median longitude on continuous colour scale? or should I categorise them?
+# - add median longitude points into gap - OR, a line would be best if possible, with magma scale
 
 #* circular plot ----
 pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 9)
@@ -118,6 +137,7 @@ offset_xx_yy <- function(xx, yy, offset) {
   )
 }
 
+# define x and y coordinates at offset = 2
 xx_yy <- offset_xx_yy(
   xx = pp$xx[1:ape::Ntip(tree_budsz)],
   yy = pp$yy[1:ape::Ntip(tree_budsz)],
@@ -130,11 +150,49 @@ points(xx_yy$xx,
        pch = 15, cex = 1,
        col = cols[flcol[tree_budsz$tip.label]])
 
+# define x and y coordinates at offset = 3.5
+xx_yy <- offset_xx_yy(
+  xx = pp$xx[1:ape::Ntip(tree_budsz)],
+  yy = pp$yy[1:ape::Ntip(tree_budsz)],
+  offset = 3.5
+)
+
+# add median longitude points also, real small
+points(xx_yy$xx,
+       xx_yy$yy,
+       pch = 20, cex = 0.5,
+       col = colsmedlong(nrow(medlong))[medlong$order])
+
 rm(xx_yy, offset_xx_yy, pp)
 
 # legend
 legend(x = "bottomleft", legend = c("white-cream", "mixed", "colourful"), 
        col = cols, bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
+
+# also legend for median longitude now
+phytools::add.color.bar(leg = 30,
+                        cols = colsmedlong(nrow(medlong)),
+                        title = "Median longitude",
+                        lims = NULL,
+                        digits = 3,
+                        prompt = FALSE,
+                        lwd = 8,
+                        direction = "upwards",
+                        subtitle = "",
+                        x = 73,
+                        y = -70)
+
+# then add custom tick marks
+lines(x = rep(75, 2), y = c(-70, -40)) # draw vertical line
+Y <- cbind(seq(-70, -40, length.out = 3), # define y pos for ticks
+           seq(-70, -40, length.out = 3))
+X <- cbind(rep(75, 3), # define x pos for ticks
+           rep(77, 3))
+for(i in 1:nrow(Y)) lines(X[i,], Y[i,]) # draw ticks
+ticks <- seq(min(medlong$medlong, na.rm = TRUE), 
+             max(medlong$medlong, na.rm = TRUE), length.out = 3) # get tick values
+text(x = X[,2]-1, y = Y[,2], round(ticks, 1), pos = 4, cex = 0.5) # draw tick values
+rm(X, Y, i, ticks)
 
 #** clade labelling ----
 
@@ -145,34 +203,34 @@ source("scripts/functions/arclabel.R")
 arclabel(text = "Blakella",
          tips = c(1, 34),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.19)
+         ln.offset = 1.15,
+         lab.offset = 1.20)
 arclabel(text = "Angophora",
          orientation = "perpendicular",
          tips = c(35, 43),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.16)
+         ln.offset = 1.15,
+         lab.offset = 1.165)
 arclabel(text = "Corymbia",
          tips = c(44, 87),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.19)
+         ln.offset = 1.15,
+         lab.offset = 1.2)
 arclabel(text = "Eudesmia",
          tips = c(89, 109),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.19)
+         ln.offset = 1.15,
+         lab.offset = 1.2)
 arclabel(text = "Eucalyptus",
          tips = c(112, 216),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.19)
+         ln.offset = 1.15,
+         lab.offset = 1.2)
 arclabel(text = "Symphyomyrtus",
          tips = c(219, 680),
          col = "grey",
-         ln.offset = 1.14,
-         lab.offset = 1.19)
+         ln.offset = 1.15,
+         lab.offset = 1.2)
 
 # label sections of Symphyomyrtus
 # first calculate tip positions
@@ -194,13 +252,12 @@ for(i in 1:length(sect_label$sect_label)) {
            tips = c(sect_label$mintip[i], sect_label$maxtip[i]),
            cex = 0.75,
            col = "grey",
-           ln.offset = 1.07,
-           lab.offset = 1.1)
+           ln.offset = 1.08,
+           lab.offset = 1.12)
 }
 rm(i, sect_label)
 
 dev.off()
 
-
 rm(arclabel, budsz_contdata, tree_budsz, treecont, contMap_data, 
-   cols, flcol)
+   cols, flcol, medlong, colsmedlong)
