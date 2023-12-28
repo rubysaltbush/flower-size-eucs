@@ -92,7 +92,7 @@ galah::search_taxa(insectpolls)
 # check how many records match these names
 galah_call() %>%
   galah_identify(insectpolls) %>%
-  galah_apply_profile(ALA) %>% # filters based on several conditions, excludes presence-only records, eDNA and fossil records, records before 1700, duplicates, uncertain coordinates
+  galah_apply_profile(ALA) %>% # filters based on several conditions, excludes absence-only records, eDNA and fossil records, records before 1700, duplicates, uncertain coordinates
   galah_filter(cl22 %in% c("New South Wales", "Victoria", "Queensland",
                            "South Australia", "Western Australia",
                            "Northern Territory", "Australian Capital Territory", 
@@ -107,7 +107,7 @@ galah_config(email = "stephenseruby@gmail.com", verbose = TRUE)
 # have to do state by state as too many records at once for galah otherwise
 insectpollrecords <- galah_call() %>%
   galah_identify(insectpolls) %>%
-  galah_apply_profile(ALA) %>% # filters based on several conditions, excludes presence-only records, eDNA and fossil records, records before 1700, duplicates, uncertain coordinates
+  galah_apply_profile(ALA) %>% # filters based on several conditions, excludes absence-only records, eDNA and fossil records, records before 1700, duplicates, uncertain coordinates
   galah_filter(cl22 %in% c("Tasmania", "Victoria")) %>%
   atlas_occurrences()
 
@@ -193,6 +193,14 @@ insectpollrichness <- insectpollrecords %>%
 rm(insectpollrecords)
 # make sure "NA" cells (values in ocean) retained as NA/0 species richness
 insectpollrichness[is.na(insectpollrichness$cell_id),2] <- NA
+
+# describe pattern of flower-visiting insect species richness across Aus
+summary(insectpollrichness$richness)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# 1.0    22.0    67.0   284.6   227.0  5122.0       1 
+# standard error
+sd(insectpollrichness$richness, na.rm = TRUE)/sqrt(length(insectpollrichness$richness))
+# 21.45181
 
 # turn into raster
 InsectPollinatorRichness <- terra::subst(rangerast$cell_id, 
