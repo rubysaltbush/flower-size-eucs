@@ -61,20 +61,34 @@ treecont <- phytools::contMap(tree_budsz, budsz_contdata, plot = FALSE)
 # re-colour contmap with continous bud size colour scale
 treecont <- phytools::setMap(treecont, my_colours$budsz)
 
+#* tall plot ----
+
+# dummy plot to get locations to draw tip labels coloured by symmetry
+plot(treecont, fsize = c(0.5, 0.7))
+lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+# redo cols so visible in font
+colfont <- cols
+colfont[1] <- "black"
+
 # export basic contMap with species labels
-pdf(file = "figures/logbudsizemm2_full_phylogeny.pdf", width = 12, height = 50)
+pdf(file = "figures/logbudsizemm2_full_phylogeny.pdf", width = 12, height = 70)
 plot(treecont, legend = 0.7*max(nodeHeights(tree_budsz)), sig = 1, 
-     fsize = c(0.5, 0.7), lwd = 2, outline = FALSE, leg.txt = "Bud size (log mm²)")
+     ftype = "off", lwd = 5, outline = FALSE, 
+     xlim = c(lastPP$x.lim[1], lastPP$x.lim[2]),
+     leg.txt = "Bud size (log mm²)")
+for(i in 1:length(flcol)) {
+  text(lastPP$xx[i], lastPP$yy[i], 
+       gsub("_", " ", treecont$tree$tip.label[i]),
+       pos = 4, cex = 0.6, col = colfont[flcol[i]], font = 3)
+}
+# legend
+legend(x = "topleft", legend = c("white-cream", "mixed", "colourful"), 
+       col = colfont, bty = "n", cex = 1.5, title = "Flower colour", pch = 15)
 dev.off()
+rm(lastPP, i, colfont)
 
 # plot contmap with data on flower colour displayed at tips with phytools
 # workaround from http://blog.phytools.org/2022/06/how-to-plot-tip-node-labels-without.html
-
-# TO DO
-# - expand plot limits
-# - move clade labels out further
-# - can I do points for median longitude on continuous colour scale? or should I categorise them?
-# - add median longitude points into gap - OR, a line would be best if possible, with magma scale
 
 #* circular plot ----
 pdf(file = "figures/phylogeny_logbudsize.pdf", width = 12, height = 9)
@@ -86,11 +100,11 @@ phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
 
 # first label beginning of Neogene at 23 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 23, 
-                     border = "grey", lty = 3)
+                     border = "grey", lty = 2)
 
 # then label eucalyptae crown age at 52 mya
 plotrix::draw.circle(0, 0, radius = max(nodeHeights(tree_budsz)) - 52, 
-                     border = "grey", lty = 3)
+                     border = "grey", lty = 2)
 
 # plot contMap again
 par(new = TRUE) # hack to force below to plot on top of above 

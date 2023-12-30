@@ -58,7 +58,7 @@ dev.off()
 
 rm(rlogBudSize, logbudsize_mm2, meanlogBudSize)
 
-#* flower colourfulness ----
+#* flower colour ----
 # prep flower colour data
 colour_bin <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, colour_binary) %>%
@@ -97,7 +97,7 @@ ggplot() +
   scale_fill_gradientn(colours = my_colours$flcol_cont) +
   geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "darkgrey") +
   theme_void() +
-  labs(fill = "Mean eucalypt flower colourfulness\n(0 = white-cream, 1 = colourful)")
+  labs(fill = "Mean eucalypt flower colour\n(0=white-cream, 1=colourful)")
 dev.off()
 
 rm(rColour, colour_bin, meanColour)
