@@ -138,7 +138,7 @@ euc_traits_nosubsp %>%
 ggplot(aes(x = meanbatpres_bin, y = logbudsize_mm2)) +
   geom_boxplot() +
   theme_pubr(legend = "right") + 
-  geom_jitter(aes(colour = colour_binary), size = 0.8, alpha = 0.9) +
+  geom_jitter(aes(colour = colour_binary), size = 0.8) +
   scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
   scale_x_discrete(labels = c("bats absent", "bats present")) +
   xlab("") +
