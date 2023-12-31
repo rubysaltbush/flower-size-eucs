@@ -116,7 +116,7 @@ phytools::plot.contMap(treecont, type = "fan", legend = FALSE,
 # add bud size legend using phytools function
 phytools::add.color.bar(leg = 70,
                         cols = treecont$cols,
-                        title = "Eucalypt bud size (log mm²)",
+                        title = "Flower size (log mm²)",
                         lims = NULL,
                         digits = 2,
                         prompt = FALSE,
