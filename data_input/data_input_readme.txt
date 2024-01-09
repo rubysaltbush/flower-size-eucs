@@ -26,3 +26,5 @@ speciesLevelUpdated = some species I further amalgamated because they were consi
 
 clades_forlabelling.csv - Ruby Stephens and David Coleman - added 2023-10-19 - Thornhill et al (2019) tree names, subgenus and position in tree matched to eucalypt section and selected subgenus and section labels excluding smaller clades and paraphyletic taxa
 
+marsupial_pollinator_ranges - Ruby Stephens and Marsh et al. (2022) - added 2024-01-10 - ranges for flower-visiting marsupials in Australia, 14 species from Table 8 in Armstrong (1979) chosen for presence of nectar in their diet according to Wilman et al. (2014) EltonTraits 1.0. 
+Ranges from Marsh, C. J., Sica, Y. V., Burgin, C. J., Dorman, W. A., Anderson, R. C., del Toro Mijares, I., Vigneron, J. G., Barve, V., Dombrowik, V. L., Duong, M., Guralnick, R., Hart, J. A., Maypole, J. K., McCall, K., Ranipeta, A., Schuerkmann, A., Torselli, M. A., Lacher Jr, T., Mittermeier, R. A., … Jetz, W. (2022). Expert range maps of global mammal distributions harmonised to three taxonomic authorities. Journal of Biogeography, 49(5), 979–992. https://doi.org/10.1111/jbi.14330

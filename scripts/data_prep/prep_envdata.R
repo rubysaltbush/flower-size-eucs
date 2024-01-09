@@ -835,7 +835,7 @@ marsupials %>%
     txt = walk2(.x = data, 
                 .y = sciname, 
                 ~st_write(obj = .x, 
-                          dsn = paste0("data_cache/marsupial_pollinator_ranges/", 
+                          dsn = paste0("data_input/marsupial_pollinator_ranges/", 
                                        .y, 
                                        ".shp"),
                           append = FALSE)))
@@ -857,10 +857,10 @@ rm(marsupials)
 # first read in range maps for Australian flower visiting bird species
 # as per above assembled species list
 # also cached, files too large and not permitted to share
-files <- list.files(path = "data_cache/marsupial_pollinator_ranges", 
+files <- list.files(path = "data_input/marsupial_pollinator_ranges", 
                     pattern = ".shp$", full.names = TRUE)
 marsranges <- lapply(files, FUN = terra::vect)
-files <- gsub("data_cache/marsupial_pollinator_ranges/", "", files)
+files <- gsub("data_input/marsupial_pollinator_ranges/", "", files)
 files <- gsub("\\.shp", "", files)
 files <- gsub(" ", "_", files)
 names(marsranges) <- files
