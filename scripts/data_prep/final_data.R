@@ -73,13 +73,29 @@ ggsave("figures/Fig S8 euc species mean bat presence histogram.pdf", width = 7, 
 # will have 50% cutoff for now
 euc_traits_nosubsp$meanbatpres_bin <- ifelse(euc_traits_nosubsp$meanbatpres > 0.5, 1, 0)
 table(euc_traits_nosubsp$meanbatpres_bin)
+# 0   1 
+# 365 421 
+hist(euc_traits_nosubsp$meanmarspres)
+# export publishable histogram
+ggplot(euc_traits_nosubsp, aes(x = meanmarspres)) +
+  geom_histogram() +
+  ggpubr::theme_pubr() +
+  xlab("Mean eucalypt flower-visiting marsupial presence") +
+  ylab("Number of eucalypt species")
+ggsave("figures/Fig SX euc species mean marsupial presence histogram.pdf", width = 7, height = 4)
+# marsupial presence best to classify as binary (gliders or no gliders)
+# will have 50% cutoff for now
+euc_traits_nosubsp$meanmarspres_bin <- ifelse(euc_traits_nosubsp$meanmarspres > 0.5, 1, 0)
+table(euc_traits_nosubsp$meanmarspres_bin)
+# 0   1 
+# 87 699 
 
 # remove irrelevant columns
 euc_traits_nosubsp <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, tree_names, range_names, subgenus, budsize_mm2, 
                 logbudsize_mm2, colours_all, colour_binary, colour_fullbinary,
                 frtsize_mm2, medianlong, meanMAT, meanMAP, meanAVP, meanbirdrich,
-                meanbatpres, meanbatpres_bin)
+                meanbatpres, meanbatpres_bin, meanmarspres, meanmarspres_bin)
 
 # write data to folder so it can be cached
 readr::write_csv(euc_traits_nosubsp, "data_output/euc_traits_nosubsp.csv")

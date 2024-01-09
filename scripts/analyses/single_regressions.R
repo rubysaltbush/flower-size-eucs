@@ -47,6 +47,14 @@ regressions_todo <- list(
     xlabel = "Species flower-visiting bird species richness",
     ylabel = "Eucalypt bud size (log mm²)",
     output_path = "figures/regressions/residuals/budsize vs birds"
+  ),
+  # bud v euc flower-visiting marsupial presence
+  lmbudszmars = list(
+    xdata = euc_traits_nosubsp$meanmarspres_bin,
+    ydata = euc_traits_nosubsp$logbudsize_mm2,
+    xlabel = "Eucalypt flower-visiting marsupial presence",
+    ylabel = "Eucalypt bud size (log mm²)",
+    output_path = "figures/regressions/residuals/budsize vs marsupials"
   )
 )
 
@@ -131,7 +139,24 @@ ggplot(euc_traits_nosubsp, aes(x = meanbirdrich, y = logbudsize_mm2)) +
                      "    P = ", format.pval(summary(regressions$lmbudszbird)$coef[2,4], eps = .001, digits = 2)))
 ggsave("figures/regressions/budsize vs birdrich.pdf", width = 8, height = 5)
 
-# bud size and bat richness boxplot
+# bud size and marsupial presence boxplot
+euc_traits_nosubsp %>%
+  dplyr::filter(!is.na(meanmarspres_bin)) %>%
+  dplyr::mutate(meanmarspres_bin = factor(meanmarspres_bin)) %>%
+  ggplot(aes(x = meanmarspres_bin, y = logbudsize_mm2)) +
+  geom_boxplot() +
+  theme_pubr(legend = "right") + 
+  geom_jitter(aes(colour = colour_binary), size = 0.8) +
+  scale_color_manual(values = c("#F0E4BE", "light pink", "red", "black"), name = "Flower colour", labels = c("white-cream", "mixed", "colourful", "NA")) +
+  scale_x_discrete(labels = c("marsupials absent", "marsupials present")) +
+  xlab("") +
+  ylab("Eucalypt bud size (log mm²)") +
+  theme(axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  labs(title = paste("R² = ", signif(summary(regressions$lmbudszmars)$r.squared, 2),
+                     "    P = ", format.pval(summary(regressions$lmbudszmars)$coef[2,4], eps = .001, digits = 2)))
+ggsave("figures/regressions/budsize vs marsupial presence boxplot.pdf", width = 8, height = 6)
+
+# bud size and bat presence boxplot
 euc_traits_nosubsp %>%
   dplyr::filter(!is.na(meanbatpres_bin)) %>%
   dplyr::mutate(meanbatpres_bin = factor(meanbatpres_bin)) %>%

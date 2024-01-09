@@ -75,11 +75,23 @@ rm(occurrences, occurrences_list, thinlist, thinlistmax,
 readr::write_csv(occurrences_thinned, "data_output/occurrences_thinned.csv")
 })
 
+# read in shapefile of Aus outline for plotting
+aus <- terra::vect("data_input/Aus_outline.shp")
+# bit slow and over complex, simplify to make faster
+aus <- terra::simplifyGeom(aus, tolerance = 0.01)
+# crop to remove Norfolk and Christmas Islands from outline
+aus <- terra::crop(aus, terra::ext(c(xmin = 112, xmax = 155, ymin = -43.74, ymax = -9.14)))
+
 #### 1 - PHOSPHORUS ####                        
 # read in 3 rasters of available phosphorus across Australia (90m resolution)
 # from the Soil and Landscape Grid of Australia (SLGA)
 # https://esoil.io/TERNLandscapes/Public/Pages/SLGA/index.html
 # and take 1 mean of top 30cm, where P most available to plants
+
+mean_avp <- cache_RDS("data_cache/mean_AVP_0to30cm_SLGA.tiff",
+                      read_function = terra::rast,
+                      save_function = terra::writeRaster,
+                      function() {
 
 # available soil phosphorus #
 # read in 3 rasters downloaded from SLGA using terra stack function
@@ -97,15 +109,6 @@ rm(avp)
 plot(mean_avp)
 # generally higher along east coast but a bit variable
 
-# read in shapefile of Aus outline for plotting
-aus <- terra::vect("data_input/Aus_outline.shp")
-# bit slow and over complex, simplify to make faster
-aus <- terra::simplifyGeom(aus, tolerance = 0.01)
-# crop to remove Norfolk and Christmas Islands from outline
-aus <- terra::crop(aus, terra::ext(c(xmin = 112, xmax = 155, ymin = -43.74, ymax = -9.14)))
-# change aus outline projection to match raster
-aus <- terra::project(aus, crs(mean_avp))
-
 # export raster image with base R as resolution too high for ggplot
 pdf(file = "figures/maps/aus_mean_available_phosphorus_0to30cm_SLGA.pdf",
     width = 10, height = 10)
@@ -118,6 +121,7 @@ dev.off()
 terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff",
                    overwrite = TRUE)
 # because it's huge have to write to cache, can't sync via GitHub
+})
 
 # now calculate mean AVP for each species by intersecting occurrences
 # with mean modelled available phosphorus for Australia at 0-30cm metres depth
@@ -125,9 +129,10 @@ terra::writeRaster(mean_avp, "data_cache/mean_AVP_0to30cm_SLGA.tiff",
 # extract available phosphorus value for each cleaned eucalypt occurrence
 # first make occurrences spatial
 euc_occurr <- terra::vect(occurrences_thinned, 
-                          geom = c("Longitude", "Latitude"), 
+                          geom = c("Longitude", "Latitude"),
                           crs = crs(mean_avp))
-# check it out
+# check them out
+plot(mean_avp)
 plot(euc_occurr, add = TRUE)
 
 # now extract!
@@ -143,6 +148,8 @@ species_meanAVP <- occurrences_thinned %>%
 
 # check it out
 summary(species_meanAVP$meanAVP)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# 3.222   7.427  12.980  14.170  19.240  46.000       1 
 hist(species_meanAVP$meanAVP)
 
 rm(mean_avp, euc_occurr_mean_avp)
@@ -185,6 +192,8 @@ species_meanMAT <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAT = mean(mat_chelsav2, na.rm = TRUE))
 summary(species_meanMAT$meanMAT)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 6.983  15.530  17.150  18.108  20.395  27.842
 hist(species_meanMAT$meanMAT)
 
 rm(mat, euc_occurr_mean_MAT)
@@ -218,6 +227,8 @@ species_meanMAP <- occurrences_thinned %>%
   dplyr::group_by(range_names) %>%
   dplyr::summarise(meanMAP = mean(map_chelsav2, na.rm = TRUE))
 summary(species_meanMAP$meanMAP)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 221.5   386.5   684.5   705.7   928.5  2096.7 
 hist(species_meanMAP$meanMAP)
 
 rm(euc_occurr_mean_MAP, map)
@@ -225,6 +236,11 @@ rm(euc_occurr_mean_MAP, map)
 #### 4 - BAT RICHNESS ####  
 
 # create raster of flower-visiting bat species richness across Australia
+
+rbatrichness <- cache_RDS("data_output/rasters/flvisbat_sprichness_aus.tif",
+                      read_function = terra::rast,
+                      save_function = terra::writeRaster,
+                      function() {
 
 # first read in range maps for Australian flower visiting bat species
 # as per Table 7 in Armstrong (1979)'s review of Australian pollination
@@ -269,7 +285,6 @@ batranges <- batranges[!(names(batranges) %in% c("Dobsonia_magna_outlier",
 # generate blank raster at finer scale than eucalypt ranges raster
 # 5km*5km to match occurrence thinning, each cell with unique integer value
 # to intersect with bat and bird ranges
-
 # generate blank raster with defined resolution (5000 m = 5km)
 blankrast <- terra::rast(resolution = c(5000, 5000),
                          extent = terra::ext(rangerast$cell_id),
@@ -321,9 +336,6 @@ rbatrichness <- terra::mask(rbatrichness, mask = aus2, touches = FALSE)
 rm(aus2)
 plot(rbatrichness)
 plot(aus, add = TRUE)
-# save raster as output
-terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.tif",
-                   overwrite = TRUE)
 
 # export raster image with base R as resolution too high for ggplot
 pdf(file = "figures/maps/aus_mean_flower-visiting_bat_richness.pdf",
@@ -360,6 +372,11 @@ ggplot() +
   labs(fill = "Flower-visiting bat\nspecies richness",
        colour = "Flower-visiting bat\nspecies richness")
 ggsave("figures/maps/aus_flowervis_bat_richness_ggplot.png", width = 10, height = 10)
+
+# save raster as output
+terra::writeRaster(rbatrichness, "data_output/rasters/flvisbat_sprichness_aus.tif",
+                   overwrite = TRUE)
+})
 
 # as many zeroes, will just use bat richness as binary i.e. bats or no bats
 # reduce raster to 1 (bats present) or 0 (no bats in area)
@@ -402,6 +419,8 @@ species_meanbatpres <- occurrences_thinned %>%
 
 # check it out
 summary(species_meanbatpres$meanbatpres)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# 0.000  0.000  0.8560  0.5367  1.0000  1.0000     1 
 hist(species_meanbatpres$meanbatpres) # mostly 0 or 1, v few in between
 rm(rbatrichness, euc_occurr_mean_batp)
 
@@ -410,6 +429,11 @@ rm(rbatrichness, euc_occurr_mean_batp)
 # extract Australian flower-visiting bird ranges from BirdLife International
 # range maps (too large to share), then calculate diversity of flower-visiting
 # birds across Australia for 100x100km eucalypt range grid
+
+rbirdrichness <- cache_RDS("data_output/rasters/flvisbird_sprichness_aus.tif",
+                          read_function = terra::rast,
+                          save_function = terra::writeRaster,
+                          function() {
 
 # to get Bird Range maps emailed BirdLife International who provided geodatabase
 # of global bird species ranges, too large for R to handle so in QGIS I have: 
@@ -665,6 +689,19 @@ for(name in names(birdranges)) {
 }
 rm(name)
 
+# generate blank raster at finer scale than eucalypt ranges raster
+# 5km*5km to match occurrence thinning, each cell with unique integer value
+# to intersect with bat and bird ranges
+# generate blank raster with defined resolution (5000 m = 5km)
+blankrast <- terra::rast(resolution = c(5000, 5000),
+                         extent = terra::ext(rangerast$cell_id),
+                         crs = terra::crs(rangerast$cell_id))
+blankrast[] <- 1:max(terra::cells(blankrast)) # fill cells with unique ID
+plot(blankrast)
+# check resolution correct
+terra::res(blankrast)
+# looks good!
+
 # test plotting a few different bird ranges to check shapefiles
 plot(blankrast)
 plot(birdranges$`Acanthagenys rufogularis`, add = TRUE) # central Aus
@@ -696,10 +733,6 @@ rbirdrichness <- terra::subst(blankrast, from = birdrichness$lyr.1,
                               to = birdrichness$richness, others = NA)
 names(rbirdrichness) <- "richness"
 
-# save raster as output
-terra::writeRaster(rbirdrichness, 
-                   "data_output/rasters/flvisbird_sprichness_aus.tif",
-                   overwrite = TRUE)
 
 #convert aus outline back to terra SpatVect to plot
 aus <- terra::vect(aus)
@@ -740,7 +773,13 @@ ggplot() +
        colour = "Flower-visiting bird\nspecies richness")
 ggsave("figures/maps/aus_flowervis_bird_richness_ggplot.png", width = 10, height = 10)
 
-rm(birdranges, birdrange_cells, blankrast, aus, birdrichness, rbirdrichnessdf)
+rm(birdranges, birdrange_cells, birdrichness, rbirdrichnessdf)
+
+# save raster as output
+terra::writeRaster(rbirdrichness, 
+                   "data_output/rasters/flvisbird_sprichness_aus.tif",
+                   overwrite = TRUE)
+})
 
 # now calculate mean richness of fl-vis birds in landcsape per species
 # extract birdrichness value for each cleaned eucalypt occurrence
@@ -761,8 +800,233 @@ species_meanbirdrich <- occurrences_thinned %>%
 
 # check it out
 summary(species_meanbirdrich$meanbirdrich)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# 8.667  19.957  21.869  25.667  32.826  41.286       1 
 hist(species_meanbirdrich$meanbirdrich)
-rm(rbirdrichness, euc_occurr_mean_fvbirdr, euc_occurr)
+rm(rbirdrichness, euc_occurr_mean_fvbirdr)
+
+#### 6 - MARSUPIAL RICHNESS #### 
+
+# make map of species richness of eucalypt flower-visiting marsupials across
+# Australia (from Table 8 in Armstrong (1979) but reduced down to 13 currently
+# recognised marsupial species with reported eucalypt flower-visiting behaviour,
+# given many in Table 8 unable to reach height of eucalypt flowers or more likely
+# to destroy rather than pollinate flowers)
+
+# using range maps from Marsh et al. (2022). Expert range maps of global mammal 
+# distributions harmonised to three taxonomic authorities. Journal of 
+# Biogeography, 49(5), 979–992. https://doi.org/10.1111/jbi.14330
+
+# already clipped to Australia and reduced to 13 species in QGIS
+
+rmarsrichness <- cache_RDS("data_output/rasters/eucvismars_sprichness_aus.tif",
+                           read_function = terra::rast,
+                           save_function = terra::writeRaster,
+                           function() {
+
+# read in shapefile from data cache
+marsupials <- sf::st_read("data_cache/marsupial_pollinator_ranges.shp")
+
+# export one shapefile for each species' range to use next
+marsupials %>%
+  group_by(sciname) %>%
+  nest() %>%
+  mutate( 
+    txt = walk2(.x = data, 
+                .y = sciname, 
+                ~st_write(obj = .x, 
+                          dsn = paste0("data_cache/marsupial_pollinator_ranges/", 
+                                       .y, 
+                                       ".shp"),
+                          append = FALSE)))
+#   1 Cercartetus lepidus 
+#   2 Cercartetus nanus 
+#   3 Acrobates pygmaeus 
+#   4 Acrobates frontalis 
+#   5 Petaurus australis 
+#   6 Cercartetus concinnus 
+#   7 Petaurus norfolcensis  
+#   8 Petaurus ariel 
+#   9 Petaurus notatus
+#   10 Gymnobelideus leadbeateri
+#   11 Petaurus gracilis 
+#   12 Petaurus breviceps 
+#   13 Cercartetus caudatus
+#   14 Tarsipes rostratus 
+rm(marsupials)
+# first read in range maps for Australian flower visiting bird species
+# as per above assembled species list
+# also cached, files too large and not permitted to share
+files <- list.files(path = "data_cache/marsupial_pollinator_ranges", 
+                    pattern = ".shp$", full.names = TRUE)
+marsranges <- lapply(files, FUN = terra::vect)
+files <- gsub("data_cache/marsupial_pollinator_ranges/", "", files)
+files <- gsub("\\.shp", "", files)
+files <- gsub(" ", "_", files)
+names(marsranges) <- files
+rm(files)
+# make sure projections same as Euc ranges raster
+for(name in names(marsranges)) {
+  marsranges[[name]] <- terra::project(marsranges[[name]], 
+                                       crs(rangerast$cell_id))
+}
+rm(name)
+
+# generate blank raster at finer scale than eucalypt ranges raster
+# 5km*5km to match occurrence thinning, each cell with unique integer value
+# to intersect with bat and bird ranges
+# generate blank raster with defined resolution (5000 m = 5km)
+blankrast <- terra::rast(resolution = c(5000, 5000),
+                         extent = terra::ext(rangerast$cell_id),
+                         crs = terra::crs(rangerast$cell_id))
+blankrast[] <- 1:max(terra::cells(blankrast)) # fill cells with unique ID
+plot(blankrast)
+# check resolution correct
+terra::res(blankrast)
+# looks good!
+
+# test plotting a few different bird ranges to check shapefiles
+plot(blankrast)
+plot(marsranges$Acrobates_frontalis, add = TRUE) # eastern Aus
+plot(marsranges$Cercartetus_concinnus, add = TRUE) # southern Aus
+# looks good!
+
+# now, extract blank 5x5km raster cell ID for each bird range map
+marsrange_cells <- tibble::tibble()
+for(name in names(marsranges)) {
+  temp <- terra::extract(x = blankrast, y = marsranges[[name]])
+  temp$species <- name
+  marsrange_cells <- rbind(marsrange_cells, temp)
+}
+rm(temp, name)
+# filter out NAs and remove unnecessary ID column
+marsrange_cells <- marsrange_cells %>%
+  dplyr::select(-ID) %>%
+  dplyr::filter(!(is.na(lyr.1)))
+
+# prepare map figure of euc flower-visiting marsupial species richness across Aus
+# calculate richness per grid cell 
+marsrichness <- marsrange_cells %>%
+  dplyr::group_by(lyr.1) %>%
+  dplyr::summarise(richness = n())
+summary(marsrichness)
+# min 1, mean 2, max 6, seems about right
+
+# turn into marsupial richness raster
+rmarsrichness <- terra::subst(blankrast, from = marsrichness$lyr.1, 
+                              to = marsrichness$richness, others = 0) # others = 0 as many areas in central aus with 0 marsupial pollinators
+names(rmarsrichness) <- "richness"
+
+# now mask raster to only cells within aus polygon
+# first read in more detailed aus polygon to be sure accurate
+# read in shapefile of Aus outline for plotting
+aus2 <- terra::vect("data_input/Aus_outline.shp")
+# crop to remove Norfolk and Christmas Islands from outline
+aus2 <- terra::crop(aus2, terra::ext(c(xmin = 112, xmax = 155, ymin = -43.74, ymax = -9.14)))
+# change aus outline projection to match raster
+aus2 <- terra::project(aus2, crs(rangerast$cell_id))
+rmarsrichness <- terra::mask(rmarsrichness, mask = aus2, touches = FALSE)
+rm(aus2)
+
+#convert aus outline back to terra SpatVect to plot
+aus <- terra::vect(aus)
+# change aus outline projection to match raster
+aus <- terra::project(aus, crs(rangerast$cell_id))
+plot(rmarsrichness)
+plot(aus, add = TRUE)
+
+# export raster image with base R
+pdf(file = "figures/maps/aus_mean_eucflower-visiting_marsupial_richness.pdf",
+    width = 10, height = 10)
+plot(rmarsrichness, main = "Eucalypt flower-visiting marsupial species richness", box = FALSE)
+plot(aus, add = TRUE)
+dev.off()
+
+# convert raster back to df to plot with ggplot
+rmarsrichnessdf <- as.data.frame(rmarsrichness, xy = TRUE) %>%
+  na.omit()
+head(rmarsrichnessdf)
+# convert aus to sf for ggplot plotting
+aus <- sf::st_as_sf(aus)
+
+# plot using ggplot and viridis colour scale with Aus coastline
+pdf("figures/maps/aus_eucflowervis_marsupial_richness_ggplot.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rmarsrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting\nmarsupial\nspecies richness",
+       colour = "Flower-visiting\nmarsupial\nspecies richness")
+dev.off()
+# then png version for figure
+ggplot() +
+  geom_tile(data = rmarsrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_viridis_c() + #breaks = c(10, 50, 100, 150)
+  scale_colour_viridis_c() +
+  geom_sf(data = aus, fill = NA, linewidth = 0.75, colour = "grey") +
+  theme_void() +
+  labs(fill = "Flower-visiting\nmarsupial\nspecies richness",
+       colour = "Flower-visiting\nmarsupial\nspecies richness")
+ggsave("figures/maps/aus_eucflowervis_marsupial_richness_ggplot.png", width = 10, height = 10)
+
+rm(marsrange_cells, marsrichness, marsranges)
+
+# save raster as output
+terra::writeRaster(rmarsrichness, 
+                   "data_output/rasters/eucvismars_sprichness_aus.tif",
+                   overwrite = TRUE)
+})
+
+# as many zeroes, will just use marsupial richness as binary i.e. marsupial or no marsupial
+# reduce raster to 1 (pollinating marsupials present) or 0 (no pollinating marsupials in area)
+rmarsrichness <- terra::ifel(rmarsrichness$richness >=1, 1, 0)
+plot(rmarsrichness)
+
+# convert back to df to ggplot
+rmarsrichnessdf <- as.data.frame(rmarsrichness, xy = TRUE) %>%
+  na.omit()
+head(rmarsrichnessdf)
+# convert aus to sf for ggplot plotting
+aus <- sf::st_as_sf(aus)
+
+# plot using ggplot and custom colour scale with Aus coastline
+pdf("figures/maps/aus_eucflower-visiting_marsupial_presence.pdf", width = 10, height = 10)
+ggplot() +
+  geom_tile(data = rmarsrichnessdf, aes(x = x, y = y, fill = richness, colour = richness)) +
+  scale_fill_gradientn(colours = c("white", "darkgreen")) +
+  scale_colour_gradientn(colours = c("white", "darkgreen")) +
+  geom_sf(data = aus, fill = NA, linewidth = 0.5, colour = "black") +
+  theme_void() +
+  labs(fill = "Flower-visiting\nmarsupial presence", colour = "Flower-visiting\nmarsupial presence")
+dev.off()
+rm(rmarsrichnessdf)
+
+# extract marsupial presence value for each cleaned eucalypt occurrence
+# change projection so raster and vector match
+euc_occurr <- terra::project(euc_occurr, crs(rmarsrichness))
+# check it out
+plot(rmarsrichness)
+plot(euc_occurr, add = TRUE)
+
+# now extract!
+euc_occurr_mean_marsr <- terra::extract(rmarsrichness, euc_occurr)
+
+# and join back to data frame
+occurrences_thinned$marsrichness <- euc_occurr_mean_marsr[, -1]
+
+# now summarise by species!
+species_meanmarspres <- occurrences_thinned %>%
+  dplyr::group_by(range_names) %>%
+  dplyr::summarise(meanmarspres = mean(marsrichness, na.rm = TRUE))
+
+# check it out
+summary(species_meanmarspres$meanmarspres)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+# 0.0000  0.9465  1.0000  0.8699  1.0000  1.0000       1
+hist(species_meanmarspres$meanmarspres) # quite a few 1s, only 45 0s
+rm(rmarsrichness, euc_occurr_mean_marsr,  aus, blankrast, euc_occurr)
 
 #### FINAL SP MEAN ENV ####
 
@@ -771,7 +1035,8 @@ spmean_env <- species_meanMAT %>%
   dplyr::left_join(species_meanMAP, by = "range_names") %>%
   dplyr::left_join(species_meanAVP, by = "range_names") %>%
   dplyr::left_join(species_meanbatpres, by = "range_names") %>%
-  dplyr::left_join(species_meanbirdrich, by = "range_names")
+  dplyr::left_join(species_meanbirdrich, by = "range_names") %>%
+  dplyr::left_join(species_meanmarspres, by = "range_names")
 
 # add in median longitude of each eucalypt species
 medianlong <- occurrences_thinned %>%
@@ -788,6 +1053,6 @@ readr::write_csv(occurrences_thinned,
                  "data_output/thinned_occurrence_data_with_environment.csv")
 
 rm(species_meanAVP, species_meanMAP, species_meanMAT, species_meanbatpres,
-   species_meanbirdrich, medianlong, occurrences_thinned)
+   species_meanbirdrich, species_meanmarspres, medianlong, occurrences_thinned)
 
 })

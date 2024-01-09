@@ -33,19 +33,24 @@ table(euc_traits_nosubsp$meanbatpres_bin)
 # almost equal numbers in bat:no bats categories
 hist(euc_traits_nosubsp$meanbirdrich)
 # normalish
+table(euc_traits_nosubsp$meanmarspres_bin)
+# 0   1 
+# 87 699 
+# much fewer species in no marsupials category
 
 #* correlation plots ----
 
 # visually check relationships between predictor and response variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(6, 9, 12, 13, 14, 15, 17), 
+                columns = c(6, 9, 12, 13, 14, 15, 17, 19), 
                 columnLabels = c("Bud size (log)",
                                  "Flower colour",
                                  "Temperature", 
                                  "Precipitation",
                                  "Phosphorus",
                                  "Bird richness",
-                                 "Bat presence"))
+                                 "Bat presence",
+                                 "Mars. presence"))
 ggsave("figures/regressions/full pairwise correlation plot.pdf", 
        width = 13, height = 10)
 # lots going on - looks like bud size best (-vely )correlated with bat presence, 
@@ -55,12 +60,13 @@ ggsave("figures/regressions/full pairwise correlation plot.pdf",
 
 # check for collinearity among predictor variables
 GGally::ggpairs(data = euc_traits_nosubsp, 
-                columns = c(12, 13, 14, 15, 17), 
+                columns = c(12, 13, 14, 15, 17, 19), 
                 columnLabels = c("Temperature", 
                                  "Precipitation",
                                  "Phosphorus",
                                  "Bird richness",
-                                 "Bat presence"))
+                                 "Bat presence",
+                                 "Mars. presence"))
 ggsave("figures/regressions/predictors pairwise correlation plot.pdf", width = 9, height = 5.6)
 # some correlation between mean bird richness and bat presence (0.73)
 # and birds/bats and mean soil available phosphorus (~bird = 0.68, ~bat = 0.56)
@@ -120,36 +126,37 @@ plot(multi_reg$budsize_abiotic)
 #* bud size biotic model ----
 
 multi_reg$budsize_biotic <- lm(logbudsize_mm2 ~ scale(meanbirdrich) + 
-                               scale(meanbatpres_bin), #biotic
+                               scale(meanbatpres_bin) + scale(meanmarspres_bin), #biotic
                              data = euc_traits_nosubsp)
 summary(multi_reg$budsize_biotic)
 
 # Call:
-#   lm(formula = logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin), 
-#      data = euc_traits_nosubsp)
+#   lm(formula = logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin) + 
+#        scale(meanmarspres_bin), data = euc_traits_nosubsp)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.0933 -0.5674 -0.0653  0.4616  3.7198 
+# -2.0995 -0.5690 -0.0709  0.4642  3.7096 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)             3.74845    0.03155 118.800  < 2e-16 ***
-#   scale(meanbirdrich)    -0.13037    0.04554  -2.863  0.00431 ** 
-#   scale(meanbatpres_bin) -0.28084    0.04564  -6.154 1.21e-09 ***
-#   ---
+# (Intercept)              3.74853    0.03156 118.757  < 2e-16 ***
+#   scale(meanbirdrich)     -0.14198    0.04901  -2.897  0.00387 ** 
+#   scale(meanbatpres_bin)  -0.27569    0.04636  -5.947 4.12e-09 ***
+#   scale(meanmarspres_bin)  0.02199    0.03423   0.642  0.52080    
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8812 on 777 degrees of freedom
+# Residual standard error: 0.8815 on 776 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1611,	Adjusted R-squared:  0.1589 
-# F-statistic:  74.6 on 2 and 777 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1615,	Adjusted R-squared:  0.1583 
+# F-statistic: 49.84 on 3 and 776 DF,  p-value: < 2.2e-16
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$budsize_biotic)
-# scale(meanbirdrich) scale(meanbatpres_bin) 
-# 2.087015               2.087015 
-# VIF under 2.1 for all, multicollinearity unlikely
+# scale(meanbirdrich)  scale(meanbatpres_bin) scale(meanmarspres_bin) 
+# 2.415335                2.151503                1.182782 
+# VIF under 2.45 for all, multicollinearity unlikely
 
 # some improvement in adjusted R2 with biotic rather than abiotic predictors at 0.16
 
@@ -164,43 +171,45 @@ multi_reg$budsize_full <- lm(logbudsize_mm2 ~ scale(meanMAT) +
                                               scale(meanMAP) + 
                                               scale(meanAVP) + #abiotic
                                               scale(meanbirdrich) + 
-                                              scale(meanbatpres_bin), #biotic
+                                              scale(meanbatpres_bin) +
+                                              scale(meanmarspres_bin), #biotic
                                         data = euc_traits_nosubsp)
 summary(multi_reg$budsize_full)
 
 # Call:
 #   lm(formula = logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + 
-#        scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#      data = euc_traits_nosubsp)
+#        scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin) + 
+#        scale(meanmarspres_bin), data = euc_traits_nosubsp)
 # 
 # Residuals:
 #   Min      1Q  Median      3Q     Max 
-# -2.3192 -0.5728 -0.0650  0.4797  3.6597 
+# -2.3283 -0.5717 -0.0630  0.4749  3.6566 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)             3.7485506  0.0312421 119.984  < 2e-16 ***
-#   scale(meanMAT)          0.0424570  0.0442982   0.958  0.33814    
-# scale(meanMAP)          0.0009261  0.0429807   0.022  0.98281    
-# scale(meanAVP)         -0.1554312  0.0507142  -3.065  0.00225 ** 
-#   scale(meanbirdrich)    -0.0077479  0.0552525  -0.140  0.88852    
-# scale(meanbatpres_bin) -0.2913908  0.0633472  -4.600 4.94e-06 ***
-#   ---
+# (Intercept)              3.74859    0.03126 119.933  < 2e-16 ***
+# scale(meanMAT)           0.05411    0.04866   1.112  0.26653    
+# scale(meanMAP)          -0.01041    0.04724  -0.220  0.82568    
+# scale(meanAVP)          -0.14306    0.05504  -2.599  0.00953 ** 
+# scale(meanbirdrich)     -0.01747    0.05776  -0.302  0.76242    
+# scale(meanbatpres_bin)  -0.28919    0.06349  -4.555 6.08e-06 ***
+# scale(meanmarspres_bin)  0.02330    0.04020   0.580  0.56236    
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.8725 on 774 degrees of freedom
+# Residual standard error: 0.8729 on 773 degrees of freedom
 # (18 observations deleted due to missingness)
-# Multiple R-squared:  0.1807,	Adjusted R-squared:  0.1754 
-# F-statistic: 34.14 on 5 and 774 DF,  p-value: < 2.2e-16
+# Multiple R-squared:  0.1811,	Adjusted R-squared:  0.1747 
+# F-statistic: 28.49 on 6 and 773 DF,  p-value: < 2.2e-16
 
 # bat presence/absence explains most variation, also phosphorus but smaller effect
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$budsize_full)
-# scale(meanMAT)         scale(meanMAP)         scale(meanAVP)    
-# 2.022265               1.901890               2.637149              
-# scale(meanbirdrich)   scale(meanbatpres_bin) 
-# 3.134028               4.101253
+# scale(meanMAT)          scale(meanMAP)          scale(meanAVP)     scale(meanbirdrich) 
+# 2.438439                2.295189                3.103977                3.422537 
+# scale(meanbatpres_bin) scale(meanmarspres_bin) 
+# 4.115949                1.663188 
 # VIF below 4.2 for all, generally recommended threshold is 5-10
 # higher VIF for bat presence here suggests some overlap with other predictors
 
@@ -216,10 +225,10 @@ BIC(multi_reg$budsize_abiotic, multi_reg$budsize_biotic, multi_reg$budsize_full)
 
 #                           df      BIC
 # multi_reg$budsize_abiotic  5 2062.106
-# multi_reg$budsize_biotic   4 2039.851
-# multi_reg$budsize_full     7 2041.376
+# multi_reg$budsize_biotic   5 2046.096
+# multi_reg$budsize_full     8 2047.696
 
-# biotic model has lowest BIC, 2 below full model
+# biotic model has lowest BIC, though only ~1 below full model
 
 # now AIC (doesn't penalise additional variables so consider difference between
 # full model and biotic/abiotic models - if dropping X variables leads to larger
@@ -229,10 +238,10 @@ AIC(multi_reg$budsize_abiotic, multi_reg$budsize_biotic, multi_reg$budsize_full)
 
 #                           df      AIC
 # multi_reg$budsize_abiotic  5 2038.809
-# multi_reg$budsize_biotic   4 2021.214
-# multi_reg$budsize_full     7 2008.761
+# multi_reg$budsize_biotic   5 2022.799
+# multi_reg$budsize_full     8 2010.422
 
-# dif between full and abiotic (~30) larger than dif between full and biotic (~13)
+# dif between full and abiotic (~28) larger than dif between full and biotic (~12)
 # suggesting biotic variables more important to model
 
 #* flower colourfulness abiotic ----
@@ -241,7 +250,7 @@ AIC(multi_reg$budsize_abiotic, multi_reg$budsize_biotic, multi_reg$budsize_full)
 # for these models
 tempflcol <- euc_traits_nosubsp %>%
   dplyr::select(apc_nosubsp, colour_fullbinary, meanMAT, meanMAP, meanAVP,
-                meanbirdrich, meanbatpres_bin) %>%
+                meanbirdrich, meanbatpres_bin, meanmarspres_bin) %>%
   dplyr::filter(complete.cases(.))
 
 # using glm with binomial distribution for logistic regression
@@ -289,36 +298,37 @@ plot(multi_reg$flcolour_abiotic)
 
 # using glm with binomial distribution for logistic regression
 multi_reg$flcolour_biotic <- glm(colour_fullbinary ~ scale(meanbirdrich) + 
-                                 scale(meanbatpres_bin),
+                                 scale(meanbatpres_bin) + scale(meanmarspres_bin),
                                data = tempflcol,
                                family = binomial)
 summary(multi_reg$flcolour_biotic)
 
 # Call:
-#   glm(formula = colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin), 
-#       family = binomial, data = tempflcol)
+#   glm(formula = colour_fullbinary ~ scale(meanbirdrich) + scale(meanbatpres_bin) + 
+#         scale(meanmarspres_bin), family = binomial, data = tempflcol)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)             -2.4972     0.1709 -14.615  < 2e-16 ***
-#   scale(meanbirdrich)     -0.5093     0.2259  -2.254 0.024182 *  
-#   scale(meanbatpres_bin)  -0.7462     0.1986  -3.758 0.000172 ***
-#   ---
+# (Intercept)             -2.49787    0.17104 -14.604  < 2e-16 ***
+#   scale(meanbirdrich)     -0.51861    0.23973  -2.163 0.030516 *  
+#   scale(meanbatpres_bin)  -0.74187    0.20187  -3.675 0.000238 ***
+#   scale(meanmarspres_bin)  0.01222    0.10491   0.117 0.907245    
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 561.46  on 777  degrees of freedom
-# Residual deviance: 487.53  on 775  degrees of freedom
-# AIC: 493.53
+# Residual deviance: 487.52  on 774  degrees of freedom
+# AIC: 495.52
 # 
 # Number of Fisher Scoring iterations: 6
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$flcolour_biotic)
-# scale(meanbirdrich) scale(meanbatpres_bin) 
-# 1.641838               1.641838
-# VIF under 1.65, multicollinearity unlikely
+# scale(meanbirdrich)  scale(meanbatpres_bin) scale(meanmarspres_bin) 
+# 1.842997                1.696707                1.124948 
+# VIF under 1.85, multicollinearity unlikely
 
 # plot residuals to check
 par(mfrow = c(2, 2))
@@ -331,42 +341,44 @@ multi_reg$flcolour_full <- glm(colour_fullbinary ~ scale(meanMAT) +
                                                    scale(meanMAP) + 
                                                    scale(meanAVP) + 
                                                    scale(meanbirdrich) + 
-                                                   scale(meanbatpres_bin),
+                                                   scale(meanbatpres_bin) +
+                                                   scale(meanmarspres_bin),
                                           data = tempflcol,
                                           family = binomial())
 summary(multi_reg$flcolour_full)
 
 # Call:
 #   glm(formula = colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) + 
-#         scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#       family = binomial(), data = tempflcol)
+#         scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin) + 
+#         scale(meanmarspres_bin), family = binomial(), data = tempflcol)
 # 
 # Coefficients:
 #   Estimate Std. Error z value Pr(>|z|)    
-# (Intercept)            -2.62767    0.19834 -13.249   <2e-16 ***
-#   scale(meanMAT)          0.18707    0.20285   0.922    0.356    
-# scale(meanMAP)         -0.01213    0.19265  -0.063    0.950    
-# scale(meanAVP)         -0.35951    0.21873  -1.644    0.100    
-# scale(meanbirdrich)    -0.40211    0.27040  -1.487    0.137    
-# scale(meanbatpres_bin) -0.75611    0.31375  -2.410    0.016 *  
-#   ---
+# (Intercept)             -2.64671    0.20400 -12.974   <2e-16 ***
+#   scale(meanMAT)           0.29240    0.25287   1.156   0.2476    
+# scale(meanMAP)          -0.08524    0.22090  -0.386   0.6996    
+# scale(meanAVP)          -0.25440    0.26254  -0.969   0.3325    
+# scale(meanbirdrich)     -0.46584    0.28740  -1.621   0.1050    
+# scale(meanbatpres_bin)  -0.77444    0.32010  -2.419   0.0155 *  
+#   scale(meanmarspres_bin)  0.10765    0.15171   0.710   0.4780    
+# ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # (Dispersion parameter for binomial family taken to be 1)
 # 
 # Null deviance: 561.46  on 777  degrees of freedom
-# Residual deviance: 479.47  on 772  degrees of freedom
-# AIC: 491.47
+# Residual deviance: 478.96  on 771  degrees of freedom
+# AIC: 492.96
 # 
 # Number of Fisher Scoring iterations: 6
 
 # double check for multicollinearity using Variance Inflation Factor (VIF)
 car::vif(multi_reg$flcolour_full)
-# scale(meanMAT)         scale(meanMAP)         scale(meanAVP)
-# 2.111037               1.895237               1.505707
-# scale(meanbirdrich)   scale(meanbatpres_bin) 
-# 1.704373               4.040679 
-# VIF under 4.1 for all, multicollinearity unlikely
+# scale(meanMAT)          scale(meanMAP)          scale(meanAVP)     scale(meanbirdrich) 
+# 3.290522                2.441691                2.157751                1.847573 
+# scale(meanbatpres_bin) scale(meanmarspres_bin) 
+# 4.198234                2.352074 
+# VIF under 4.2 for all, multicollinearity unlikely
 
 # plot residuals to check
 par(mfrow = c(2, 2))
@@ -380,10 +392,10 @@ BIC(multi_reg$flcolour_abiotic, multi_reg$flcolour_biotic, multi_reg$flcolour_fu
 
 #                             df      BIC
 # multi_reg$flcolour_abiotic  4 526.4958
-# multi_reg$flcolour_biotic   3 507.4996
-# multi_reg$flcolour_full     6 519.4137
+# multi_reg$flcolour_biotic   4 514.1427
+# multi_reg$flcolour_full     7 525.5610
 
-# biotic model has lowest BIC, by 12
+# biotic model has lowest BIC, by 11
 
 # now AIC (doesn't penalise additional variables so consider difference between
 # full model and biotic/abiotic models - if dropping X variables leads to larger
@@ -393,10 +405,10 @@ AIC(multi_reg$flcolour_abiotic, multi_reg$flcolour_biotic, multi_reg$flcolour_fu
 
 #                             df      AIC
 # multi_reg$flcolour_abiotic  4 507.8689
-# multi_reg$flcolour_biotic   3 493.5295
-# multi_reg$flcolour_full     6 491.4733
+# multi_reg$flcolour_biotic   4 495.5158
+# multi_reg$flcolour_full     7 492.9639
 
-# dif between full and abiotic (~16) larger than dif between full and biotic (~2)
+# dif between full and abiotic (~15) larger than dif between full and biotic (~3)
 # suggesting biotic variables more important to model
 
 rm(tempflcol)
@@ -409,7 +421,8 @@ rm(tempflcol)
 # removing data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
   dplyr::select(tree_names, logbudsize_mm2,
-                meanAVP, meanMAT, meanMAP, meanbirdrich, meanbatpres_bin) %>%
+                meanAVP, meanMAT, meanMAP, 
+                meanbirdrich, meanbatpres_bin, meanmarspres_bin) %>%
   dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
 
@@ -478,7 +491,8 @@ plot(multi_reg$budsize_abiotic_PGLS)
 
 multi_reg$budsize_biot_PGLS <- nlme::gls(logbudsize_mm2 ~ 
                                            scale(meanbirdrich) + 
-                                           scale(meanbatpres_bin),
+                                           scale(meanbatpres_bin) +
+                                           scale(meanmarspres_bin),
                                          data = pgls_data,
                                          correlation = 
                                            ape::corBrownian(phy = tree_pgls, 
@@ -486,10 +500,10 @@ multi_reg$budsize_biot_PGLS <- nlme::gls(logbudsize_mm2 ~
                                          method = "ML")
 summary(multi_reg$budsize_biot_PGLS)
 # Generalized least squares fit by maximum likelihood
-# Model: logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin) 
+# Model: logbudsize_mm2 ~ scale(meanbirdrich) + scale(meanbatpres_bin) +      scale(meanmarspres_bin) 
 # Data: pgls_data 
-# AIC      BIC    logLik
-# 2165.632 2183.691 -1078.816
+# AIC      BIC   logLik
+# 2167.559 2190.133 -1078.78
 # 
 # Correlation Structure: corBrownian
 # Formula: ~spp 
@@ -498,21 +512,23 @@ summary(multi_reg$budsize_biot_PGLS)
 # 
 # Coefficients:
 #   Value Std.Error   t-value p-value
-# (Intercept)             3.596566 2.6794971  1.342254    0.18
-# scale(meanbirdrich)    -0.174506 0.0406999 -4.287612    0.00
-# scale(meanbatpres_bin)  0.156106 0.0369556  4.224138    0.00
+# (Intercept)              3.597244 2.6813483  1.341580  0.1802
+# scale(meanbirdrich)     -0.168502 0.0463962 -3.631800  0.0003
+# scale(meanbatpres_bin)   0.151106 0.0413527  3.654082  0.0003
+# scale(meanmarspres_bin) -0.007764 0.0287387 -0.270175  0.7871
 # 
 # Correlation: 
-#   (Intr) scl(m)
-# scale(meanbirdrich)     0.001       
-# scale(meanbatpres_bin) -0.002 -0.445
+#   (Intr) scl(m) scl(mnb_)
+# scale(meanbirdrich)      0.001                 
+# scale(meanbatpres_bin)  -0.003 -0.564          
+# scale(meanmarspres_bin) -0.001 -0.479  0.447   
 # 
 # Standardized residuals:
 #   Min          Q1         Med          Q3         Max 
-# -0.32923390 -0.07747648  0.01085582  0.09754168  0.55337062 
+# -0.32874134 -0.07769112  0.01039178  0.09841640  0.55069055 
 # 
-# Residual standard error: 7.071707 
-# Degrees of freedom: 675 total; 672 residual
+# Residual standard error: 7.071323 
+# Degrees of freedom: 675 total; 671 residual
 
 # plot residuals to check
 plot(multi_reg$budsize_biot_PGLS)
@@ -523,19 +539,19 @@ multi_reg$budsize_PGLS <- nlme::gls(logbudsize_mm2 ~ scale(meanMAT) +
                                                      scale(meanMAP) + 
                                                      scale(meanAVP) + 
                                                      scale(meanbirdrich) + 
-                                                     scale(meanbatpres_bin),
+                                                     scale(meanbatpres_bin) +
+                                                     scale(meanmarspres_bin),
                                            data = pgls_data,
                                            correlation = 
                                              ape::corBrownian(phy = tree_pgls, 
                                                               form = ~spp),
                                            method = "ML")
 summary(multi_reg$budsize_PGLS)
-
 # Generalized least squares fit by maximum likelihood
-# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) +      scale(meanbirdrich) + scale(meanbatpres_bin) 
+# Model: logbudsize_mm2 ~ scale(meanMAT) + scale(meanMAP) + scale(meanAVP) +      scale(meanbirdrich) + scale(meanbatpres_bin) + scale(meanmarspres_bin) 
 # Data: pgls_data 
-# AIC     BIC    logLik
-# 2162.957 2194.56 -1074.478
+# AIC      BIC    logLik
+# 2164.75 2200.868 -1074.375
 # 
 # Correlation Structure: corBrownian
 # Formula: ~spp 
@@ -544,27 +560,29 @@ summary(multi_reg$budsize_PGLS)
 # 
 # Coefficients:
 #   Value Std.Error   t-value p-value
-# (Intercept)             3.683896 2.6684852  1.380520  0.1679
-# scale(meanMAT)         -0.079014 0.0533733 -1.480399  0.1392
-# scale(meanMAP)         -0.107635 0.0426566 -2.523283  0.0119
-# scale(meanAVP)          0.026316 0.0465785  0.564974  0.5723
-# scale(meanbirdrich)    -0.175694 0.0431652 -4.070278  0.0001
-# scale(meanbatpres_bin)  0.167580 0.0409878  4.088526  0.0000
+# (Intercept)              3.683274 2.6700739  1.379465  0.1682
+# scale(meanMAT)          -0.069161 0.0576819 -1.199000  0.2310
+# scale(meanMAP)          -0.117971 0.0484208 -2.436365  0.0151
+# scale(meanAVP)           0.032283 0.0484398  0.666459  0.5053
+# scale(meanbirdrich)     -0.184337 0.0472336 -3.902672  0.0001
+# scale(meanbatpres_bin)   0.173121 0.0428052  4.044400  0.0001
+# scale(meanmarspres_bin)  0.015671 0.0346662  0.452042  0.6514
 # 
 # Correlation: 
-#   (Intr) s(MAT) s(MAP) s(AVP) scl(m)
-# scale(meanMAT)         -0.009                            
-# scale(meanMAP)         -0.008  0.025                     
-# scale(meanAVP)         -0.001  0.299 -0.200              
-# scale(meanbirdrich)     0.000  0.234 -0.162 -0.070       
-# scale(meanbatpres_bin)  0.000 -0.416  0.131 -0.123 -0.503
+#   (Intr) s(MAT) s(MAP) s(AVP) scl(m) scl(mnb_)
+# scale(meanMAT)          -0.009                                      
+# scale(meanMAP)          -0.007 -0.158                               
+# scale(meanAVP)          -0.001  0.369 -0.298                        
+# scale(meanbirdrich)      0.000  0.046  0.060 -0.171                 
+# scale(meanbatpres_bin)   0.000 -0.260 -0.024 -0.036 -0.556          
+# scale(meanmarspres_bin) -0.001  0.378 -0.472  0.273 -0.405  0.286   
 # 
 # Standardized residuals:
 #   Min            Q1           Med            Q3           Max 
-# -0.3053361999 -0.0867856247 -0.0007746207  0.0825956010  0.5330582471 
+# -0.3069960087 -0.0862511081 -0.0003897475  0.0830043370  0.5363147316 
 # 
-# Residual standard error: 7.026407 
-# Degrees of freedom: 675 total; 669 residual
+# Residual standard error: 7.025333 
+# Degrees of freedom: 675 total; 668 residual
 
 # plot residuals to check
 plot(multi_reg$budsize_PGLS)
@@ -575,10 +593,10 @@ BIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsi
 
 #                                 df      BIC
 # multi_reg$budsize_abiotic_PGLS  5 2203.515
-# multi_reg$budsize_biot_PGLS     4 2183.691
-# multi_reg$budsize_PGLS          7 2194.560
+# multi_reg$budsize_biot_PGLS     5 2190.133
+# multi_reg$budsize_PGLS          8 2200.868
 
-# biotic model lowest BIC by fair margin
+# biotic model lowest BIC by 10
 
 # now AIC (doesn't penalise additional variables so consider difference between
 # full model and biotic/abiotic models - if dropping X variables leads to larger
@@ -588,10 +606,10 @@ AIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsi
 
 #                                 df      AIC
 # multi_reg$budsize_abiotic_PGLS  5 2180.942
-# multi_reg$budsize_biot_PGLS     4 2165.632
-# multi_reg$budsize_PGLS          7 2162.957
+# multi_reg$budsize_biot_PGLS     5 2167.559
+# multi_reg$budsize_PGLS          8 2164.750
 
-# dif from full to abiotic (18) larger than full to biotic (3)
+# dif from full to abiotic (16) larger than full to biotic (3)
 
 #* flower colourfulness ----
 
@@ -600,7 +618,8 @@ AIC(multi_reg$budsize_abiotic_PGLS, multi_reg$budsize_biot_PGLS, multi_reg$budsi
 # removing data with no match in tree
 pgls_data <- euc_traits_nosubsp %>%
   dplyr::select(tree_names, colour_fullbinary,
-                meanAVP, meanMAT, meanMAP, meanbirdrich, meanbatpres_bin) %>%
+                meanAVP, meanMAT, meanMAP, 
+                meanbirdrich, meanbatpres_bin, meanmarspres_bin) %>%
   dplyr::filter(complete.cases(.)) %>%
   as.data.frame()
 
@@ -621,53 +640,49 @@ spp <- rownames(pgls_data) # set species names as reference point
 
 #** full model ----
 # using phylolm to run phylogenetic logistic regression by Ives & Garland method
-# VERY SLOW/COMPUTATIONALLY INTENSE
+# VERY SLOW/COMPUTATIONALLY INTENSE (2.5 hours to run)
 multi_reg$flcolour_PGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + 
                                                                  scale(meanMAP) + 
                                                                  scale(meanAVP) + 
                                                                  scale(meanbirdrich) + 
-                                                                 scale(meanbatpres_bin),
+                                                                 scale(meanbatpres_bin) +
+                                                                 scale(meanmarspres_bin),
                                              data = pgls_data,
                                              phy = tree_pgls,
                                              method = "logistic_IG10", 
                                              boot = 100)
 summary(multi_reg$flcolour_PGLS)
 
-# Warning message:
-# In phylolm::phyloglm(colour_fullbinary ~ scale(meanMAT) + scale(meanMAP) +  :
-#   the estimate of 'alpha' (0.933133843743045) reached the upper bound (0.935504358062397).
-#  This may simply reflect a flat likelihood at large alpha values,
-#  meaning that the phylogenetic correlation is estimated to be negligible.
-# 
 # Call:
-# phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) + 
-#     scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin), 
-#     data = pgls_data, phy = tree_pgls, method = "logistic_IG10", 
-#     boot = 100)
-#        AIC     logLik Pen.logLik 
-#      424.3     -205.2     -195.2 
+#   phylolm::phyloglm(formula = colour_fullbinary ~ scale(meanMAT) + 
+#                       scale(meanMAP) + scale(meanAVP) + scale(meanbirdrich) + scale(meanbatpres_bin) + 
+#                       scale(meanmarspres_bin), data = pgls_data, phy = tree_pgls, 
+#                     method = "logistic_IG10", boot = 100)
+# AIC     logLik Pen.logLik 
+# 427.1     -205.6     -193.6 
 # 
 # Method: logistic_IG10
 # Mean tip height: 58.36226
 # Parameter estimate(s):
-# alpha: 0.9331338 
-#       bootstrap mean: 0.6110966 (on log scale, then back transformed)
-#       so possible downward bias.
-#       bootstrap 95% CI: (0.08255452,0.9353072)
+#   alpha: 0.9328167 
+# bootstrap mean: 0.564187 (on log scale, then back transformed)
+# so possible downward bias.
+# bootstrap 95% CI: (0.1119177,0.9352041)
 # 
 # Coefficients:
-#                           Estimate      StdErr     z.value lowerbootCI upperbootCI p.value    
-# (Intercept)             -2.4750363   0.2326271 -10.6395028  -2.8972531     -2.0729 < 2e-16 ***
-# scale(meanMAT)           0.3075586   0.2113589   1.4551484  -0.1172937      0.6350 0.14563    
-# scale(meanMAP)           0.0172855   0.1788656   0.0966397  -0.3758315      0.2927 0.92301    
-# scale(meanAVP)           0.0088924   0.2238713   0.0397211  -0.3706773      0.4536 0.96832    
-# scale(meanbirdrich)     -0.5640107   0.2466886  -2.2863267  -1.0618231     -0.0419 0.02224 *  
-# scale(meanbatpres_bin)  -0.5309859   0.2743492  -1.9354383  -0.9699495      0.0523 0.05294 .  
+#   Estimate     StdErr    z.value lowerbootCI upperbootCI p.value    
+# (Intercept)              -2.458098   0.231972 -10.596537   -2.845717     -1.9628 < 2e-16 ***
+# scale(meanMAT)            0.383641   0.244510   1.569023   -0.029643      0.8593 0.11664    
+# scale(meanMAP)           -0.080483   0.208953  -0.385174   -0.498080      0.2544 0.70011    
+# scale(meanAVP)            0.090151   0.253657   0.355405   -0.360510      0.4837 0.72229    
+# scale(meanbirdrich)      -0.651354   0.259449  -2.510531   -1.096116     -0.1136 0.01205 *  
+# scale(meanbatpres_bin)   -0.488802   0.264956  -1.844843   -1.025788      0.0863 0.06506 .  
+# scale(meanmarspres_bin)   0.111786   0.150295   0.743778   -0.143246      0.4288 0.45701    
 # ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Note: Wald-type p-values for coefficients, conditional on alpha=0.9331338
-#       Parametric bootstrap results based on 100 fitted replicates
+# Note: Wald-type p-values for coefficients, conditional on alpha=0.9328167
+# Parametric bootstrap results based on 100 fitted replicates
 
 #** abiotic model ----
 
@@ -720,7 +735,7 @@ summary(multi_reg$flcolour_abioticPGLS)
 # using phylolm to run phylogenetic logistic regression by Ives & Garland method
 # VERY SLOW/COMPUTATIONALLY INTENSE
 multi_reg$flcolour_bioticPGLS <- phylolm::phyloglm(colour_fullbinary ~ scale(meanbirdrich) + 
-                                               scale(meanbatpres_bin),
+                                               scale(meanbatpres_bin) + scale(meanmarspres_bin),
                                              data = pgls_data,
                                              phy = tree_pgls,
                                              method = "logistic_IG10", 
