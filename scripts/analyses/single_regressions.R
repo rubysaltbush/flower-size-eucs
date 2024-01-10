@@ -79,8 +79,16 @@ for (regression_name in names(regressions_todo)) {
   regresults <- rbind(regresults, new_row)
 }
 
+r2 <- data.frame()
+for (regression_name in names(regressions_todo)) {
+  new_row <- rr2::R2(regressions[[regression_name]])
+  r2 <- rbind(r2, new_row)
+}
+names(r2) <- c("R2lik", "R2resid", "R2pred")
+regresults <- cbind(regresults, r2)
+
 write_csv(regresults, "results/single_regression_results.csv")
-rm(regression_name, todo, regressions_todo, new_row, regresults, do_regression)
+rm(regression_name, todo, regressions_todo, new_row, regresults, do_regression, r2)
 
 # figures ----
 
