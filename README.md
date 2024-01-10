@@ -18,7 +18,7 @@ Using RStudio open [main.R](https://github.com/rubysaltbush/flower-size-eucs/blo
 and run scripts in order given in this main script.
 
 Necessary packages can be installed by running [install_dependencies.R](https://github.com/rubysaltbush/flower-size-eucs/blob/main/scripts/install_dependencies.R).
-Check package versions mentioned in this script are consistent with your installed versions. Originally run in R version 4.1.3
+Check package versions mentioned in this script are consistent with your installed versions. Originally run in R version 4.3.0
 
 The code caches several steps of the data cleaning and results. 
 Original files for some environmental data are not provided as they are too large for GitHub and/or not allowed to be shared but processed rasters are available in [data_output/rasters](https://github.com/rubysaltbush/flower-size-eucs/tree/main/data_output/rasters).
