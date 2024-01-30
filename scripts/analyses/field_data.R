@@ -23,19 +23,19 @@ summary(bud_vs_flower)
 #   lm(formula = ydata ~ xdata)
 # 
 # Residuals:
-#   Min       1Q   Median       3Q      Max 
-# -0.80853 -0.21900  0.02084  0.23825  0.60683 
+#   Min      1Q  Median      3Q     Max 
+# -0.8342 -0.2277  0.0656  0.2476  0.6007 
 # 
 # Coefficients:
 #   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  2.48259    0.31196   7.958 6.44e-08 ***
-#   xdata        0.75867    0.05656  13.414 4.55e-12 ***
+# (Intercept)  2.59282    0.31473   8.238 2.58e-08 ***
+#   xdata        0.74270    0.05758  12.898 5.17e-12 ***
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Residual standard error: 0.3866 on 22 degrees of freedom
-# Multiple R-squared:  0.891,	Adjusted R-squared:  0.8861 
-# F-statistic: 179.9 on 1 and 22 DF,  p-value: 4.552e-12
+# Residual standard error: 0.3998 on 23 degrees of freedom
+# Multiple R-squared:  0.8785,	Adjusted R-squared:  0.8733 
+# F-statistic: 166.4 on 1 and 23 DF,  p-value: 5.167e-12
 
 # export pretty plot to include in supp. mat.
 ggplot(fieldmeas, aes(x = log(bdsz_mm2), y = log(flsz_mm2))) +
