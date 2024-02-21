@@ -1,16 +1,6 @@
 # flower-size-eucs
 Data and analysis R code for the paper *Eucalypt flower size and colour shaped more by pollination than abiotic environment*
 
-Authors: Ruby E. Stephens (1,2), Hervé Sauquet (2,3), Bree Laugier (4), Carl R. Gosper (5), , Rachael V. Gallagher (1,4)
-+ Corresponding author: Ruby E. Stephens, stephenseruby@gmail.com
-
-Author addresses:
-
-1. School of Natural Sciences, Macquarie University, Sydney, Australia
-2. National Herbarium of New South Wales (NSW), Royal Botanic Gardens and Domain Trust, Sydney, Australia
-3. Evolution and Ecology Research Centre, University of New South Wales, Sydney, Australia
-4. Hawkesbury Institute for the Environment, Western Sydney University, Sydney, Australia
-5. Biodiversity and Conservation Science, Department of Biodiversity, Conservation and Attractions, Perth, WA, Australia
 
 ## Re-running analysis
 

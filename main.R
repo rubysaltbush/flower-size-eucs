@@ -25,7 +25,7 @@ source("scripts/functions/cache_RDS.R")
 
 #### GET DATA #####
 
-# euc ranges raster from Stuart Allen, cleaned by Ruby Stephens
+# euc ranges raster from Acknowledged_SA, cleaned by Lead Author
 rangerast <- list(cell_id = terra::rast("data_input/euc_raster/aus_100x100_cells.tif"),
                   taxa = readr::read_csv("data_input/euc_raster/aus_100x100_taxa.csv"),
                   cell_taxa = readr::read_csv("data_input/euc_raster/aus_100x100_cell_taxa.csv"))

@@ -68,7 +68,7 @@ ggplot(euc_traits_nosubsp, aes(x = meanbatpres)) +
   ggpubr::theme_pubr() +
   xlab("Mean flower-visiting bat presence") +
   ylab("Number of eucalypt species")
-ggsave("figures/Fig S8 euc species mean bat presence histogram.pdf", width = 7, height = 4)
+ggsave("figures/Fig S6 euc species mean bat presence histogram.pdf", width = 7, height = 4)
 # bat presence best to classify as binary (bats or no bats)
 # will have 50% cutoff for now
 euc_traits_nosubsp$meanbatpres_bin <- ifelse(euc_traits_nosubsp$meanbatpres > 0.5, 1, 0)
@@ -82,7 +82,7 @@ ggplot(euc_traits_nosubsp, aes(x = meanmarspres)) +
   ggpubr::theme_pubr() +
   xlab("Mean eucalypt flower-visiting marsupial presence") +
   ylab("Number of eucalypt species")
-ggsave("figures/Fig SX euc species mean marsupial presence histogram.pdf", width = 7, height = 4)
+ggsave("figures/Fig S7 euc species mean marsupial presence histogram.pdf", width = 7, height = 4)
 # marsupial presence best to classify as binary (gliders or no gliders)
 # will have 50% cutoff for now
 euc_traits_nosubsp$meanmarspres_bin <- ifelse(euc_traits_nosubsp$meanmarspres > 0.5, 1, 0)

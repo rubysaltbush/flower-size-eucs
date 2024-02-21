@@ -26,7 +26,7 @@ occurrences_thinned <- cache_RDS("data_output/occurrences_thinned.csv",
                                  save_function = readr::write_csv, 
                                  function() {
                           
-# read in cleaned euc herbarium occurrences from Bree-Anne Laugier Kitchener
+# read in cleaned euc herbarium occurrences from Third Author
 occurrences <- readr::read_csv("data_input/occurrence_data_Ruby_fromBree.csv") 
 occurrences <- occurrences %>%
   dplyr::select(range_names = speciesLevelUpdated, latitude, longitude, year,
