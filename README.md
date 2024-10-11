@@ -1,5 +1,5 @@
 # flower-size-eucs
-Data and analysis R code for the paper *Eucalypt flower size and colour shaped more by pollination than abiotic environment*
+Data and analysis R code for the paper *Eucalypt flower size and colourfulness reflect pollination more than abiotic environment*
 
 
 ## Re-running analysis
@@ -17,4 +17,4 @@ Feel free to re-use scripts and functions for your own analyses, e.g.
 
 [arclabel.R](https://github.com/rubysaltbush/flower-size-eucs/blob/main/scripts/functions/arclabel.R) adds custom labels to circular phylogenies by providing the tips to draw the label between
 
-Citation: 
+Citation: Stephens, R. E., Sauquet, H., Laugier, B., Gosper, C., Gallagher, R. V. Eucalypt flower size and colourfulness reflect pollination more than abiotic environment. In review.
