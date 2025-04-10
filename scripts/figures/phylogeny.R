@@ -168,13 +168,13 @@ points(xx_yy$xx,
 xx_yy <- offset_xx_yy(
   xx = pp$xx[1:ape::Ntip(tree_budsz)],
   yy = pp$yy[1:ape::Ntip(tree_budsz)],
-  offset = 3.5
+  offset = 3.7
 )
 
 # add median longitude points also, real small
 points(xx_yy$xx,
        xx_yy$yy,
-       pch = 20, cex = 0.5,
+       pch = 15, cex = 1,
        col = colsmedlong(nrow(medlong))[medlong$order])
 
 rm(xx_yy, offset_xx_yy, pp)
@@ -216,33 +216,33 @@ source("scripts/functions/arclabel.R")
 # label broad subgenus clades (some exceptions within label areas)
 arclabel(text = "Blakella",
          tips = c(1, 34),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.20)
 arclabel(text = "Angophora",
          orientation = "perpendicular",
          tips = c(35, 43),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.165)
 arclabel(text = "Corymbia",
          tips = c(44, 87),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.2)
 arclabel(text = "Eudesmia",
          tips = c(89, 109),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.2)
 arclabel(text = "Eucalyptus",
          tips = c(112, 216),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.2)
 arclabel(text = "Symphyomyrtus",
          tips = c(219, 680),
-         col = "grey",
+         col = "black",
          ln.offset = 1.15,
          lab.offset = 1.2)
 
@@ -265,7 +265,7 @@ for(i in 1:length(sect_label$sect_label)) {
   arclabel(text = sect_label$sect_label[i],
            tips = c(sect_label$mintip[i], sect_label$maxtip[i]),
            cex = 0.75,
-           col = "grey",
+           col = "black",
            ln.offset = 1.08,
            lab.offset = 1.12)
 }
